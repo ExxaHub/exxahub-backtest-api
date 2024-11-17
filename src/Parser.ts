@@ -12,7 +12,7 @@ type Indicator = {
 export class Parser {
   private indicators: Map<string, Indicator> = new Map()
 
-  parseIndicators(algorithm: Algorithm) {
+  parseIndicators(algorithm: Algorithm): Indicator[] {
     this.parseNode(algorithm)
     return Array.from(this.indicators.values())
   }

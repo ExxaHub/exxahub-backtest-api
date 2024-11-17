@@ -11,10 +11,8 @@ const algorithm: Algorithm = JSON.parse(algorithmJson);
 const parser = new Parser()
 
 const indicators = parser.parseIndicators(algorithm)
-console.log(indicators);
-console.log(indicators.length);
 
-// const dataProvider = new DataProvider(indicators)
+const dataProvider = new DataProvider(indicators)
 
 // const interpreter = new Interpreter(dataProvider)
 
