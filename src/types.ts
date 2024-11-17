@@ -35,3 +35,25 @@ export type AllocationAsset = {
     exchange: string;
     percentage: number;
 }
+
+export type Indicator = {
+    ticker: string,
+    fn: string,
+    params: {
+      window?: number
+    }
+}
+
+export interface ClientInterface {
+    getBars(symbols: string[]): Promise<{[key: string]: OHLCBar[]}>
+}
+
+export type OHLCBar = {
+    close: number;
+    high: number;
+    low: number;
+    open: number;
+    date: string;
+    volume: number;
+    [key: string]: unknown;
+}

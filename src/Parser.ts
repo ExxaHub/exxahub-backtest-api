@@ -1,13 +1,5 @@
-import type { Algorithm, AlgorithmNode } from "./types";
+import type { Algorithm, AlgorithmNode, Indicator } from "./types";
 import { createHash } from "crypto";
-
-type Indicator = {
-  ticker: string,
-  fn: string,
-  params: {
-    window?: number
-  }
-}
 
 export class Parser {
   private indicators: Map<string, Indicator> = new Map()

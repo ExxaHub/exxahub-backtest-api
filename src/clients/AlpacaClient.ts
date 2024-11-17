@@ -1,4 +1,5 @@
 import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/alpaca";
+import { type OHLCBar } from "../types";
 
 export type AlpacaOHLCBar = {
     c: number;
@@ -9,22 +10,12 @@ export type AlpacaOHLCBar = {
     v: number;
 }
 
-export type OHLCBar = {
-    close: number;
-    high: number;
-    low: number;
-    open: number;
-    date: string;
-    volume: number;
-    [key: string]: unknown;
-}
-
 export type AlpacaHistoricalBarsResponse =
     {
         "bars": {
             [key: string]: AlpacaOHLCBar[]
         },
-        "next_page_token": string
+        "next_page_token": string | null
     }
 
 export type ReverseSplit = {
@@ -99,27 +90,51 @@ export class AlpacaBaseClient {
 
 export class AlpacaStockClient extends AlpacaBaseClient {
     async getBars(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
-        const params = {
-            symbols: symbols.join(','),
-            timeframe: '1Day',
-            start: '2023-01-03',
-            limit: '1000',
-            adjustment: 'raw',
-            feed: 'sip',
-            sort: 'asc'
+        const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
+
+        for (const symbol of symbols) {
+            promises.push(this.getBarsForSymbol(symbol))
         }
-        const resp = await this.get<AlpacaHistoricalBarsResponse>('/v2/stocks/bars', params)
-        return this.normalizeAlpacaBars(resp.bars)
+
+        const results = await Promise.allSettled(promises)
+
+        const bars: {[key: string]: OHLCBar[]} = {}
+        
+        for (const result of results) {
+            if (result.status === 'rejected') {
+                throw new Error('Unable to fetch data')
+            }
+
+            bars[result.value.symbol] = result.value.bars
+        }
+
+        return bars
     }
 
-    async getCorporateActions(symbols: string[]): Promise<AlpacaCorporateActionsResponse> {
-        const params = {
-            symbols: symbols.join(','),
-            types: 'reverse_split,forward_split,cash_dividend,stock_dividend',
-            start: '2022-01-03',
-        }
-        const resp = await this.get<AlpacaCorporateActionsResponse>('/v1beta1/corporate-actions', params)
-        return resp
+    async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
+        let bars: OHLCBar[] = []
+        let resp: AlpacaHistoricalBarsResponse | undefined
+        do {
+            const params = {
+                symbols: symbol,
+                timeframe: '1Day',
+                start: '2023-01-03',
+                limit: '1000',
+                adjustment: 'all',
+                feed: 'sip',
+                sort: 'asc'
+            }
+
+            if (resp && resp.next_page_token) {
+                params.page_token = resp.next_page_token
+            }
+
+            resp = await this.get<AlpacaHistoricalBarsResponse>('/v2/stocks/bars', params)
+            const normalizedBars = this.normalizeAlpacaBars(resp.bars)
+            bars = [...bars, ...normalizedBars[symbol]]
+        } while (resp.next_page_token)
+
+        return { symbol, bars }
     }
 
     private normalizeAlpacaBars(bars: {[key: string]: AlpacaOHLCBar[]}): {[key: string]: OHLCBar[]} {
