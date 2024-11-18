@@ -20,11 +20,29 @@ export class DataProvider {
       const tickerBars = bars[indicator.ticker]
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
-      const calculatedIndicator = indicatorFn(indicator.ticker, indicator.params, tickerBars)
+      const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
       this.cachedIndicators.set(key, calculatedIndicator)
     }
 
     console.log(this.cachedIndicators)
+  }
+
+  getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
+    const key = `${ticker}-${fn}-${params.window}`
+    console.log('KEY', {key: key})
+    const cachedIndicator = this.cachedIndicators.get(key)
+    if (cachedIndicator) {
+      console.log('CACHE HIT', { cachedIndicator, date })
+      if (date) {
+        return cachedIndicator[date]
+      } else {
+        const keys = Object.keys(cachedIndicator)
+        return cachedIndicator[keys[keys.length - 1]]
+      }
+    } else {
+      console.log('CACHE MISS')
+    }
+    throw new Error(`Unable for get cached indicator: ${key}`)
   }
 
   private getTickerList(): string[] {
@@ -33,30 +51,6 @@ export class DataProvider {
 
   private async getTickerBars(): Promise<{[key: string]: OHLCBar[]}> {
     return this.client.getBars(this.getTickerList())
-  }
-
-  private calculateIndicators() {
-    // TODO: Iterate over each indicator and calculate indicator values from the ticker bars
-    // TODO: Store the indicator values in a structure with Ticker as key and the value is another object of date -> value
-    
-    /**
-     * const indicators = {
-     *   'SPY-RSI-5': {
-     *     '2024-01-10': 50.0,
-     *     '2024-01-09': 52.0,
-     *     '2024-01-08': 55.0,
-     *     '2024-01-07': 59.0,
-     *     '2024-01-06': 52.0,
-     *   }
-     *   'TQQQ-RSI-10': {
-     *     '2024-01-10': 50.0,
-     *     '2024-01-09': 52.0,
-     *     '2024-01-08': 55.0,
-     *     '2024-01-07': 59.0,
-     *     '2024-01-06': 52.0,
-     *   }
-     * }
-     */
   }
 
   private getIndicatorFunction(fn: string): CallableFunction {

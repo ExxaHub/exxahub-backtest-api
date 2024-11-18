@@ -1,8 +1,10 @@
 import type {OHLCBar} from "../types";
+import { AlpacaStockClient } from "../clients/AlpacaClient";
 
 type Params = {}
 
-export const currentPrice = (ticker: string, params: Params, bars: OHLCBar[]): number => {
-    // TODO: Pull current price from cache
-    return 1.0
+const alpacaClient = new AlpacaStockClient()
+
+export const currentPrice = async (ticker: string, params: Params, bars: OHLCBar[]): Promise<Record<string, number>> => {
+    return await alpacaClient.getCurrentPriceForSymbol(ticker)
 }

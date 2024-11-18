@@ -18,8 +18,8 @@ const alpacaClient = new AlpacaStockClient()
 const dataProvider = new DataProvider(alpacaClient, indicators)
 await dataProvider.load()
 
-// const interpreter = new Interpreter(dataProvider)
+const interpreter = new Interpreter(dataProvider)
 
-// const allocations = interpreter.evaluate(algorithm)
+const allocations = interpreter.evaluate(algorithm)
 
-// console.log(allocations);
+console.log(allocations);

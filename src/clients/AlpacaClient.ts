@@ -18,6 +18,19 @@ export type AlpacaHistoricalBarsResponse =
         "next_page_token": string | null
     }
 
+export type AlpacaLatestTradeResponse = {
+    "symbol": string,
+    "trade": {
+      "t": string,
+      "x": string,
+      "p": number,
+      "s": number,
+      "c": string[],
+      "i": number,
+      "z": string
+    }
+  }    
+
 export type ReverseSplit = {
     symbol: string,
     new_rate: number,
@@ -109,6 +122,16 @@ export class AlpacaStockClient extends AlpacaBaseClient {
         }
 
         return bars
+    }
+
+    async getCurrentPriceForSymbol(symbol: string): Promise<Record<string, number>> {
+        const params = {}
+
+        const resp = await this.get<AlpacaLatestTradeResponse>(`/v2/stocks/${symbol}/trades/latest`, params)
+        
+        return {
+            [resp.trade.t.split('T')[0]]: resp.trade.p
+        }
     }
 
     async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import type { DataProvider } from "./DataProvider";
 import type { 
   Algorithm,
@@ -14,6 +15,7 @@ export class Interpreter {
 
   evaluate(algorithm: Algorithm) {
     const rawAllocations = this.evaluateNode(algorithm)
+    console.log('raw allocations', rawAllocations)
     return this.combineAllocationsByAsset(rawAllocations as AllocationAsset[])
   }
 
@@ -81,6 +83,15 @@ export class Interpreter {
   
     const comparison = this.compare(lhsValue, rhsValue, comparator);
 
+    console.log('IF', {
+      lhs: `${ifBlock['lhs-val']} ${ifBlock['lhs-fn']} ${JSON.stringify(ifBlock['lhs-fn-params'])}`,
+      lhs_value: lhsValue,
+      comparator: comparator,
+      rhs: `${ifBlock['rhs-val']} ${ifBlock['rhs-fn']} ${JSON.stringify(ifBlock['rhs-fn-params'])}`,
+      rhs_value: rhsValue,
+      result: comparison
+    })
+
     if (comparison) {
       return ifBlock.children!.flatMap((child) =>
         this.evaluateNode(child, parentWeight)
@@ -92,10 +103,9 @@ export class Interpreter {
     }
   }
   
-  private getIndicatorValue(asset: string | undefined, fn: string | undefined, params: Record<string, any> = {}): number {
-    // Simulated function to fetch indicator values
-    console.log(`Fetching ${fn} for ${asset} with params`, params);
-    return Math.random() * 100; // Replace with actual logic
+  private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
+    console.log(`Fetching ${fn} for ${ticker} with params`, params);
+    return this.dataProvider.getIndicatorValue(ticker, fn, params)
   }
   
   private compare(lhs: number, rhs: number, comparator: string): boolean {
