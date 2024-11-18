@@ -8,6 +8,11 @@ type Params = {
 export const rsi = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
     const rsiLength = params.window
     const indicator: Record<string, number> = {}
+
+    if (rsiLength > bars.length) {
+        throw new Error(`Not enough data for RSI calculation. Ticker: ${ticker}`)
+    }
+
     const closes: number[] = bars.map(bar => bar.close);
     const changes: number[] = [];
     for (let i = 1; i < closes.length; i++) {
