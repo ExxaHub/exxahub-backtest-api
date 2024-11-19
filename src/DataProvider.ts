@@ -1,6 +1,9 @@
+import { cumulativeReturn } from "./indicators/cumulativeReturn"
 import { currentPrice } from "./indicators/currentPrice"
+import { exponentialMovingAverageOfPrice } from "./indicators/exponentialMovingAverageOfPrice"
 import { movingAverageOfPrice } from "./indicators/movingAverageOfPrice"
 import { rsi } from "./indicators/rsi"
+import { standardDeviationOfPrice } from "./indicators/standardDeviationOfPrice"
 import type { Indicator, ClientInterface, OHLCBar } from "./types"
 
 export class DataProvider {
@@ -59,8 +62,14 @@ export class DataProvider {
         return rsi
       case 'moving-average-price':
         return movingAverageOfPrice
+      case 'exponential-moving-average-price':
+        return exponentialMovingAverageOfPrice
       case 'current-price':
         return currentPrice
+      case 'cumulative-return':
+        return cumulativeReturn
+      case 'standard-deviation-price':
+        return standardDeviationOfPrice
       default:
         throw new Error(`Unknown indicator function: ${fn}`)
     }

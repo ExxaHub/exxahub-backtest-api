@@ -5,6 +5,14 @@ type Params = {
 }
 
 export const movingAverageOfPrice = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+    if (params.window <= 0) {
+        throw new Error('Window size must be greater than zero')
+    }
+
+    if (params.window >= bars.length) {
+        throw new Error('Not enough data to calculate for window size')
+    }
+
     const indicator: Record<string, number> = {}
     const period = params.window
 

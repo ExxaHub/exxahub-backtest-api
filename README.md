@@ -19,20 +19,20 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
 - Supported indicators
     - [x] Current Price
         - [ ] Unit tests
-    - [ ] Cumulative Return
-        - [ ] Unit tests
-    - [ ] Exponential Moving Average of Price
-        - [ ] Unit tests
+    - [x] Cumulative Return
+        - [x] Unit tests
+    - [x] Exponential Moving Average of Price
+        - [x] Unit tests
     - [ ] Max Drawdown
         - [ ] Unit tests
     - [x] Moving Average of Price
-        - [ ] Unit tests
+        - [x] Unit tests
     - [ ] Moving Average of Return
         - [ ] Unit tests
     - [x] Relative Strength Index
         - [x] Unit tests
-    - [ ] Standard Deviation of Price
-        - [ ] Unit tests
+    - [x] Standard Deviation of Price
+        - [x] Unit tests
     - [ ] Standard Deviation of Return
         - [ ] Unit tests
 - Backtesting
