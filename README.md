@@ -27,8 +27,8 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [x] Unit tests
     - [x] Moving Average of Price
         - [x] Unit tests
-    - [ ] Moving Average of Return
-        - [ ] Unit tests
+    - [x] Moving Average of Return
+        - [x] Unit tests
     - [x] Relative Strength Index
         - [x] Unit tests
     - [x] Standard Deviation of Price
