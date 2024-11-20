@@ -6,6 +6,7 @@ import { movingAverageOfPrice } from "./indicators/movingAverageOfPrice"
 import { movingAverageOfReturn } from "./indicators/movingAverageOfReturn"
 import { rsi } from "./indicators/rsi"
 import { standardDeviationOfPrice } from "./indicators/standardDeviationOfPrice"
+import { standardDeviationOfReturn } from "./indicators/standardDeviationOfReturn"
 import type { Indicator, ClientInterface, OHLCBar } from "./types"
 
 export class DataProvider {
@@ -76,6 +77,8 @@ export class DataProvider {
         return maxDrawdown
       case 'moving-average-return':
         return movingAverageOfReturn
+      case 'standard-deviation-return':
+        return standardDeviationOfReturn
       default:
         throw new Error(`Unknown indicator function: ${fn}`)
     }

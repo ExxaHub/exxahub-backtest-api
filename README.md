@@ -33,8 +33,8 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [x] Unit tests
     - [x] Standard Deviation of Price
         - [x] Unit tests
-    - [ ] Standard Deviation of Return
-        - [ ] Unit tests
+    - [x] Standard Deviation of Return
+        - [x] Unit tests
 - Backtesting
 - Set start date dynamically from ETF when fetching alpaca data
 - Better error description when algo fails
