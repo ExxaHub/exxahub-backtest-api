@@ -1,6 +1,7 @@
 import { cumulativeReturn } from "./indicators/cumulativeReturn"
 import { currentPrice } from "./indicators/currentPrice"
 import { exponentialMovingAverageOfPrice } from "./indicators/exponentialMovingAverageOfPrice"
+import { maxDrawdown } from "./indicators/maxDrawdown"
 import { movingAverageOfPrice } from "./indicators/movingAverageOfPrice"
 import { rsi } from "./indicators/rsi"
 import { standardDeviationOfPrice } from "./indicators/standardDeviationOfPrice"
@@ -70,6 +71,8 @@ export class DataProvider {
         return cumulativeReturn
       case 'standard-deviation-price':
         return standardDeviationOfPrice
+      case 'max-drawdown':
+        return maxDrawdown
       default:
         throw new Error(`Unknown indicator function: ${fn}`)
     }

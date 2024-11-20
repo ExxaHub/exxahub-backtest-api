@@ -23,8 +23,8 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [x] Unit tests
     - [x] Exponential Moving Average of Price
         - [x] Unit tests
-    - [ ] Max Drawdown
-        - [ ] Unit tests
+    - [x] Max Drawdown
+        - [x] Unit tests
     - [x] Moving Average of Price
         - [x] Unit tests
     - [ ] Moving Average of Return
