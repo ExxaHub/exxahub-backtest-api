@@ -5,7 +5,7 @@ type Params = {
     window: number 
 }
 
-export const rsi = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
     const rsiLength = params.window
     const indicator: Record<string, number> = {}
 

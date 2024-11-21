@@ -4,12 +4,12 @@ import { exponentialMovingAverageOfPrice } from "./indicators/exponentialMovingA
 import { maxDrawdown } from "./indicators/maxDrawdown"
 import { movingAverageOfPrice } from "./indicators/movingAverageOfPrice"
 import { movingAverageOfReturn } from "./indicators/movingAverageOfReturn"
-import { rsi } from "./indicators/rsi"
+import { relativeStrengthIndex} from "./indicators/relativeStrengthIndex"
 import { standardDeviationOfPrice } from "./indicators/standardDeviationOfPrice"
 import { standardDeviationOfReturn } from "./indicators/standardDeviationOfReturn"
 import type { Indicator, ClientInterface, OHLCBar } from "./types"
 
-export class DataProvider {
+export class IndicatorCache {
   private client: ClientInterface
   private indicators: Indicator[]
   private cachedIndicators: Map<string, { [key: string]: number }> = new Map<string, { [key: string]: number }>()
@@ -21,7 +21,7 @@ export class DataProvider {
 
   async load(): Promise<void> {
     const bars = await this.getTickerBars()
-    console.log(this.indicators)
+    
     for (const indicator of this.indicators) {
       const tickerBars = bars[indicator.ticker]
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
@@ -35,10 +35,10 @@ export class DataProvider {
 
   getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
     const key = `${ticker}-${fn}-${params.window}`
-    console.log('KEY', {key: key})
+    // console.log('KEY', {key: key})
     const cachedIndicator = this.cachedIndicators.get(key)
     if (cachedIndicator) {
-      console.log('CACHE HIT', { cachedIndicator, date })
+      // console.log('CACHE HIT', { cachedIndicator, date })
       if (date) {
         return cachedIndicator[date]
       } else {
@@ -62,7 +62,7 @@ export class DataProvider {
   private getIndicatorFunction(fn: string): CallableFunction {
     switch(fn) {
       case 'relative-strength-index':
-        return rsi
+        return relativeStrengthIndex
       case 'moving-average-price':
         return movingAverageOfPrice
       case 'exponential-moving-average-price':

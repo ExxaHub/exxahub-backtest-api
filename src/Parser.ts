@@ -1,12 +1,22 @@
 import type { Algorithm, AlgorithmNode, Indicator } from "./types";
 import { createHash } from "crypto";
 
+export type ParsedAssetsAndIndicators = {
+  assets: string[],
+  indicators: Indicator[]
+}
+
 export class Parser {
   private indicators: Map<string, Indicator> = new Map()
+  private assets: Set<string> = new Set<string>()
 
-  parseIndicators(algorithm: Algorithm): Indicator[] {
+  parse(algorithm: Algorithm): ParsedAssetsAndIndicators {
     this.parseNode(algorithm)
-    return Array.from(this.indicators.values())
+    
+    return {
+      assets: Array.from(this.assets),
+      indicators: Array.from(this.indicators.values())
+    }
   }
 
   private parseNode(node: AlgorithmNode): void {
@@ -37,6 +47,7 @@ export class Parser {
       }
   
       case 'asset': {
+        this.assets.add(node.ticker!)
         break
       }
   
@@ -50,18 +61,22 @@ export class Parser {
     const elseBlock = node.children![1]
 
     const lhs = {
-      ticker: ifBlock['lhs-val'],
-      fn: ifBlock['lhs-fn'],
-      params: ifBlock['lhs-fn-params']
+      ticker: ifBlock['lhs-val']!,
+      fn: ifBlock['lhs-fn']!,
+      params: ifBlock['lhs-window-days'] ? { window: parseInt(ifBlock['lhs-window-days']) } : ifBlock['lhs-fn-params']!
     }
+    this.assets.add(lhs.ticker)
     this.indicators.set(this.generateHash(lhs), lhs)
 
-    const rhs = {
-      ticker: ifBlock['rhs-val'],
-      fn: ifBlock['rhs-fn'],
-      params: ifBlock['rhs-fn-params']
+    if (!ifBlock['rhs-fixed-value?']) {
+      const rhs = {
+        ticker: ifBlock['rhs-val']!,
+        fn: ifBlock['rhs-fn']!,
+        params: ifBlock['rhs-window-days'] ? { window: parseInt(ifBlock['rhs-window-days']) } : ifBlock['rhs-fn-params']!
+      }
+      this.assets.add(rhs.ticker)
+      this.indicators.set(this.generateHash(rhs), rhs)
     }
-    this.indicators.set(this.generateHash(rhs), rhs)
 
     ifBlock.children!.flatMap((child) =>
       this.parseNode(child)

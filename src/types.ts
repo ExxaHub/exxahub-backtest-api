@@ -4,13 +4,16 @@ export interface AlgorithmNode {
     name?: string;
     ticker?: string;
     exchange?: string;
+    'lhs-window-days'?: string;
     'lhs-fn-params'?: Record<string, any>;
-    'rhs-fn'?: string;
     'lhs-fn'?: string;
     'lhs-val'?: string;
+    'rhs-val'?: string;
+    'rhs-fn'?: string;
+    'rhs-fixed-value?'?: boolean;
+    'rhs-window-days'?: string;
     'rhs-fn-params'?: Record<string, any>;
     comparator?: string;
-    'rhs-val'?: string;
     'is-else-condition'?: boolean;
     children?: AlgorithmNode[];
     weight?: { num: number; den: number };
