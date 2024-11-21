@@ -7,56 +7,42 @@ import { movingAverageOfReturn } from "./indicators/movingAverageOfReturn"
 import { relativeStrengthIndex} from "./indicators/relativeStrengthIndex"
 import { standardDeviationOfPrice } from "./indicators/standardDeviationOfPrice"
 import { standardDeviationOfReturn } from "./indicators/standardDeviationOfReturn"
-import type { Indicator, ClientInterface, OHLCBar } from "./types"
+import type { OhlcCache } from "./OhlcCache"
+import type { Indicator } from "./types"
 
 export class IndicatorCache {
-  private client: ClientInterface
+  private ohlcCache: OhlcCache
   private indicators: Indicator[]
   private cachedIndicators: Map<string, { [key: string]: number }> = new Map<string, { [key: string]: number }>()
 
-  constructor(client: ClientInterface, indicators: Indicator[]) {
-    this.client = client
+  constructor(ohlcCache: OhlcCache, indicators: Indicator[]) {
+    this.ohlcCache = ohlcCache
     this.indicators = indicators
   }
 
   async load(): Promise<void> {
-    const bars = await this.getTickerBars()
-    
     for (const indicator of this.indicators) {
-      const tickerBars = bars[indicator.ticker]
+      const tickerBars = this.ohlcCache.getBars(indicator.ticker)
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
       const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
       this.cachedIndicators.set(key, calculatedIndicator)
     }
-
-    console.log(this.cachedIndicators)
   }
 
   getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
     const key = `${ticker}-${fn}-${params.window}`
-    // console.log('KEY', {key: key})
+    
     const cachedIndicator = this.cachedIndicators.get(key)
     if (cachedIndicator) {
-      // console.log('CACHE HIT', { cachedIndicator, date })
       if (date) {
         return cachedIndicator[date]
       } else {
         const keys = Object.keys(cachedIndicator)
         return cachedIndicator[keys[keys.length - 1]]
       }
-    } else {
-      console.log('CACHE MISS')
     }
     throw new Error(`Unable for get cached indicator: ${key}`)
-  }
-
-  private getTickerList(): string[] {
-    return this.indicators.map(ind => ind.ticker)
-  }
-
-  private async getTickerBars(): Promise<{[key: string]: OHLCBar[]}> {
-    return this.client.getBars(this.getTickerList())
   }
 
   private getIndicatorFunction(fn: string): CallableFunction {
