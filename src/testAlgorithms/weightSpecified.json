@@ -1,0 +1,57 @@
+{
+    "description": "",
+    "children": [
+        {
+            "id": "caec991e-a56b-45c3-82c0-17325fb23bf1",
+            "step": "wt-cash-specified",
+            "suppress-incomplete-warnings?": false,
+            "children": [
+                {
+                    "weight": {
+                        "num": "30",
+                        "den": 100
+                    },
+                    "ticker": "SPY",
+                    "exchange": "ARCX",
+                    "name": "SPDR S&P 500 ETF Trust",
+                    "id": "6cdfff5f-5179-4724-9240-f8b90ee3a3a8",
+                    "step": "asset",
+                    "suppress-incomplete-warnings?": true
+                },
+                {
+                    "weight": {
+                        "num": "45",
+                        "den": 100
+                    },
+                    "ticker": "QQQ",
+                    "exchange": "XNAS",
+                    "name": "Invesco QQQ Trust Series I",
+                    "id": "8d9203d4-73be-4272-af78-86aff1594c50",
+                    "step": "asset",
+                    "suppress-incomplete-warnings?": true
+                },
+                {
+                    "weight": {
+                        "num": 25,
+                        "den": 100
+                    },
+                    "ticker": "DIA",
+                    "exchange": "ARCX",
+                    "name": "SPDR Dow Jones Industrial Average ETF Trust",
+                    "id": "99f31109-9874-4fad-a2bd-4c545dd867ec",
+                    "step": "asset",
+                    "suppress-incomplete-warnings?": true
+                }
+            ]
+        }
+    ],
+    "suppress-incomplete-warnings?": false,
+    "name": "New Symphony",
+    "asset_class": "EQUITIES",
+    "rebalance": "daily",
+    "id": "new",
+    "step": "root",
+    "asset_classes": [
+        "EQUITIES"
+    ]
+}

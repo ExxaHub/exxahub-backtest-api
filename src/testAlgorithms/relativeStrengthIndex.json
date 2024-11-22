@@ -1,1 +1,73 @@
-{"id":"new","step":"root","name":"Test Algorithm","description":"","rebalance":"daily","children":[{"id":"4c1dc281-bcc2-4ea3-a657-9b5789e9594c","step":"wt-cash-equal","suppress-incomplete-warnings?":true,"children":[{"weight":{"num":100,"den":100},"id":"dd84bb89-d0f2-455f-a7b3-5d57307beca7","step":"if","children":[{"children":[{"ticker":"SPY","exchange":"ARCX","name":"SPDR S&P 500 ETF Trust","id":"99b685c5-5a88-4552-9baf-ddc01e0cf29b","step":"asset","suppress-incomplete-warnings?":true}],"lhs-fn-params":{"window":10},"rhs-fn":"relative-strength-index","is-else-condition?":false,"suppress-incomplete-warnings?":false,"lhs-fn":"relative-strength-index","lhs-val":"SPY","id":"146e8233-510c-4bba-b536-e977d0dab453","rhs-fn-params":{"window":20},"comparator":"gt","rhs-val":"SPY","step":"if-child"},{"id":"4bc2df6e-7cc8-4b14-aee8-6576c63a9379","step":"if-child","suppress-incomplete-warnings?":true,"is-else-condition?":true,"children":[{"ticker":"BIL","exchange":"ARCX","name":"SPDR Bloomberg 1-3 Month T-Bill ETF","id":"ee65f9d9-1298-4d04-9639-07b246900cec","step":"asset","suppress-incomplete-warnings?":true}]}]}]}],"asset_class":"EQUITIES","asset_classes":["EQUITIES"]}
+{
+    "asset_class": "EQUITIES",
+    "asset_classes": [
+        "EQUITIES"
+    ],
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "exchange": "ARCX",
+                                    "id": "99b685c5-5a88-4552-9baf-ddc01e0cf29b",
+                                    "name": "SPDR S&P 500 ETF Trust",
+                                    "step": "asset",
+                                    "suppress-incomplete-warnings?": true,
+                                    "ticker": "SPY"
+                                }
+                            ],
+                            "comparator": "gt",
+                            "id": "146e8233-510c-4bba-b536-e977d0dab453",
+                            "is-else-condition?": false,
+                            "lhs-fn": "relative-strength-index",
+                            "lhs-fn-params": {
+                                "window": 10
+                            },
+                            "lhs-val": "SPY",
+                            "rhs-fn": "relative-strength-index",
+                            "rhs-fn-params": {
+                                "window": 20
+                            },
+                            "rhs-val": "SPY",
+                            "step": "if-child",
+                            "suppress-incomplete-warnings?": false
+                        },
+                        {
+                            "children": [
+                                {
+                                    "exchange": "ARCX",
+                                    "id": "ee65f9d9-1298-4d04-9639-07b246900cec",
+                                    "name": "SPDR Bloomberg 1-3 Month T-Bill ETF",
+                                    "step": "asset",
+                                    "suppress-incomplete-warnings?": true,
+                                    "ticker": "BIL"
+                                }
+                            ],
+                            "id": "4bc2df6e-7cc8-4b14-aee8-6576c63a9379",
+                            "is-else-condition?": true,
+                            "step": "if-child",
+                            "suppress-incomplete-warnings?": true
+                        }
+                    ],
+                    "id": "dd84bb89-d0f2-455f-a7b3-5d57307beca7",
+                    "step": "if",
+                    "weight": {
+                        "den": 100,
+                        "num": 100
+                    }
+                }
+            ],
+            "id": "4c1dc281-bcc2-4ea3-a657-9b5789e9594c",
+            "step": "wt-cash-equal",
+            "suppress-incomplete-warnings?": true
+        }
+    ],
+    "description": "",
+    "id": "new",
+    "name": "Test Algorithm",
+    "rebalance": "daily",
+    "step": "root"
+}

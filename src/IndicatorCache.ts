@@ -32,6 +32,8 @@ export class IndicatorCache {
 
   getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
     const key = `${ticker}-${fn}-${params.window}`
+
+    console.log('KEY', key)
     
     const cachedIndicator = this.cachedIndicators.get(key)
     if (cachedIndicator) {
