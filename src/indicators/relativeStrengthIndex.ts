@@ -10,7 +10,7 @@ export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLC
     const indicator: Record<string, number> = {}
 
     if (rsiLength > bars.length) {
-        throw new Error(`Not enough data for RSI calculation. Ticker: ${ticker}`)
+        throw new Error(`Not enough data for RSI calculation. Ticker: ${ticker}, RSI Length: ${rsiLength}, Bars: ${bars.length}`)
     }
 
     const closes: number[] = bars.map(bar => bar.close);

@@ -17,6 +17,10 @@ export type TiingoOHLCBar =    {
     splitFactor: number
 }
 
+type ErrorResponse = {
+    detail: string
+}
+
 export class TiingoClient implements ClientInterface {
     protected baseUrl = 'https://api.tiingo.com/tiingo'
 
@@ -34,6 +38,12 @@ export class TiingoClient implements ClientInterface {
                 'Content-Type': 'application/json'
             },
         });
+
+        if (response.status !== 200) {
+            const json = await response.json() as ErrorResponse
+            throw new Error(json.detail)
+        }
+
         return await response.json() as T;
     }
 
@@ -50,8 +60,7 @@ export class TiingoClient implements ClientInterface {
         
         for (const result of results) {
             if (result.status === 'rejected') {
-                console.error(result)
-                throw new Error('Unable to fetch data')
+                throw new Error(result.reason)
             }
 
             bars[result.value.symbol] = result.value.bars
@@ -72,6 +81,7 @@ export class TiingoClient implements ClientInterface {
         }
 
         resp = await this.get<TiingoOHLCBar[]>(`/daily/${symbol}/prices`, params)
+
         const normalizedBars = this.normalizeTiingoBars({ [symbol]: resp })
         bars = normalizedBars[symbol]
         return { symbol, bars }

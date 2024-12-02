@@ -38,7 +38,8 @@ export class Backtester {
         this.calculateBacktestStartDate()
         
         // Iterate over each day starting from the backtest start date
-        let currentDate = dayjs(this.backtestStartDate)
+        let fromDate = dayjs(this.backtestStartDate)
+        let currentDate = fromDate.clone()
         let toDate = dayjs(this.backtestEndDate)
         
         const interpreter = new Interpreter(this.indicatorCache)
@@ -49,16 +50,16 @@ export class Backtester {
         })
 
         while (currentDate < toDate) {
-            // TODO: Update OHLC cache with new bars for current date
-            // TODO: Update indicator cache with new OHLC cache values
+            // TODO: Recalculate indicator cache for new date range
+            await this.indicatorCache.recalculateForDateRange(fromDate, currentDate)
 
             // Calculate allocations for date
             const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache)
             
-            console.log({
-                date: currentDate.format('YYYY-MM-DD'),
-                allocations
-            })
+            // console.log({
+            //     date: currentDate.format('YYYY-MM-DD'),
+            //     allocations
+            // })
 
             // Pass new allocations to Rebalancer
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
@@ -114,7 +115,8 @@ export class Backtester {
         }
 
         this.backtestStartDate = earlieststartDate
-            .add(this.indicatorCache.getLargestWindow(), 'days')
+            // TODO: Figure out better way to account for weekends other than multiplying by 2
+            .add(this.indicatorCache.getLargestWindow() * 2, 'days')
             .format('YYYY-MM-DD')
 
         console.log(`Earliest Start Date is ${this.backtestStartDate} for ticker ${earliestStartDateTicker}`)
