@@ -14,6 +14,8 @@ export class IndicatorCache {
   private ohlcCache: OhlcCache
   private indicators: Indicator[]
   private cachedIndicators: Map<string, { [key: string]: number }> = new Map<string, { [key: string]: number }>()
+  private largestWindow = 0
+  private loaded: boolean = false
 
   constructor(ohlcCache: OhlcCache, indicators: Indicator[]) {
     this.ohlcCache = ohlcCache
@@ -27,13 +29,25 @@ export class IndicatorCache {
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
       const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
       this.cachedIndicators.set(key, calculatedIndicator)
+
+      if (indicator.params.window) {
+        this.largestWindow = Math.max(this.largestWindow, indicator.params.window)
+      }
     }
+
+    this.loaded = true
+  }
+
+  isLoaded(): boolean {
+    return this.loaded
+  }
+
+  getLargestWindow(): number {
+    return this.largestWindow
   }
 
   getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
     const key = `${ticker}-${fn}-${params.window}`
-
-    console.log('KEY', key)
     
     const cachedIndicator = this.cachedIndicators.get(key)
     if (cachedIndicator) {

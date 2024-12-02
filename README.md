@@ -35,8 +35,8 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [x] Unit tests
     - [x] Standard Deviation of Return
         - [x] Unit tests
-    - [ ] Fixed values
-        - [ ] Unit tests
+    - [x] Fixed values
+        - [x] Unit tests
 - Backtesting
     - Set start date dynamically from ETF when fetching alpaca data
     - Determine backtest start date from ticker list and indicator windows

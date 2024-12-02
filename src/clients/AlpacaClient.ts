@@ -1,5 +1,5 @@
 import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/alpaca";
-import { type OHLCBar } from "../types";
+import { type ClientInterface, type OHLCBar } from "../types";
 
 export type AlpacaOHLCBar = {
     c: number;
@@ -101,7 +101,7 @@ export class AlpacaBaseClient {
     }
 }
 
-export class AlpacaStockClient extends AlpacaBaseClient {
+export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterface {
     async getBars(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
@@ -115,6 +115,7 @@ export class AlpacaStockClient extends AlpacaBaseClient {
         
         for (const result of results) {
             if (result.status === 'rejected') {
+                console.error(result)
                 throw new Error('Unable to fetch data')
             }
 
@@ -134,14 +135,14 @@ export class AlpacaStockClient extends AlpacaBaseClient {
         }
     }
 
-    async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
+    private async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: AlpacaHistoricalBarsResponse | undefined
         do {
             const params = {
                 symbols: symbol,
                 timeframe: '1Day',
-                start: '2023-01-03',
+                start: '1990-01-01',
                 limit: '1000',
                 adjustment: 'all',
                 feed: 'sip',
@@ -153,6 +154,10 @@ export class AlpacaStockClient extends AlpacaBaseClient {
             }
 
             resp = await this.get<AlpacaHistoricalBarsResponse>('/v2/stocks/bars', params)
+            console.log('>>>> RESP', {
+                ticker: symbol,
+                resp: resp
+            })
             const normalizedBars = this.normalizeAlpacaBars(resp.bars)
             bars = [...bars, ...normalizedBars[symbol]]
         } while (resp.next_page_token)

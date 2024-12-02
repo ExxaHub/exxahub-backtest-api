@@ -4,6 +4,7 @@ export class OhlcCache {
   private client: ClientInterface
   private tickers: string[]
   private cachedOhlcBars: Map<string, OHLCBar[]> = new Map<string, OHLCBar[]>()
+  private loaded: boolean = false
 
   constructor(client: ClientInterface, tickers: string[]) {
     this.client = client
@@ -15,6 +16,11 @@ export class OhlcCache {
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, ohlcBars)
     }
+    this.loaded = true
+  }
+
+  isLoaded(): boolean {
+    return this.loaded
   }
 
   getBars(ticker: string): OHLCBar[] {
@@ -25,6 +31,10 @@ export class OhlcCache {
     }
 
     return bars
+  }
+
+  getTickers(): string[] {
+    return Array.from(this.cachedOhlcBars.keys())
   }
 
   private async getTickerBars(): Promise<{[key: string]: OHLCBar[]}> {

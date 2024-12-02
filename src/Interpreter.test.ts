@@ -309,4 +309,36 @@ describe("Interpreter", () => {
 
     expect(allocations['BIL']).toEqual(100)
   });
+
+  it("Evaluates a fixedValueCompare algorithm IF block correctly", async () => {
+    indicatorCache.getIndicatorValue = mock((ticker: string, fn: string, params: Record<string, any> = {}): number => {
+      const key = `${ticker}-${fn}-${params.window}`
+      switch(key) {
+        case 'SPY-relative-strength-index-10': return 79
+        default: throw new Error(`No indicator stubbed for key: ${key}`)
+      }
+    });
+
+    const algorithm: Algorithm = await import('./testAlgorithms/fixedValueCompare.json') as unknown as Algorithm;
+    const interpreter = new Interpreter(indicatorCache)
+    const allocations = interpreter.evaluate(algorithm)
+
+    expect(allocations['SPY']).toEqual(100)
+  });
+
+  it("Evaluates a fixedValueCompare algorithm ELSE block correctly", async () => {
+    indicatorCache.getIndicatorValue = mock((ticker: string, fn: string, params: Record<string, any> = {}): number => {
+      const key = `${ticker}-${fn}-${params.window}`
+      switch(key) {
+        case 'SPY-relative-strength-index-10': return 81
+        default: throw new Error(`No indicator stubbed for key: ${key}`)
+      }
+    });
+
+    const algorithm: Algorithm = await import('./testAlgorithms/fixedValueCompare.json') as unknown as Algorithm;
+    const interpreter = new Interpreter(indicatorCache)
+    const allocations = interpreter.evaluate(algorithm)
+
+    expect(allocations['BIL']).toEqual(100)
+  });
 });

@@ -1,0 +1,71 @@
+{
+    "id": "new",
+    "step": "root",
+    "name": "New Symphony",
+    "description": "",
+    "rebalance": "daily",
+    "children": [
+        {
+            "id": "c7a2a9d2-a662-4104-9b35-e0b336907856",
+            "step": "wt-cash-equal",
+            "suppress-incomplete-warnings?": true,
+            "children": [
+                {
+                    "weight": {
+                        "num": 100,
+                        "den": 100
+                    },
+                    "id": "6b3dfda5-4e47-4076-910e-ff0ebced51c0",
+                    "step": "if",
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "ticker": "BIL",
+                                    "exchange": "ARCX",
+                                    "name": "SPDR Bloomberg 1-3 Month T-Bill ETF",
+                                    "id": "54d49467-24a9-44f6-a880-cd89b12d4aa6",
+                                    "step": "asset",
+                                    "suppress-incomplete-warnings?": true,
+                                    "children-count": 0
+                                }
+                            ],
+                            "lhs-fn-params": {
+                                "window": 10
+                            },
+                            "is-else-condition?": false,
+                            "rhs-fixed-value?": true,
+                            "suppress-incomplete-warnings?": false,
+                            "lhs-fn": "relative-strength-index",
+                            "lhs-val": "SPY",
+                            "id": "a25dae61-b581-47c3-8d55-bdb3c5c1d92a",
+                            "comparator": "gt",
+                            "rhs-val": "80",
+                            "step": "if-child"
+                        },
+                        {
+                            "id": "e10da167-2dac-4b25-9ca7-a62c06eaa45b",
+                            "step": "if-child",
+                            "suppress-incomplete-warnings?": true,
+                            "is-else-condition?": true,
+                            "children": [
+                                {
+                                    "ticker": "SPY",
+                                    "exchange": "ARCX",
+                                    "name": "SPDR S&P 500 ETF Trust",
+                                    "id": "cbc1ebbb-b011-4283-8194-bb4eb543b640",
+                                    "step": "asset",
+                                    "suppress-incomplete-warnings?": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "asset_class": "EQUITIES",
+    "asset_classes": [
+        "EQUITIES"
+    ]
+}

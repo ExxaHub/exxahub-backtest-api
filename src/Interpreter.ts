@@ -18,7 +18,8 @@ export class Interpreter {
     this.indicatorCache = indicatorCache
   }
 
-  evaluate(algorithm: Algorithm) {
+  evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache) {
+    this.indicatorCache = indicatorCache
     const rawAllocations = this.evaluateNode(algorithm)
     return this.combineAllocationsByAsset(rawAllocations as AllocationAsset[])
   }
@@ -34,18 +35,15 @@ export class Interpreter {
 
     switch (node.step) {
       case "root": {
-        console.log("Evaluating node: root");
         return node.children!.flatMap(childNode => this.evaluateNode(childNode, weightType, parentWeight));
       }
   
       case 'wt-cash-equal': {
-        console.log("Evaluating node: wt-cash-equal");
         const equalWeight = parentWeight / node.children!.length;
         return node.children!.flatMap((child) => this.evaluateNode(child, WeightType.Equal, equalWeight))
       }
   
       case 'wt-cash-specified': {
-        console.log("Evaluating node: wt-cash-specified");
         return node.children!.flatMap((child) => this.evaluateNode(child, WeightType.Specified))
       }
   
@@ -60,7 +58,6 @@ export class Interpreter {
       }
   
       case 'asset': {
-        console.log(`Evaluating node: asset - ${node.ticker}`)
         return [
           {
             ticker: node.ticker,
@@ -91,14 +88,14 @@ export class Interpreter {
   
     const comparison = this.compare(lhsValue, rhsValue, comparator);
 
-    console.log('IF', {
-      lhs: `${ifBlock['lhs-val']} ${ifBlock['lhs-fn']} ${JSON.stringify(lhsParams)}`,
-      lhs_value: lhsValue,
-      comparator: comparator,
-      rhs: `${ifBlock['rhs-val']} ${ifBlock['rhs-fn']} ${JSON.stringify(rhsParams)}`,
-      rhs_value: rhsValue,
-      result: comparison
-    })
+    // console.log('IF', {
+    //   lhs: `${ifBlock['lhs-val']} ${ifBlock['lhs-fn']} ${JSON.stringify(lhsParams)}`,
+    //   lhs_value: lhsValue,
+    //   comparator: comparator,
+    //   rhs: `${ifBlock['rhs-val']} ${ifBlock['rhs-fn']} ${JSON.stringify(rhsParams)}`,
+    //   rhs_value: rhsValue,
+    //   result: comparison
+    // })
 
     if (comparison) {
       return ifBlock.children!.flatMap((child) =>
@@ -112,7 +109,6 @@ export class Interpreter {
   }
   
   private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
-    console.log(`Fetching ${fn} for ${ticker} with params`, params);
     return this.indicatorCache.getIndicatorValue(ticker, fn, params)
   }
   
