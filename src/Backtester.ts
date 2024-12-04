@@ -50,16 +50,13 @@ export class Backtester {
         })
 
         while (currentDate < toDate) {
-            // TODO: Recalculate indicator cache for new date range
-            await this.indicatorCache.recalculateForDateRange(fromDate, currentDate)
-
             // Calculate allocations for date
-            const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache)
+            const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache, currentDate)
             
-            // console.log({
-            //     date: currentDate.format('YYYY-MM-DD'),
-            //     allocations
-            // })
+            console.log({
+                date: currentDate.format('YYYY-MM-DD'),
+                allocations
+            })
 
             // Pass new allocations to Rebalancer
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought

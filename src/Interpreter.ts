@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import type { IndicatorCache } from "./IndicatorCache";
 import type { 
   Algorithm,
@@ -13,13 +13,15 @@ enum WeightType {
 
 export class Interpreter {
   private indicatorCache: IndicatorCache
+  private date: string
 
   constructor(indicatorCache: IndicatorCache) {
     this.indicatorCache = indicatorCache
   }
 
-  evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache) {
+  evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache, date?: Dayjs) {
     this.indicatorCache = indicatorCache
+    this.date = date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
     const rawAllocations = this.evaluateNode(algorithm)
     return this.combineAllocationsByAsset(rawAllocations as AllocationAsset[])
   }
@@ -83,7 +85,9 @@ export class Interpreter {
     const rhsParams = ifBlock['rhs-window-days'] ? { window: parseInt(ifBlock['rhs-window-days']) } : ifBlock['rhs-fn-params']!
 
     const lhsValue = this.getIndicatorValue(ifBlock['lhs-val'], ifBlock['lhs-fn'], lhsParams);
-    const rhsValue = ifBlock['rhs-fixed-value?'] ? parseInt(ifBlock['rhs-val']!) : this.getIndicatorValue(ifBlock['rhs-val'], ifBlock['rhs-fn'], rhsParams);
+    const rhsValue = ifBlock['rhs-fixed-value?'] 
+      ? parseInt(ifBlock['rhs-val']!) 
+      : this.getIndicatorValue(ifBlock['rhs-val'], ifBlock['rhs-fn'], rhsParams);
     const comparator = ifBlock.comparator || "eq"
   
     const comparison = this.compare(lhsValue, rhsValue, comparator);
@@ -109,7 +113,7 @@ export class Interpreter {
   }
   
   private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
-    return this.indicatorCache.getIndicatorValue(ticker, fn, params)
+    return this.indicatorCache.getIndicatorValue(ticker, fn, params, this.date)
   }
   
   private compare(lhs: number, rhs: number, comparator: string): boolean {
