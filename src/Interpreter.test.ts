@@ -16,7 +16,7 @@ describe("Interpreter", () => {
     const algorithm: Algorithm = await import('./testAlgorithms/weightEqual.json') as unknown as Algorithm;
 
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(25)
     expect(allocations['QQQ']).toEqual(25)
@@ -27,7 +27,7 @@ describe("Interpreter", () => {
     const algorithm: Algorithm = await import('./testAlgorithms/weightSpecified.json') as unknown as Algorithm;
 
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(30)
     expect(allocations['QQQ']).toEqual(45)
@@ -47,7 +47,7 @@ describe("Interpreter", () => {
     const algorithm: Algorithm = await import('./testAlgorithms/cumulativeReturn.json') as unknown as Algorithm;
 
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -65,7 +65,7 @@ describe("Interpreter", () => {
     const algorithm: Algorithm = await import('./testAlgorithms/cumulativeReturn.json') as unknown as Algorithm;
 
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -83,7 +83,7 @@ describe("Interpreter", () => {
     const algorithm: Algorithm = await import('./testAlgorithms/exponentialMovingAverageOfPrice.json') as unknown as Algorithm;
 
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -101,7 +101,7 @@ describe("Interpreter", () => {
     const algorithm: Algorithm = await import('./testAlgorithms/exponentialMovingAverageOfPrice.json') as unknown as Algorithm;
 
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -118,7 +118,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/maxDrawdown.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -135,7 +135,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/maxDrawdown.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -152,7 +152,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/movingAverageOfPrice.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -169,7 +169,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/movingAverageOfPrice.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -186,7 +186,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/movingAverageOfReturn.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -203,7 +203,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/movingAverageOfReturn.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -220,7 +220,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/relativeStrengthIndex.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -237,7 +237,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/relativeStrengthIndex.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -254,7 +254,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/standardDeviationOfPrice.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -271,7 +271,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/standardDeviationOfPrice.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -288,7 +288,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/standardDeviationOfReturn.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -305,7 +305,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/standardDeviationOfReturn.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
@@ -321,7 +321,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/fixedValueCompare.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
   });
@@ -337,7 +337,7 @@ describe("Interpreter", () => {
 
     const algorithm: Algorithm = await import('./testAlgorithms/fixedValueCompare.json') as unknown as Algorithm;
     const interpreter = new Interpreter(indicatorCache)
-    const allocations = interpreter.evaluate(algorithm)
+    const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
   });
