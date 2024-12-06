@@ -9,10 +9,12 @@ describe("maxDrawdown", () => {
         { date: "2024-11-12", open: 99, high: 108, low: 94, close: 100, volume: 10 },
         { date: "2024-11-13", open: 103, high: 107, low: 93, close: 91, volume: 10 },
         { date: "2024-11-14", open: 104, high: 110, low: 92, close: 100, volume: 10 },
+        { date: "2024-11-17", open: 102, high: 107, low: 93, close: 91, volume: 10 },
+        { date: "2024-11-18", open: 101, high: 110, low: 92, close: 100, volume: 10 },
     ];
 
     it("calculates max drawdown for a valid window", () => {
-        const params = { window: 5 };
+        const params = { window: 7 };
         const result = maxDrawdown("TEST", params, mockBars);
 
         expect(result).toEqual({
@@ -20,7 +22,9 @@ describe("maxDrawdown", () => {
             "2024-11-11": 3,
             "2024-11-12": 3,
             "2024-11-13": 9,
-            "2024-11-14": 9
+            "2024-11-14": 9,
+            "2024-11-17": 9,
+            "2024-11-18": 9,
         });
     });
 

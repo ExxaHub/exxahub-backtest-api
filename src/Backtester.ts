@@ -49,7 +49,7 @@ export class Backtester {
             toDate: toDate.format('YYYY-MM-DD'),
         })
 
-        while (currentDate < toDate) {
+        while (currentDate <= toDate) {
             // Calculate allocations for date
             const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache, currentDate)
             
@@ -62,9 +62,12 @@ export class Backtester {
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
             // After rebalance, Rebalancer logs new portfolio value for date
 
+            if (currentDate.isSame(toDate)) {
+                break
+            }
+
             currentDate = this.getNextMarketDate(currentDate)
         }
-        console.log('>>>> 7')
     }
 
     async loadData(): Promise<void> {

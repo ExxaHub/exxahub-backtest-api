@@ -9,6 +9,8 @@ describe("stdDev", () => {
     { date: "2024-11-12", open: 102, high: 107, low: 97, close: 104, volume: 10 },
     { date: "2024-11-13", open: 103, high: 108, low: 98, close: 106, volume: 10 },
     { date: "2024-11-14", open: 104, high: 109, low: 99, close: 108, volume: 10 },
+    { date: "2024-11-17", open: 105, high: 110, low: 100, close: 110, volume: 10 },
+    { date: "2024-11-18", open: 106, high: 111, low: 101, close: 112, volume: 10 },
   ];
 
   it("should calculate standard deviation for a valid period", () => {
@@ -19,11 +21,13 @@ describe("stdDev", () => {
       "2024-11-12": 1.63, // Standard deviation of [100, 102, 104]
       "2024-11-13": 1.63, // Standard deviation of [102, 104, 106]
       "2024-11-14": 1.63, // Standard deviation of [104, 106, 108]
+      "2024-11-17": 1.63, // Standard deviation of [106, 108, 110]
+      "2024-11-18": 1.63, // Standard deviation of [108, 110, 112]
     });
   });
 
   it("should return an empty object if the period is larger than the number of bars", () => {
-    const params = { window: 6 }; // Period > number of bars
+    const params = { window: 8 }; // Period > number of bars
     expect(() => standardDeviationOfPrice("TEST", params, bars)).toThrow(`Not enough data to calculate for window size`);
   });
 
@@ -36,7 +40,7 @@ describe("stdDev", () => {
   });
 
   it("should handle edge case with exactly `window` bars", () => {
-    const params = { window: 5 }; // Period == number of bars
+    const params = { window: 7 }; // Period == number of bars
     expect(() => standardDeviationOfPrice("TEST", params, bars)).toThrow(`Not enough data to calculate for window size`);
   });
 

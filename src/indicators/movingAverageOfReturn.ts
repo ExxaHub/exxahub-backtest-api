@@ -7,7 +7,7 @@ type Params = {
 export const movingAverageOfReturn = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
     const { window } = params;
 
-    if (window < 1) {
+    if (window < 2) {
         throw new Error(`Not enough data to calculate moving average of return for a window of ${window}.`);
     }
 
@@ -16,23 +16,47 @@ export const movingAverageOfReturn = (ticker: string, params: Params, bars: OHLC
         throw new Error(`Not enough data to calculate moving average of return for a window of ${window}.`);
     }
 
-    // Extract the most recent `window` bars
-    const recentBars = bars.slice(-window - 1); // Need `window + 1` bars to calculate `window` returns
+    const indicator: Record<string, number> = {}
 
-    // Calculate daily returns
-    const returns = [];
-    for (let i = 1; i < recentBars.length; i++) {
-        const prevClose = recentBars[i - 1].close;
-        const currClose = recentBars[i].close;
+    for (let j = window; j <= bars.length; j++) {
+        // Extract the most recent `window` bars
+        const recentBars = bars.slice(j - window, j);
 
-        const dailyReturn = (currClose - prevClose) / prevClose;
-        returns.push(dailyReturn);
+        // Calculate daily returns
+        const returns = [];
+        for (let i = 1; i < recentBars.length; i++) {
+            const prevClose = recentBars[i - 1].close;
+            const currClose = recentBars[i].close;
+
+            const dailyReturn = (currClose - prevClose) / prevClose;
+            returns.push(dailyReturn);
+        }
+
+        // Calculate the moving average of returns
+        const movingAverage = returns.reduce((sum, r) => sum + r, 0) / returns.length;    
+
+        indicator[recentBars[recentBars.length - 1].date] = movingAverage
     }
 
-    // Calculate the moving average of returns
-    const movingAverage = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+    return indicator
 
-    return {
-        [recentBars[recentBars.length - 1].date]: movingAverage
-    };
+    // // Extract the most recent `window` bars
+    // const recentBars = bars.slice(-window - 1); // Need `window + 1` bars to calculate `window` returns
+
+    // // Calculate daily returns
+    // const returns = [];
+    // for (let i = 1; i < recentBars.length; i++) {
+    //     const prevClose = recentBars[i - 1].close;
+    //     const currClose = recentBars[i].close;
+
+    //     const dailyReturn = (currClose - prevClose) / prevClose;
+    //     returns.push(dailyReturn);
+    // }
+
+    // // Calculate the moving average of returns
+    // const movingAverage = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+
+    // return {
+    //     [recentBars[recentBars.length - 1].date]: movingAverage
+    // };
 };

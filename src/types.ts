@@ -25,10 +25,10 @@ export interface Algorithm {
     description: string;
     name: string;
     id: string;
-    step: 'root';
+    step: "root";
     rebalance: string;
-    assetClass: string;
-    assetClasses: string[];
+    assetClass?: string;
+    assetClasses?: string[];
     children: AlgorithmNode[];
 }
 

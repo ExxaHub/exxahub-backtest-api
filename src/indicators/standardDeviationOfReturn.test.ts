@@ -9,6 +9,8 @@ describe("standardDeviationOfReturn", () => {
         { date: "2024-11-12", open: 110, high: 120, low: 105, close: 115, volume: 1300 },
         { date: "2024-11-13", open: 115, high: 125, low: 110, close: 120, volume: 1400 },
         { date: "2024-11-14", open: 120, high: 130, low: 115, close: 125, volume: 1500 },
+        { date: "2024-11-17", open: 125, high: 135, low: 120, close: 130, volume: 1600 },
+        { date: "2024-11-18", open: 130, high: 140, low: 125, close: 135, volume: 1700 },
     ];
 
     it("calculates the standard deviation of returns correctly for a valid window", () => {
@@ -24,20 +26,24 @@ describe("standardDeviationOfReturn", () => {
         // Std Dev: sqrt(variance)
 
         expect(result).toEqual({
-            "2024-11-14": 0.0015468821699171481,
+            "2024-11-12": 0.0010822510822510803,
+            "2024-11-13": 0.0009881422924901198,
+            "2024-11-14": 0.0009057971014492759,
+            "2024-11-17": 0.0008333333333333318,
+            "2024-11-18": 0.0007692307692307686,
         });
 
     });
 
     it("throws an error if there are not enough bars for the given window", () => {
-        const params = { window: 5 }; // Requires at least 6 bars
+        const params = { window: 7 }; // Requires at least 8 bars
         expect(() => standardDeviationOfReturn("TEST", params, sampleBars)).toThrow(
-            "Not enough data to calculate standard deviation of return for a window of 5."
+            "Not enough data to calculate standard deviation of return for a window of 7."
         );
     });
 
-    it("handles a minimal valid window of 1", () => {
-        const params = { window: 1 };
+    it("handles a minimal valid window of 2", () => {
+        const params = { window: 2 };
         const result = standardDeviationOfReturn("TEST", params, sampleBars);
 
         // Expected return:
@@ -45,7 +51,12 @@ describe("standardDeviationOfReturn", () => {
         // Std Dev: 0 (all returns are identical)
 
         expect(result).toEqual({
+            "2024-11-11": 0,
+            "2024-11-12": 0,
+            "2024-11-13": 0,
             "2024-11-14": 0,
+            "2024-11-17": 0,
+            "2024-11-18": 0,
         });
     });
 
@@ -75,7 +86,10 @@ describe("standardDeviationOfReturn", () => {
         // Std Dev: sqrt(variance of these returns)
 
         expect(result).toEqual({
-            "2024-11-14": 0.0022192006381178027,
+            "2024-11-13": 0.0016910511289219587,
+            "2024-11-14": 0.0015468821699171481,
+            "2024-11-17": 0.001420404872269483,
+            "2024-11-18": 0.0013088369941122678,
         });
     });
 });
