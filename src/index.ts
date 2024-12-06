@@ -17,7 +17,7 @@ import testAlgorithmMovingAverageOfPrice from './testAlgorithms/movingAverageOfP
 const algorithm: Algorithm = JSON.parse(JSON.stringify(testAlgorithmMovingAverageOfPrice))
 const parser = new Parser()
 
-const { assets, indicators } = parser.parse(algorithm)
+const { assets, tradeableAssets, indicators } = parser.parse(algorithm)
 
 const client = new AlpacaStockClient()
 // const client = new TiingoClient()
@@ -30,5 +30,5 @@ const indicatorCache = new IndicatorCache(ohlcCache, indicators)
 await indicatorCache.load()
 // indicatorCache.printDebugTable()
 
-const backtester = new Backtester(algorithm, client)
+const backtester = new Backtester(algorithm, client, tradeableAssets)
 await backtester.run()

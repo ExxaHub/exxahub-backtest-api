@@ -3,18 +3,21 @@ import { createHash } from "crypto";
 
 export type ParsedAssetsAndIndicators = {
   assets: string[],
+  tradeableAssets: string[],
   indicators: Indicator[]
 }
 
 export class Parser {
   private indicators: Map<string, Indicator> = new Map()
   private assets: Set<string> = new Set<string>()
+  private tradeableAssets: Set<string> = new Set<string>()
 
   parse(algorithm: Algorithm): ParsedAssetsAndIndicators {
     this.parseNode(algorithm)
     
     return {
       assets: Array.from(this.assets),
+      tradeableAssets: Array.from(this.tradeableAssets),
       indicators: Array.from(this.indicators.values())
     }
   }
@@ -48,6 +51,7 @@ export class Parser {
   
       case 'asset': {
         this.assets.add(node.ticker!)
+        this.tradeableAssets.add(node.ticker!)
         break
       }
   

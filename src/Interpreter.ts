@@ -14,9 +14,11 @@ enum WeightType {
 export class Interpreter {
   private indicatorCache: IndicatorCache
   private date: string
+  private tradeableAssets: string[]
 
-  constructor(indicatorCache: IndicatorCache) {
+  constructor(indicatorCache: IndicatorCache, tradeableAssets: string[]) {
     this.indicatorCache = indicatorCache
+    this.tradeableAssets = tradeableAssets
   }
 
   evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache, date?: Dayjs) {
@@ -130,7 +132,7 @@ export class Interpreter {
   }
 
   private combineAllocationsByAsset(allocations: AllocationAsset[]) {
-    return allocations.reduce((accumulator: Record<string, number>, allocation: AllocationAsset) => {
+    const combinedAllocations = allocations.reduce((accumulator: Record<string, number>, allocation: AllocationAsset) => {
       if (accumulator[allocation.ticker] === undefined) {
         accumulator[allocation.ticker] = 0
       }
@@ -138,5 +140,11 @@ export class Interpreter {
       accumulator[allocation.ticker] += allocation.percentage
       return accumulator
     }, {})
+
+    const allAllocations: { [key: string]: number | null } = {}
+    for (const tradeableAsset of this.tradeableAssets) {
+      allAllocations[tradeableAsset] = combinedAllocations[tradeableAsset] ?? null
+    }
+    return allAllocations
   }
 }
