@@ -36,6 +36,8 @@ export class IndicatorCache {
       }
     }
 
+    console.log(JSON.stringify(this.cachedIndicators, null, 2))
+
     this.loaded = true
   }
 
@@ -67,15 +69,27 @@ export class IndicatorCache {
     const key = `${ticker}-${fn}-${params.window}`
     
     const cachedIndicator = this.cachedIndicators.get(key)
+    
     if (cachedIndicator) {
       if (date) {
-        return cachedIndicator[date]
+        const value = cachedIndicator[date]
+
+        // if (!value) {
+        //   throw new Error(`Could not calculate indicator value for key: ${key} on date ${date}`)
+        // }
+
+        return value
       } else {
         const keys = Object.keys(cachedIndicator)
         return cachedIndicator[keys[keys.length - 1]]
       }
     }
     throw new Error(`Unable for get cached indicator: ${key}`)
+  }
+
+  getIndicatorValues(ticker: string, fn: string, params: Record<string, any> = {}): { [key: string]: number } | undefined {
+    const key = `${ticker}-${fn}-${params.window}`
+    return this.cachedIndicators.get(key)
   }
 
   private getIndicatorFunction(fn: string): CallableFunction {
@@ -101,5 +115,28 @@ export class IndicatorCache {
       default:
         throw new Error(`Unknown indicator function: ${fn}`)
     }
+  }
+
+  printDebugTable() {
+    const indicators = Array.from(this.cachedIndicators.keys())
+
+    const tableData: {[key: string]: { [key: string]: number }} = {}
+    for (const indicator of indicators) {
+      const values = this.cachedIndicators.get(indicator)
+      
+      if (!values) {
+        throw new Error(`Could not print values for indicator: ${indicator}`)
+      }
+
+      for (const date of Object.keys(values)) {
+        const value = values[date]
+        if (!tableData[date]) {
+          tableData[date] = {}
+        }
+        tableData[date][indicator] = value
+      }
+    }
+
+    console.table(tableData) 
   }
 }

@@ -16,20 +16,37 @@ const parser = new Parser()
 
 const { assets, indicators } = parser.parse(algorithm)
 
-const alpacaClient = new AlpacaStockClient()
-const tiingoClient = new TiingoClient()
+const client = new AlpacaStockClient()
+// const client = new TiingoClient()
 
-// const ohlcCache = new OhlcCache(alpacaClient, assets)
-// await ohlcCache.load()
+const ohlcCache = new OhlcCache(client, assets)
+await ohlcCache.load()
+ohlcCache.printDebugTable()
 
-// const indicatorCache = new IndicatorCache(ohlcCache, indicators)
-// await indicatorCache.load()
+const indicatorCache = new IndicatorCache(ohlcCache, indicators)
+await indicatorCache.load()
+indicatorCache.printDebugTable()
 
-// const interpreter = new Interpreter(indicatorCache)
+// // const hydRsi = indicatorCache.getIndicatorValues('HYD', 'relative-strength-index', {window: 10})
+// // const iyzRsi = indicatorCache.getIndicatorValues('IYZ', 'relative-strength-index', {window: 10})
+// // const dates = Object.keys(hydRsi!)
 
-// const allocations = interpreter.evaluate(algorithm)
+// // const tableData = []
+// // for (const date of dates) {
+// //   tableData.push({
+// //     date,
+// //     hyd: hydRsi[date],
+// //     iyz: iyzRsi[date],
+// //     allocated: hydRsi[date] > iyzRsi[date] ? 'TQQQ' : 'PSQ'
+// //   })
+// // }
+// // console.table(tableData)
 
-// console.log(allocations);
+// // const interpreter = new Interpreter(indicatorCache)
 
-const backtester = new Backtester(algorithm, tiingoClient)
+// // const allocations = interpreter.evaluate(algorithm,)
+
+// // console.log(allocations);
+
+const backtester = new Backtester(algorithm, client)
 await backtester.run()

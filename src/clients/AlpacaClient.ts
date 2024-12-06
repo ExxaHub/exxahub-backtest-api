@@ -154,10 +154,6 @@ export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterfa
             }
 
             resp = await this.get<AlpacaHistoricalBarsResponse>('/v2/stocks/bars', params)
-            console.log('>>>> RESP', {
-                ticker: symbol,
-                resp: resp
-            })
             const normalizedBars = this.normalizeAlpacaBars(resp.bars)
             bars = [...bars, ...normalizedBars[symbol]]
         } while (resp.next_page_token)

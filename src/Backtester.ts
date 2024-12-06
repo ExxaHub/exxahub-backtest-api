@@ -2,7 +2,7 @@ import type { Algorithm, ClientInterface } from "./types";
 import { OhlcCache } from './OhlcCache'
 import { IndicatorCache } from './IndicatorCache'
 import { Parser } from './Parser'
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { Interpreter } from "./Interpreter";
 
 const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
@@ -62,7 +62,7 @@ export class Backtester {
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
             // After rebalance, Rebalancer logs new portfolio value for date
 
-            currentDate = currentDate.add(1, 'day')
+            currentDate = this.getNextMarketDate(currentDate)
         }
         console.log('>>>> 7')
     }
@@ -118,5 +118,17 @@ export class Backtester {
 
         console.log(`Earliest Start Date is ${this.backtestStartDate} for ticker ${earliestStartDateTicker}`)
         console.log(`Ticker start dates`, this.tickerStartDates)
+    }
+
+    getNextMarketDate(date: Dayjs): Dayjs {
+        if (!this.ohlcCache) {
+            throw new Error('ohlcCache not loaded.')
+        }
+
+        do {
+            date = date.add(1, 'day')
+        } while (!this.ohlcCache.hasBarsForDate(date))
+
+        return date
     }
 }

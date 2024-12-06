@@ -1,8 +1,14 @@
 import type {OHLCBar} from "../types";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 
 type Params = { 
     window: number 
+}
+
+const barDates: Set<string> = new Set<string>()
+
+const hasBarForDate = (date: Dayjs): boolean => {
+    return barDates.has(date.format('YYYY-MM-DD'))
 }
 
 export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
@@ -12,6 +18,8 @@ export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLC
     if (rsiLength > bars.length) {
         throw new Error(`Not enough data for RSI calculation. Ticker: ${ticker}, RSI Length: ${rsiLength}, Bars: ${bars.length}`)
     }
+
+    bars.map(bar => barDates.add(bar.date));
 
     const closes: number[] = bars.map(bar => bar.close);
     const changes: number[] = [];
@@ -40,9 +48,13 @@ export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLC
 
         const RS = avgGain / avgLoss;
         const RSI = 100 - (100 / (1 + RS));
-        const date = dayjs(bars[i].date).add(1, 'day')
+        
+        let date = dayjs(bars[i].date)
+        do {
+            date = date.add(1, 'day')
+        } while (!hasBarForDate(date))
 
-        indicator[date.format('YYYY-MM-DD')] = parseFloat(RSI.toFixed(2));
+        indicator[date.format('YYYY-MM-DD')] = parseFloat(RSI.toFixed(4));
     }
 
     return indicator;
