@@ -52,7 +52,7 @@ describe("IndicatorCache", () => {
     ])
     await indicatorCache.load()
 
-    expect(indicatorCache.getIndicatorValue('SPY', 'relative-strength-index', { window: 3 })).toEqual(83.37)
+    expect(indicatorCache.getIndicatorValue('SPY', 'relative-strength-index', { window: 3 })).toEqual(83.3689)
     expect(indicatorCache.getIndicatorValue('QQQ', 'max-drawdown', { window: 3 })).toEqual(9)
 
     expect(

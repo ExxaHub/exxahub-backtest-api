@@ -5,13 +5,13 @@ type Params = {
     window: number 
 }
 
-const barDates: Set<string> = new Set<string>()
-
-const hasBarForDate = (date: Dayjs): boolean => {
-    return barDates.has(date.format('YYYY-MM-DD'))
-}
-
 export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+    const barDates: Set<string> = new Set<string>()
+
+    const hasBarForDate = (date: Dayjs): boolean => {
+        return barDates.has(date.format('YYYY-MM-DD'))
+    }
+
     const rsiLength = params.window
     const indicator: Record<string, number> = {}
 
