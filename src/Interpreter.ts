@@ -11,6 +11,10 @@ enum WeightType {
   Specified = 'specified'
 }
 
+export type Allocations = {
+  [key: string]: number | null;
+}
+
 export class Interpreter {
   private indicatorCache: IndicatorCache
   private date: string
@@ -19,9 +23,10 @@ export class Interpreter {
   constructor(indicatorCache: IndicatorCache, tradeableAssets: string[]) {
     this.indicatorCache = indicatorCache
     this.tradeableAssets = tradeableAssets
+    this.date = dayjs().format('YYYY-MM-DD')
   }
 
-  evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache, date?: Dayjs) {
+  evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
     this.indicatorCache = indicatorCache
     this.date = date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
     const rawAllocations = this.evaluateNode(algorithm)
@@ -131,7 +136,7 @@ export class Interpreter {
     }
   }
 
-  private combineAllocationsByAsset(allocations: AllocationAsset[]) {
+  private combineAllocationsByAsset(allocations: AllocationAsset[]): Allocations {
     const combinedAllocations = allocations.reduce((accumulator: Record<string, number>, allocation: AllocationAsset) => {
       if (accumulator[allocation.ticker] === undefined) {
         accumulator[allocation.ticker] = 0

@@ -4,6 +4,7 @@ import { IndicatorCache } from './IndicatorCache'
 import { Parser } from './Parser'
 import dayjs, { type Dayjs } from "dayjs";
 import { Interpreter } from "./Interpreter";
+import { Rebalancer } from "./Rebalancer";
 
 const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
 
@@ -45,6 +46,7 @@ export class Backtester {
         let toDate = this.getLastMarketDate(dayjs(this.backtestEndDate))
         
         const interpreter = new Interpreter(this.indicatorCache, this.tradeableAssets)
+        const rebalancer = new Rebalancer()
 
         while (currentDate <= toDate) {
             // Calculate allocations for date
@@ -56,6 +58,8 @@ export class Backtester {
             })
 
             // Pass new allocations to Rebalancer
+            rebalancer.rebalance(allocations)
+
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
             // After rebalance, Rebalancer logs new portfolio value for date
 
