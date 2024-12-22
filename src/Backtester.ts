@@ -30,20 +30,19 @@ export class Backtester {
     }
 
     async run(): Promise<void> {
-        
         await this.loadData()
-        
+
         if (!this.indicatorCache) {
             throw new Error('Indicator cache has not been initialized.')
         }
         
         // TODO: Calculate minimum number of bars needed for the indicators, then move up the start date by that amount
         this.calculateBacktestStartDate()
-        
+
         // Iterate over each day starting from the backtest start date
         let fromDate = dayjs(this.backtestStartDate)
         let currentDate = fromDate.clone()
-        let toDate = dayjs(this.backtestEndDate)
+        let toDate = this.getLastMarketDate(dayjs(this.backtestEndDate))
         
         const interpreter = new Interpreter(this.indicatorCache, this.tradeableAssets)
 
@@ -86,15 +85,11 @@ export class Backtester {
 
     private calculateBacktestStartDate(): void {
         if (!this.ohlcCache || !this.ohlcCache.isLoaded()) {
-            throw new Error('OHLC data has not been loaded yet.')
+            throw new Error('OHLC data has not been loaded.')
         }
 
-        if (!this.indicatorCache) {
-            throw new Error('Indicator data has not been loaded yet. 1')
-        }
-
-        if (!this.indicatorCache.isLoaded()) {
-            throw new Error('Indicator data has not been loaded yet. 2')
+        if (!this.indicatorCache || !this.indicatorCache.isLoaded()) {
+            throw new Error('Indicator data has not been loaded.')
         }
 
         const tickers = this.ohlcCache.getTickers()
@@ -130,6 +125,18 @@ export class Backtester {
 
         do {
             date = date.add(1, 'day')
+        } while (!this.ohlcCache.hasBarsForDate(date))
+
+        return date
+    }
+
+    getLastMarketDate(date: Dayjs): Dayjs {
+        if (!this.ohlcCache) {
+            throw new Error('ohlcCache not loaded.')
+        }
+
+        do {
+            date = date.subtract(1, 'day')
         } while (!this.ohlcCache.hasBarsForDate(date))
 
         return date
