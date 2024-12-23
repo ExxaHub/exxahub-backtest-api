@@ -52,6 +52,11 @@ export class OhlcCache {
     return bars
   }
 
+  getBarForDate(ticker: string, date: Dayjs): OHLCBar | undefined {
+    let bars = this.cachedOhlcBars.get(ticker)
+    return bars?.find(bar => bar.date === date.format('YYYY-MM-DD'))
+  }
+
   getTickers(): string[] {
     return Array.from(this.cachedOhlcBars.keys())
   }

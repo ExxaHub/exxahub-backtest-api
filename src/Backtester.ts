@@ -36,6 +36,10 @@ export class Backtester {
         if (!this.indicatorCache) {
             throw new Error('Indicator cache has not been initialized.')
         }
+
+        if (!this.ohlcCache) {
+            throw new Error('OHLC cache has not been initialized.')
+        }
         
         // TODO: Calculate minimum number of bars needed for the indicators, then move up the start date by that amount
         this.calculateBacktestStartDate()
@@ -46,7 +50,7 @@ export class Backtester {
         let toDate = this.getLastMarketDate(dayjs(this.backtestEndDate))
         
         const interpreter = new Interpreter(this.indicatorCache, this.tradeableAssets)
-        const rebalancer = new Rebalancer()
+        const rebalancer = new Rebalancer(this.ohlcCache)
 
         while (currentDate <= toDate) {
             // Calculate allocations for date
@@ -58,7 +62,7 @@ export class Backtester {
             })
 
             // Pass new allocations to Rebalancer
-            rebalancer.rebalance(allocations)
+            rebalancer.rebalance(currentDate, allocations)
 
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
             // After rebalance, Rebalancer logs new portfolio value for date
@@ -122,7 +126,7 @@ export class Backtester {
         console.log(`Ticker start dates`, this.tickerStartDates)
     }
 
-    getNextMarketDate(date: Dayjs): Dayjs {
+    private getNextMarketDate(date: Dayjs): Dayjs {
         if (!this.ohlcCache) {
             throw new Error('ohlcCache not loaded.')
         }
@@ -134,7 +138,7 @@ export class Backtester {
         return date
     }
 
-    getLastMarketDate(date: Dayjs): Dayjs {
+    private getLastMarketDate(date: Dayjs): Dayjs {
         if (!this.ohlcCache) {
             throw new Error('ohlcCache not loaded.')
         }
