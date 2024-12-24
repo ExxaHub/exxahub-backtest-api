@@ -62,7 +62,7 @@ export class Backtester {
             })
 
             // Pass new allocations to Rebalancer
-            rebalancer.rebalance(currentDate, allocations)
+            await rebalancer.rebalance(currentDate, allocations)
 
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
             // After rebalance, Rebalancer logs new portfolio value for date
@@ -75,6 +75,7 @@ export class Backtester {
         }
 
         console.table(this.backtestResults)
+        console.log('Portfolio value: ', rebalancer.getPortfolioValue())
     }
 
     async loadData(): Promise<void> {
