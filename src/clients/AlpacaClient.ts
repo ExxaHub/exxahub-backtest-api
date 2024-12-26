@@ -102,7 +102,7 @@ export class AlpacaBaseClient {
 }
 
 export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterface {
-    async getBars(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
+    async getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
         for (const symbol of symbols) {

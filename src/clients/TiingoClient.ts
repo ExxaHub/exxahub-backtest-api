@@ -17,6 +17,26 @@ export type TiingoOHLCBar =    {
     splitFactor: number
 }
 
+export type TiingoLastPriceResponse = Array<{
+    ticker: string,
+    timestamp: string
+    quoteTimestamp: string
+    lastSaleTimeStamp: string
+    last: number,
+    lastSize: number,
+    tngoLast: number,
+    prevClose: number,
+    open: number,
+    high: number,
+    low: number,
+    mid: number,
+    volume: number,
+    bidSize: number,
+    bidPrice: number,
+    askSize: number,
+    askPrice: number,
+}>
+
 type ErrorResponse = {
     detail: string
 }
@@ -47,7 +67,7 @@ export class TiingoClient implements ClientInterface {
         return await response.json() as T;
     }
 
-    async getBars(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
+    async getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
         for (const symbol of symbols) {
@@ -85,6 +105,16 @@ export class TiingoClient implements ClientInterface {
         const normalizedBars = this.normalizeTiingoBars({ [symbol]: resp })
         bars = normalizedBars[symbol]
         return { symbol, bars }
+    }
+
+    async getCurrentPriceForSymbol(symbol: string): Promise<Record<string, number>> {
+        const params = {}
+
+        const resp = await this.get<TiingoLastPriceResponse>(`/iex/${symbol}`, params)
+        
+        return {
+            [resp[0].timestamp.split('T')[0]]: resp[0].last
+        }
     }
 
     private normalizeTiingoBars(bars: {[key: string]: TiingoOHLCBar[]}): {[key: string]: OHLCBar[]} {

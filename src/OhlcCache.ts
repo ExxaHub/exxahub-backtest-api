@@ -62,7 +62,7 @@ export class OhlcCache {
   }
 
   private async getTickerBars(): Promise<{[key: string]: OHLCBar[]}> {
-    return this.client.getBars(this.tickers)
+    return this.client.getBarsForSymbols(this.tickers)
   }
 
   printDebugTable() {

@@ -16,6 +16,11 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
 
 ### Roadmap
 
+- Supported Data providers
+    - [x] Alpaca
+    - [x] Tiingo
+    - [x] Polygon.io
+    - [ ] AlphaVantage
 - Supported indicators
     - [x] Current Price
         - [ ] Unit tests
@@ -39,8 +44,6 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [x] Unit tests
 - Backtesting
     - Set start date dynamically from ETF when fetching alpaca data
-    - Determine backtest start date from ticker list and indicator windows
-    - Iterate through each bar
     - Calculate metrics
         - [ ] Cumulative Return
         - [ ] Annualized Return

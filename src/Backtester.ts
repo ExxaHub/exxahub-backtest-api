@@ -5,6 +5,7 @@ import { Parser } from './Parser'
 import dayjs, { type Dayjs } from "dayjs";
 import { Interpreter } from "./Interpreter";
 import { Rebalancer } from "./Rebalancer";
+import { toCurrency } from "./Utils";
 
 const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
 
@@ -30,7 +31,7 @@ export class Backtester {
         this.backtestEndDate = dayjs().format('YYYY-MM-DD')
     }
 
-    async run(): Promise<void> {
+    async run(from?: string, to?: string): Promise<void> {
         await this.loadData()
 
         if (!this.indicatorCache) {
@@ -45,9 +46,9 @@ export class Backtester {
         this.calculateBacktestStartDate()
 
         // Iterate over each day starting from the backtest start date
-        let fromDate = dayjs(this.backtestStartDate)
+        let fromDate = from ? dayjs(from) : dayjs(this.backtestStartDate)
         let currentDate = fromDate.clone()
-        let toDate = this.getLastMarketDate(dayjs(this.backtestEndDate))
+        let toDate = this.getLastMarketDate(to ? dayjs(to) : dayjs(this.backtestEndDate))
         
         const interpreter = new Interpreter(this.indicatorCache, this.tradeableAssets)
         const rebalancer = new Rebalancer(this.ohlcCache)
@@ -62,10 +63,9 @@ export class Backtester {
             })
 
             // Pass new allocations to Rebalancer
-            await rebalancer.rebalance(currentDate, allocations)
-
             // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
             // After rebalance, Rebalancer logs new portfolio value for date
+            rebalancer.rebalance(currentDate, allocations)
 
             if (currentDate.isSame(toDate)) {
                 break
@@ -75,7 +75,7 @@ export class Backtester {
         }
 
         console.table(this.backtestResults)
-        console.log('Portfolio value: ', rebalancer.getPortfolioValue())
+        console.log('Portfolio value: ', toCurrency(rebalancer.getPortfolioValue()))
     }
 
     async loadData(): Promise<void> {
@@ -118,10 +118,9 @@ export class Backtester {
             }    
         }
 
-        this.backtestStartDate = earlieststartDate
-            // TODO: Figure out better way to account for weekends other than multiplying by 2
-            .add(this.indicatorCache.getLargestWindow() * 2, 'days')
-            .format('YYYY-MM-DD')
+        this.backtestStartDate = this.getNextMarketDate(
+            earlieststartDate.add(this.indicatorCache.getLargestWindow(), 'days')
+        ).format('YYYY-MM-DD')
 
         console.log(`Earliest Start Date is ${this.backtestStartDate} for ticker ${earliestStartDateTicker}`)
         console.log(`Ticker start dates`, this.tickerStartDates)

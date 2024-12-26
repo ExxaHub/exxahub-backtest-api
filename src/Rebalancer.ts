@@ -26,16 +26,16 @@ const DEFAULT_HOLDING = {
     value: 0
 }
 
-const INITIAL_PORTFOLIO_VALUE = 10000
+const INITIAL_PORTFOLIO_VALUE = 100_000
 
 export class Rebalancer {
     private ohlcCache: OhlcCache
     private portfolioValue: number
     private currentHoldings: Holdings = {}
 
-    constructor(ohlcCache: OhlcCache, portfolioValue: number = 10000) {
+    constructor(ohlcCache: OhlcCache, portfolioValue?: number) {
         this.ohlcCache = ohlcCache
-        this.portfolioValue = portfolioValue
+        this.portfolioValue = portfolioValue ?? INITIAL_PORTFOLIO_VALUE
     }
 
     getCurrentHoldings(): Holdings {
@@ -54,7 +54,7 @@ export class Rebalancer {
         this.portfolioValue = value
     }
 
-    async rebalance(date: Dayjs, newAllocations: Allocations): Promise<void> {
+    rebalance(date: Dayjs, newAllocations: Allocations): void {
         // update portfolio value based on current day's close
         this.updatePortfolioValue(date)
         
@@ -103,13 +103,13 @@ export class Rebalancer {
         }
 
         let updatedHoldings: Holdings = Object.assign({}, this.currentHoldings)
-        updatedHoldings = await this.executeTrades(trades.sell, updatedHoldings)
-        updatedHoldings = await this.executeTrades(trades.buy, updatedHoldings)
+        updatedHoldings = this.executeTrades(trades.sell, updatedHoldings)
+        updatedHoldings = this.executeTrades(trades.buy, updatedHoldings)
 
         this.setCurrentHoldings(updatedHoldings)
     }
 
-    async executeTrades(trades: Trade[], newHoldings: Holdings): Promise<Holdings> {
+    executeTrades(trades: Trade[], newHoldings: Holdings): Holdings {
         for (const trade of trades) {
             if (!newHoldings[trade.ticker]) {
                 newHoldings[trade.ticker] = Object.assign({}, DEFAULT_HOLDING)
