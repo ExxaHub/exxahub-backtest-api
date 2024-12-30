@@ -1,4 +1,4 @@
-import type { Algorithm, AlgorithmNode, Indicator } from "./types";
+import type { Symphony, SymphonyNode, Indicator } from "./types";
 import { createHash } from "crypto";
 
 export type ParsedAssetsAndIndicators = {
@@ -12,7 +12,7 @@ export class Parser {
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
 
-  parse(algorithm: Algorithm): ParsedAssetsAndIndicators {
+  parse(algorithm: Symphony): ParsedAssetsAndIndicators {
     this.parseNode(algorithm)
     
     return {
@@ -22,7 +22,7 @@ export class Parser {
     }
   }
 
-  private parseNode(node: AlgorithmNode): void {
+  private parseNode(node: SymphonyNode): void {
     switch (node.step) {
       case "root": {
         node.children!.flatMap(childNode => this.parseNode(childNode));
@@ -60,7 +60,7 @@ export class Parser {
     }
   }
 
-  private evaluateCondition(node: AlgorithmNode, parentWeight: number = 100): void {
+  private evaluateCondition(node: SymphonyNode, parentWeight: number = 100): void {
     const ifBlock = node.children![0]
     const elseBlock = node.children![1]
 

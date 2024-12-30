@@ -4,7 +4,7 @@ import { OhlcCache } from "./OhlcCache";
 
 const alpacaStockClient = new AlpacaStockClient()
 
-alpacaStockClient.getBars = mock((symbols: string[]) => {
+alpacaStockClient.getBarsForSymbols = mock((symbols: string[]) => {
   return Promise.resolve({
     'SPY': [
       { date: "2024-11-10", open: 100, high: 105, low: 95, close: 100, volume: 10 },

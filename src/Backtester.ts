@@ -1,4 +1,4 @@
-import type { Algorithm, ClientInterface } from "./types";
+import type { Symphony, ClientInterface } from "./types";
 import { OhlcCache } from './OhlcCache'
 import { IndicatorCache } from './IndicatorCache'
 import { Parser } from './Parser'
@@ -10,7 +10,7 @@ import { toCurrency } from "./Utils";
 const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
 
 export class Backtester {
-    private algorithm: Algorithm
+    private algorithm: Symphony
     private client: ClientInterface
     private ohlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
@@ -22,7 +22,7 @@ export class Backtester {
 
     private tickerStartDates: Record<string, string> = {}
 
-    constructor(algorithm: Algorithm, client: ClientInterface, tradeableAssets: string[]) {
+    constructor(algorithm: Symphony, client: ClientInterface, tradeableAssets: string[]) {
         this.algorithm = algorithm
         this.client = client
         this.tradeableAssets = tradeableAssets

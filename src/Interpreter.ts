@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from "dayjs";
 import type { IndicatorCache } from "./IndicatorCache";
 import type { 
-  Algorithm,
-  AlgorithmNode,
+  Symphony,
+  SymphonyNode,
   AllocationAsset
 } from "./types";
 
@@ -26,7 +26,7 @@ export class Interpreter {
     this.date = dayjs().format('YYYY-MM-DD')
   }
 
-  evaluate(algorithm: Algorithm, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
+  evaluate(algorithm: Symphony, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
     this.indicatorCache = indicatorCache
     this.date = date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
     const rawAllocations = this.evaluateNode(algorithm)
@@ -34,7 +34,7 @@ export class Interpreter {
   }
 
   private evaluateNode(
-    node: AlgorithmNode,
+    node: SymphonyNode,
     weightType: WeightType = WeightType.Equal,
     parentWeight: number = 100
   ): unknown {
@@ -84,7 +84,7 @@ export class Interpreter {
     return [];
   }
 
-  private evaluateCondition(node: AlgorithmNode, weightType: WeightType, parentWeight: number = 100): unknown {
+  private evaluateCondition(node: SymphonyNode, weightType: WeightType, parentWeight: number = 100): unknown {
     const ifBlock = node.children![0]
     const elseBlock = node.children![1]
   

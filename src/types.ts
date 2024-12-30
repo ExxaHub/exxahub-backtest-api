@@ -1,4 +1,4 @@
-export interface AlgorithmNode {
+export interface SymphonyNode {
     id: string;
     step: string;
     name?: string;
@@ -15,13 +15,13 @@ export interface AlgorithmNode {
     'rhs-fn-params'?: Record<string, any>;
     comparator?: string;
     'is-else-condition'?: boolean;
-    children?: AlgorithmNode[];
+    children?: SymphonyNode[];
     weight?: { num: number; den: number };
     collapsed?: boolean;
   }
 
 
-export interface Algorithm {
+export interface Symphony {
     description: string;
     name: string;
     id: string;
@@ -29,7 +29,7 @@ export interface Algorithm {
     rebalance: string;
     assetClass?: string;
     assetClasses?: string[];
-    children: AlgorithmNode[];
+    children: SymphonyNode[];
 }
 
 export type AllocationAsset = {

@@ -1,0 +1,80 @@
+{
+    "name": "New Symphony",
+    "asset_class": "EQUITIES",
+    "rebalance": "daily",
+    "id": "new",
+    "step": "root",
+    "asset_classes": [
+        "EQUITIES"
+    ],
+    "description": "",
+    "children": [
+        {
+            "id": "5e4aa7c6-81ef-4b68-bf97-8f9913a1cd31",
+            "step": "wt-cash-equal",
+            "children": [
+                {
+                    "weight": {
+                        "num": 100,
+                        "den": 100
+                    },
+                    "id": "5811db0f-357b-4104-94ea-a7501f4b71df",
+                    "step": "group",
+                    "name": "10d RSI HYD > 10d RSI IYZ",
+                    "children": [
+                        {
+                            "step": "wt-cash-equal",
+                            "id": "6ef32806-b2fe-4a49-9f39-838f576e40e6",
+                            "children": [
+                                {
+                                    "id": "cdbe8337-e418-4f85-bc39-69f1842fd1d9",
+                                    "step": "if",
+                                    "condition_type": "allOf",
+                                    "conditions": [
+                                        {
+                                            "lhs-fn": "relative-strength-index",
+                                            "lhs-fn-params": {
+                                                "window": 10
+                                            },
+                                            "lhs-val": "HYD",
+                                            "rhs-fn": "relative-strength-index",
+                                            "rhs-fn-params": {
+                                                "window": 10
+                                            },
+                                            "rhs-val": "IYZ",
+                                            "comparator": "gt"
+                                        }
+                                    ],
+                                    "then_children": [
+                                        {
+                                            "ticker": "TQQQ",
+                                            "exchange": "XNAS",
+                                            "name": "ProShares UltraPro QQQ",
+                                            "id": "8b6f212c-e237-4764-9f83-ed0293a35059",
+                                            "step": "asset",
+                                            "collapsed?": false,
+                                            "children": []
+                                        }
+                                    ],
+                                    "else_children": [
+                                        {
+                                            "ticker": "PSQ",
+                                            "exchange": "ARCX",
+                                            "name": "ProShares Short QQQ",
+                                            "id": "72463f12-d3da-44f7-86aa-9f83dd176ae1",
+                                            "step": "asset",
+                                            "collapsed?": false,
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ],
+                            "collapsed?": false
+                        }
+                    ],
+                    "collapsed?": false
+                }
+            ]
+        }
+    ]
+}

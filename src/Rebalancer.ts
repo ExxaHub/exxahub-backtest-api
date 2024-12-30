@@ -26,7 +26,7 @@ const DEFAULT_HOLDING = {
     value: 0
 }
 
-const INITIAL_PORTFOLIO_VALUE = 100_000
+const INITIAL_PORTFOLIO_VALUE = 10_000
 
 export class Rebalancer {
     private ohlcCache: OhlcCache

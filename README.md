@@ -42,8 +42,11 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [x] Unit tests
     - [x] Fixed values
         - [x] Unit tests
+- General Improvements
+    - [ ] Convert composer JSON to standardized trading bot JSON
+    - [ ] Include branching history
+    - [ ] Include detailed log from each daily rebalance that shows which conditions fired and what their values were at the time of trading
 - Backtesting
-    - Set start date dynamically from ETF when fetching alpaca data
     - Calculate metrics
         - [ ] Cumulative Return
         - [ ] Annualized Return
@@ -54,8 +57,6 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
         - [ ] Standard Deviation
         - [ ] Max Drawdown
 - Better error description when algo fails
-- Better handling of dates on weekends
-- Better handling of dates when market is closed
 - Backend
     - Algo management
     - Asset management
