@@ -1,5 +1,109 @@
+import { type Symphony, type SymphonyNode, type TradingBotNode, type TradingBotNodeCondition, type TradingBotNodeIfThenElse, TradingBotNodeType } from "../types";
+import { ulid } from "ulid";
+
 export class SymphonyAdapter {
-    adapt() {
-        
+    adapt(algorithm: Symphony) {
+        const nodes = this.parseNode(algorithm)    
+        return nodes
+    }
+
+    private parseNode(node: SymphonyNode): TradingBotNode {
+        switch (node.step) {
+          case "root": {
+            return {
+                description: node.description!,
+                name: node.name!,
+                id: node.id,
+                node_type: TradingBotNodeType.root,
+                rebalance: node.rebalance!,
+                version: 'v1',
+                children: node.children!.flatMap(childNode => this.parseNode(childNode))
+            }
+          }
+      
+          case 'wt-cash-equal': {
+            return {
+                id: this.getId('weight'),
+                node_type: TradingBotNodeType.weight_cash_equal,
+                children: node.children!.flatMap((child) => this.parseNode(child))
+            }
+          }
+      
+          case 'wt-cash-specified': {
+            return {
+                id: this.getId('weight'),
+                node_type: TradingBotNodeType.weight_cash_specified,
+                children: node.children!.flatMap((child) => this.parseNode(child))
+            }
+          }
+      
+          case 'group': {
+            return {
+                weight: {
+                    num: node.weight?.num!,
+                    den: node.weight?.den!
+                },
+                id: this.getId('group'),
+                node_type: TradingBotNodeType.group,
+                name: node.name!,
+                children: node.children!.flatMap((child) => this.parseNode(child))
+            }
+          }
+      
+          case 'if': {
+            return this.evaluateCondition(node)
+          }
+      
+          case 'asset': {
+            return {
+                ticker: node.ticker!,
+                name: node.ticker!,
+                id: this.getId('asset'),
+                node_type: TradingBotNodeType.asset
+            }
+          }
+      
+          default:
+            throw new Error(`Unknown step: ${node.step}`);
+        }
+    }
+
+    private evaluateCondition(node: SymphonyNode, parentWeight: number = 100): TradingBotNodeIfThenElse {
+        const ifBlock = node.children![0]
+        const elseBlock = node.children![1]
+    
+        let condition: TradingBotNodeCondition = {
+            id: this.getId('cond'),
+            node_type: TradingBotNodeType.condition,
+            lhs_fn: ifBlock['lhs-fn']!,
+            lhs_fn_params: ifBlock['lhs-window-days'] ? { window: parseInt(ifBlock['lhs-window-days']) } : ifBlock['lhs-fn-params']!,
+            lhs_val: ifBlock['lhs-val']!,
+            comparator: ifBlock['comparator']!
+        }
+    
+        if (!ifBlock['rhs-fixed-value?']) {
+          condition.rhs_fn = ifBlock['rhs-fn']
+          condition.rhs_fn_params = ifBlock['rhs-window-days'] ? { window: parseInt(ifBlock['rhs-window-days']) } : ifBlock['rhs-fn-params']
+          condition.rhs_val = ifBlock['rhs-val']
+        }
+    
+        let thenChildren: TradingBotNode[] = []
+        thenChildren = ifBlock.children!.flatMap((child) => this.parseNode(child));
+    
+        let elseChildren: TradingBotNode[] = []
+        elseChildren = elseBlock.children!.flatMap((child) => this.parseNode(child));
+
+        return  {
+            id: this.getId('if'),
+            node_type: TradingBotNodeType.if_then_else,
+            condition_type: "allOf",
+            conditions: [condition],
+            then_children: thenChildren,
+            else_children: elseChildren,
+        }
+    }
+
+    private getId(prefix: string): string {
+        return `${prefix}_${ulid().toLowerCase()}`
     }
 }

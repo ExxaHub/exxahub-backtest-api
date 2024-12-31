@@ -18,8 +18,9 @@ export interface SymphonyNode {
     children?: SymphonyNode[];
     weight?: { num: number; den: number };
     collapsed?: boolean;
-  }
-
+    rebalance?: string;
+    description?: string;
+}
 
 export interface Symphony {
     description: string;
@@ -31,6 +32,95 @@ export interface Symphony {
     assetClasses?: string[];
     children: SymphonyNode[];
 }
+
+export enum TradingBotNodeType {
+    root = 'root',
+    group = 'group',
+    weight_cash_equal = 'wt-cash-equal',
+    weight_cash_specified = 'wt-cash-specified',
+    if_then_else = 'if-then-else',
+    condition = 'condition',
+    asset = 'asset'
+}
+
+export interface TradingBotNodeRoot {
+    description: string;
+    name: string;
+    id: string;
+    node_type: TradingBotNodeType.root;
+    rebalance: string;
+    version: 'v1';
+    children: TradingBotNode[];
+}
+
+export type TradingBotNodeGroup = {
+    weight?: {
+        num: number,
+        den: number
+    },
+    id: string,
+    node_type: TradingBotNodeType.group,
+    name: string,
+    children: TradingBotNode[]
+}
+
+export type TradingBotNodeWeightCashEqual = {
+    id: string,
+    node_type: TradingBotNodeType.weight_cash_equal,
+    children: TradingBotNode[]
+}
+
+export type TradingBotNodeWeightCashSpecified = {
+    id: string,
+    node_type: TradingBotNodeType.weight_cash_specified,
+    children: TradingBotNode[]
+}
+
+export enum TradingBotNodeIfThenElseConditionType {
+    AllOf = 'allOf',
+    AnyOf = 'anyOf',
+}
+
+export type TradingBotNodeIfThenElse = {
+    id: string,
+    node_type: TradingBotNodeType.if_then_else
+    condition_type: "allOf" | "anyOf",
+    conditions: TradingBotNodeCondition[],
+    then_children: TradingBotNode[],
+    else_children: TradingBotNode[]
+}
+
+export type TradingBotNodeCondition = {
+    id: string,
+    node_type: TradingBotNodeType.condition,
+    lhs_fn: string,
+    lhs_fn_params: {
+        window?: number
+    },
+    lhs_val: string,
+    rhs_fn?: string,
+    rhs_fn_params?: {
+        window?: number
+    },
+    rhs_val?: string,
+    comparator: string
+}
+
+export type TradingBotNodeAsset = {
+    ticker: string,
+    name: string,
+    id: string,
+    node_type: TradingBotNodeType.asset
+}
+
+export type TradingBotNode = 
+    | TradingBotNodeRoot
+    | TradingBotNodeGroup 
+    | TradingBotNodeWeightCashEqual 
+    | TradingBotNodeWeightCashSpecified
+    | TradingBotNodeIfThenElse
+    | TradingBotNodeCondition
+    | TradingBotNodeAsset 
 
 export type AllocationAsset = {
     ticker: string;
