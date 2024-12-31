@@ -1,7 +1,16 @@
 {
-  "name": "mainsail",
+  "name": "@dpods/mainsail",
+  "version": "0.1.1",
   "module": "index.ts",
   "type": "module",
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/index.js",
+  "repository": "https://github.com/dpods/mainsail.git",
+  "scripts": {
+    "pkg": "bun build ./src/index.ts --outdir ./dist"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

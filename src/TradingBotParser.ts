@@ -1,5 +1,5 @@
-import { type Symphony, type SymphonyNode, type Indicator, type TradingBotNode, TradingBotNodeType, type TradingBotNodeIfThenElse, type TradingBotNodeCondition, TradingBotNodeIfThenElseConditionType } from "./types";
-import { createHash } from "crypto";
+import { type Indicator, type TradingBotNode, TradingBotNodeType, type TradingBotNodeIfThenElse, type TradingBotNodeCondition } from "./types";
+import { createHash } from "node:crypto";
 
 export type ParsedAssetsAndIndicators = {
   assets: string[],
@@ -92,9 +92,10 @@ export class TradingBotParser {
    * @returns A fixed-length hash string.
    */
   generateHash(input: string | object): string {
-    const hash = createHash("sha256");
+    const hasher = new Bun.CryptoHasher("sha256");
+    // const hash = createHash("sha256");
     const data = typeof input === "string" ? input : JSON.stringify(input);
-    hash.update(data);
-    return hash.digest("hex");
+    hasher.update(data);
+    return hasher.digest("hex");
   }
 }
