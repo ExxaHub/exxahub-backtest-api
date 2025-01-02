@@ -9,14 +9,13 @@ import { TradingBotInterpreter } from "./TradingBotInterpreter";
 import { TradingBotParser } from "./TradingBotParser";
 import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";
 
-const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
-
 type BacktestResults = {
     date_from?: string,
     date_to?: string,
     starting_balance?: number
     ending_balance?: number,
     allocation_history?: { [key: string]: string | number | null }[]
+    balance_history?: number[]
     ticker_start_dates?: { [key: string]: string }
 }
 
@@ -92,10 +91,10 @@ export class TradingBotBacktester {
             currentDate = this.getNextMarketDate(currentDate)
         }
 
-        this.backtestResults.allocation_history = this.allocationResults
-
         this.backtestResults.starting_balance = this.startingBalance
-        this.backtestResults.ending_balance = rebalancer.getPortfolioValue()
+        this.backtestResults.ending_balance = rebalancer.getBalance()
+        this.backtestResults.balance_history = rebalancer.getBalanceHistory()
+        this.backtestResults.allocation_history = this.allocationResults
 
         return this.backtestResults
     }

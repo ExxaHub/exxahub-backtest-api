@@ -32,6 +32,7 @@ export class Rebalancer {
     private ohlcCache: OhlcCache
     private portfolioValue: number
     private currentHoldings: Holdings = {}
+    private balanceHistory: number[] = []
 
     constructor(ohlcCache: OhlcCache, portfolioValue?: number) {
         this.ohlcCache = ohlcCache
@@ -46,12 +47,17 @@ export class Rebalancer {
         this.currentHoldings = holdings
     }
 
-    getPortfolioValue(): number {
+    getBalance(): number {
         return parseFloat(this.portfolioValue.toFixed(2))
+    }
+
+    getBalanceHistory(): number[] {
+        return this.balanceHistory
     }
 
     setPortfolioValue(value: number): void {
         this.portfolioValue = value
+        this.balanceHistory.push(this.portfolioValue)
     }
 
     rebalance(date: Dayjs, newAllocations: Allocations): void {
