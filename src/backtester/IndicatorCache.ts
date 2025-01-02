@@ -36,8 +36,6 @@ export class IndicatorCache {
       }
     }
 
-    console.log(JSON.stringify(this.cachedIndicators, null, 2))
-
     this.loaded = true
   }
 
@@ -74,9 +72,9 @@ export class IndicatorCache {
       if (date) {
         const value = cachedIndicator[date]
 
-        // if (!value) {
-        //   throw new Error(`Could not calculate indicator value for key: ${key} on date ${date}`)
-        // }
+        if (!value) {
+          throw new Error(`Could not calculate indicator value for key: ${key} on date ${date}`)
+        }
 
         return value
       } else {

@@ -21,7 +21,6 @@ type BacktestResults = {
 }
 
 export class TradingBotBacktester {
-    private algorithm: TradingBotNode
     private client: ClientInterface
     private ohlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
@@ -37,8 +36,7 @@ export class TradingBotBacktester {
 
     private startingBalance = 10000
 
-    constructor(algorithm: TradingBotNode, client: ClientInterface) {
-        this.algorithm = algorithm
+    constructor(client: ClientInterface) {
         this.client = client
 
         this.defaultBacktestStartDate = dayjs().subtract(1, 'year').format('YYYY-MM-DD')
@@ -46,7 +44,7 @@ export class TradingBotBacktester {
     }
 
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
-        await this.loadData()
+        await this.loadData(backtestConfig)
 
         if (!this.indicatorCache) {
             throw new Error('Indicator cache has not been initialized.')
@@ -74,16 +72,17 @@ export class TradingBotBacktester {
 
         while (currentDate <= toDate) {
             // Calculate allocations for date
-            const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache, currentDate)
+            const allocations = interpreter.evaluate(
+                backtestConfig.trading_bot as TradingBotNode, 
+                this.indicatorCache, 
+                currentDate
+            )
             
             this.allocationResults.push({
                 date: currentDate.format('YYYY-MM-DD'),
                 ...allocations
             })
 
-            // Pass new allocations to Rebalancer
-            // If Rebalancer has previous allocations, it calculates which assets need to be sold and which ones need to be bought
-            // After rebalance, Rebalancer logs new portfolio value for date
             rebalancer.rebalance(currentDate, allocations)
 
             if (currentDate.isSame(toDate)) {
@@ -93,10 +92,7 @@ export class TradingBotBacktester {
             currentDate = this.getNextMarketDate(currentDate)
         }
 
-        console.table(this.allocationResults)
         this.backtestResults.allocation_history = this.allocationResults
-
-        console.log('Portfolio value: ', toCurrency(rebalancer.getPortfolioValue()))
 
         this.backtestResults.starting_balance = this.startingBalance
         this.backtestResults.ending_balance = rebalancer.getPortfolioValue()
@@ -104,10 +100,10 @@ export class TradingBotBacktester {
         return this.backtestResults
     }
 
-    async loadData(): Promise<void> {
+    async loadData(backtestConfig: BacktestConfig): Promise<void> {
         const parser = new TradingBotParser()
 
-        const { assets, tradeableAssets, indicators } = parser.parse(this.algorithm)
+        const { assets, tradeableAssets, indicators } = parser.parse(backtestConfig.trading_bot as TradingBotNode)
 
         this.tradeableAssets = tradeableAssets
 
@@ -151,9 +147,6 @@ export class TradingBotBacktester {
         }
 
         let startDate = this.getNextMarketDate(earlieststartDate)
-
-        console.log(`Earliest Start Date is ${startDate.format('YYYY-MM-DD')} for ticker ${earliestStartDateTicker}`)
-        console.log(`Ticker start dates`, this.tickerStartDates)
 
         return startDate
     }

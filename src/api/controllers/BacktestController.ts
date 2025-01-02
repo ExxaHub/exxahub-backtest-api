@@ -21,9 +21,6 @@ export default class BacktestController {
         })
       }
 
-      console.log(req.body)
-      console.log(backtestConfig)
-
       const results = await this.backtestService.run(backtestConfig)
 
       return res.json(results)

@@ -11,10 +11,8 @@ export class BacktestService {
         // const adapter = new SymphonyAdapter()
         // const tradingBot = adapter.adapt(algorithm)
 
-        console.time("TradingBotBacktester");
-        const backtester = new TradingBotBacktester(backtestConfig.trading_bot as TradingBotNode, client)
+        const backtester = new TradingBotBacktester(client)
         const results = await backtester.run(backtestConfig)
-        console.timeEnd("TradingBotBacktester");
 
         return results
     }
