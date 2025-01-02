@@ -7,6 +7,7 @@ import { Rebalancer } from "./Rebalancer";
 import { toCurrency } from "./Utils";
 import { TradingBotInterpreter } from "./TradingBotInterpreter";
 import { TradingBotParser } from "./TradingBotParser";
+import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";
 
 const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
 
@@ -26,8 +27,8 @@ export class TradingBotBacktester {
     private indicatorCache?: IndicatorCache
     private tradeableAssets?: string[]
 
-    private backtestStartDate: string
-    private backtestEndDate: string
+    private defaultBacktestStartDate: string
+    private defaultBacktestEndDate: string
     
     private allocationResults: { [key: string]: string | number | null }[] = []
     private backtestResults: BacktestResults = {}
@@ -40,14 +41,12 @@ export class TradingBotBacktester {
         this.algorithm = algorithm
         this.client = client
 
-        this.backtestStartDate = DEFAULT_BACKTEST_START_DATE
-        this.backtestEndDate = dayjs().format('YYYY-MM-DD')
+        this.defaultBacktestStartDate = dayjs().subtract(1, 'year').format('YYYY-MM-DD')
+        this.defaultBacktestEndDate = dayjs().format('YYYY-MM-DD')
     }
 
-    async run(from?: string, to?: string): Promise<BacktestResults> {
-        console.time("TradingBotBacktester - loadData");
+    async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
         await this.loadData()
-        console.timeEnd("TradingBotBacktester - loadData");
 
         if (!this.indicatorCache) {
             throw new Error('Indicator cache has not been initialized.')
@@ -61,15 +60,10 @@ export class TradingBotBacktester {
             throw new Error('Tradable assets cache has not been initialized.')
         }
         
-        console.time("TradingBotBacktester - calculateBacktestStartDate");
-        // TODO: Calculate minimum number of bars needed for the indicators, then move up the start date by that amount
-        this.calculateBacktestStartDate()
-        console.timeEnd("TradingBotBacktester - calculateBacktestStartDate");
-
         // Iterate over each day starting from the backtest start date
-        let fromDate = from ? dayjs(from) : dayjs(this.backtestStartDate)
+        let fromDate = this.calculateBacktestStartDate(backtestConfig.start_date)
         let currentDate = fromDate.clone()
-        let toDate = this.getLastMarketDate(to ? dayjs(to) : dayjs(this.backtestEndDate))
+        let toDate = this.getLastMarketDate(backtestConfig.end_date ? dayjs(backtestConfig.end_date) : dayjs(this.defaultBacktestEndDate))
 
         this.backtestResults.date_from = fromDate.format('YYYY-MM-DD')
         this.backtestResults.date_to = toDate.format('YYYY-MM-DD')
@@ -78,7 +72,6 @@ export class TradingBotBacktester {
         const interpreter = new TradingBotInterpreter(this.indicatorCache, this.tradeableAssets)
         const rebalancer = new Rebalancer(this.ohlcCache, this.startingBalance)
 
-        console.time("TradingBotBacktester - while loop");
         while (currentDate <= toDate) {
             // Calculate allocations for date
             const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache, currentDate)
@@ -99,7 +92,6 @@ export class TradingBotBacktester {
 
             currentDate = this.getNextMarketDate(currentDate)
         }
-        console.timeEnd("TradingBotBacktester - while loop");
 
         console.table(this.allocationResults)
         this.backtestResults.allocation_history = this.allocationResults
@@ -126,7 +118,7 @@ export class TradingBotBacktester {
         await this.indicatorCache.load()
     }
 
-    private calculateBacktestStartDate(): void {
+    private calculateBacktestStartDate(backtestConfigStartDate?: string): Dayjs {
         if (!this.ohlcCache || !this.ohlcCache.isLoaded()) {
             throw new Error('OHLC data has not been loaded.')
         }
@@ -137,8 +129,9 @@ export class TradingBotBacktester {
 
         const tickers = this.ohlcCache.getTickers()
 
-        let earlieststartDate = dayjs(this.backtestStartDate)
+        let earlieststartDate = backtestConfigStartDate ? dayjs(backtestConfigStartDate) : dayjs(this.defaultBacktestStartDate)
         let earliestStartDateTicker = undefined
+        let limitedByTicker = false
 
         for (const ticker of tickers) {
             const bars = this.ohlcCache.getBars(ticker)
@@ -149,15 +142,20 @@ export class TradingBotBacktester {
             if (tickerStartDate > earlieststartDate) {
                 earlieststartDate = tickerStartDate
                 earliestStartDateTicker = ticker
+                limitedByTicker = true
             }    
         }
 
-        this.backtestStartDate = this.getNextMarketDate(
-            earlieststartDate.add(this.indicatorCache.getLargestWindow(), 'days')
-        ).format('YYYY-MM-DD')
+        if (limitedByTicker) {
+            earlieststartDate = earlieststartDate.add(this.indicatorCache.getLargestWindow(), 'days')
+        }
 
-        console.log(`Earliest Start Date is ${this.backtestStartDate} for ticker ${earliestStartDateTicker}`)
+        let startDate = this.getNextMarketDate(earlieststartDate)
+
+        console.log(`Earliest Start Date is ${startDate.format('YYYY-MM-DD')} for ticker ${earliestStartDateTicker}`)
         console.log(`Ticker start dates`, this.tickerStartDates)
+
+        return startDate
     }
 
     private getNextMarketDate(date: Dayjs): Dayjs {
