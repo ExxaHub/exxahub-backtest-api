@@ -1,4 +1,4 @@
-import composerSymphony from '../../composer.json'
+import composerSymphony from '../../../composer.json'
 import { SymphonyAdapter } from '../adapters/SymphonyAdapter'
 import type { Symphony } from '../types'
 

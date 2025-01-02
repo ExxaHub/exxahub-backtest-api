@@ -43,9 +43,13 @@ This project was created using `bun init` in bun v1.0.27. [Bun](https://bun.sh) 
     - [x] Fixed values
         - [x] Unit tests
 - General Improvements
-    - [ ] Convert composer JSON to standardized trading bot JSON
+    - [x] Convert composer JSON to standardized trading bot JSON
     - [ ] Include branching history
     - [ ] Include detailed log from each daily rebalance that shows which conditions fired and what their values were at the time of trading
+- Datastore
+    - [ ] Store OHLC bars in data store with a next_update data. Then only pull OHLC bars from the clients if the next_update date is in the past. Otherwise load the OHLC data from the datastore
+- Containers
+    - [ ] Get the app running in a container so it can be spun up along with the datastore
 - Backtesting
     - Calculate metrics
         - [ ] Cumulative Return

@@ -6,7 +6,7 @@ import type {
 import { AlpacaStockClient } from '../clients/AlpacaClient';
 import { TiingoClient } from '../clients/TiingoClient';
 import { OhlcCache } from '../OhlcCache';
-import { Backtester } from '../Backtester';
+import { Backtester } from '..';
 
 import { PolygonClient } from '../clients/PolygonClient';
 import { SymphonyAdapter } from '../adapters/SymphonyAdapter';

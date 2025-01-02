@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { maxDrawdown } from "../indicators/maxDrawdown";
+import { maxDrawdown } from "./maxDrawdown";
 import type { OHLCBar } from "../types";
 
 describe("maxDrawdown", () => {

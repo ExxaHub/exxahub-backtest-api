@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Mainsail",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

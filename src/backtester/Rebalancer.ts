@@ -47,7 +47,7 @@ export class Rebalancer {
     }
 
     getPortfolioValue(): number {
-        return this.portfolioValue
+        return parseFloat(this.portfolioValue.toFixed(2))
     }
 
     setPortfolioValue(value: number): void {

@@ -15,7 +15,11 @@ export class OhlcCache {
   }
 
   async load(): Promise<void> {
+    console.time("OhlcCache - getTickerBars");
     const bars = await this.getTickerBars()
+    console.timeEnd("OhlcCache - getTickerBars");
+
+    console.time("OhlcCache - setCache and addDate");
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, ohlcBars)
 
@@ -23,7 +27,8 @@ export class OhlcCache {
         this.cachedOhlcBarDates.add(ohlcBar.date)
       }
     }
-    
+    console.timeEnd("OhlcCache - setCache and addDate");
+
     this.loaded = true
   }
 

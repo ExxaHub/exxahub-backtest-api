@@ -10,30 +10,44 @@ import { TradingBotParser } from "./TradingBotParser";
 
 const DEFAULT_BACKTEST_START_DATE = '1990-01-01'
 
+type BacktestResults = {
+    date_from?: string,
+    date_to?: string,
+    starting_balance?: number
+    ending_balance?: number,
+    allocation_history?: { [key: string]: string | number | null }[]
+    ticker_start_dates?: { [key: string]: string }
+}
+
 export class TradingBotBacktester {
     private algorithm: TradingBotNode
     private client: ClientInterface
     private ohlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
-    private tradeableAssets: string[]
+    private tradeableAssets?: string[]
 
     private backtestStartDate: string
     private backtestEndDate: string
-    private backtestResults: { [key: string]: string | number | null }[] = []
+    
+    private allocationResults: { [key: string]: string | number | null }[] = []
+    private backtestResults: BacktestResults = {}
 
     private tickerStartDates: Record<string, string> = {}
 
-    constructor(algorithm: TradingBotNode, client: ClientInterface, tradeableAssets: string[]) {
+    private startingBalance = 10000
+
+    constructor(algorithm: TradingBotNode, client: ClientInterface) {
         this.algorithm = algorithm
         this.client = client
-        this.tradeableAssets = tradeableAssets
 
         this.backtestStartDate = DEFAULT_BACKTEST_START_DATE
         this.backtestEndDate = dayjs().format('YYYY-MM-DD')
     }
 
-    async run(from?: string, to?: string): Promise<void> {
+    async run(from?: string, to?: string): Promise<BacktestResults> {
+        console.time("TradingBotBacktester - loadData");
         await this.loadData()
+        console.timeEnd("TradingBotBacktester - loadData");
 
         if (!this.indicatorCache) {
             throw new Error('Indicator cache has not been initialized.')
@@ -42,23 +56,34 @@ export class TradingBotBacktester {
         if (!this.ohlcCache) {
             throw new Error('OHLC cache has not been initialized.')
         }
+
+        if (!this.tradeableAssets) {
+            throw new Error('Tradable assets cache has not been initialized.')
+        }
         
+        console.time("TradingBotBacktester - calculateBacktestStartDate");
         // TODO: Calculate minimum number of bars needed for the indicators, then move up the start date by that amount
         this.calculateBacktestStartDate()
+        console.timeEnd("TradingBotBacktester - calculateBacktestStartDate");
 
         // Iterate over each day starting from the backtest start date
         let fromDate = from ? dayjs(from) : dayjs(this.backtestStartDate)
         let currentDate = fromDate.clone()
         let toDate = this.getLastMarketDate(to ? dayjs(to) : dayjs(this.backtestEndDate))
+
+        this.backtestResults.date_from = fromDate.format('YYYY-MM-DD')
+        this.backtestResults.date_to = toDate.format('YYYY-MM-DD')
+        this.backtestResults.ticker_start_dates = this.tickerStartDates
         
         const interpreter = new TradingBotInterpreter(this.indicatorCache, this.tradeableAssets)
-        const rebalancer = new Rebalancer(this.ohlcCache)
+        const rebalancer = new Rebalancer(this.ohlcCache, this.startingBalance)
 
+        console.time("TradingBotBacktester - while loop");
         while (currentDate <= toDate) {
             // Calculate allocations for date
             const allocations = interpreter.evaluate(this.algorithm, this.indicatorCache, currentDate)
             
-            this.backtestResults.push({
+            this.allocationResults.push({
                 date: currentDate.format('YYYY-MM-DD'),
                 ...allocations
             })
@@ -74,17 +99,25 @@ export class TradingBotBacktester {
 
             currentDate = this.getNextMarketDate(currentDate)
         }
+        console.timeEnd("TradingBotBacktester - while loop");
 
-        console.table(this.backtestResults)
+        console.table(this.allocationResults)
+        this.backtestResults.allocation_history = this.allocationResults
+
         console.log('Portfolio value: ', toCurrency(rebalancer.getPortfolioValue()))
+
+        this.backtestResults.starting_balance = this.startingBalance
+        this.backtestResults.ending_balance = rebalancer.getPortfolioValue()
+
+        return this.backtestResults
     }
 
     async loadData(): Promise<void> {
         const parser = new TradingBotParser()
 
-        const { assets, indicators } = parser.parse(this.algorithm)
+        const { assets, tradeableAssets, indicators } = parser.parse(this.algorithm)
 
-        console.log(`Fetching bars for ${assets.length} tickers`)
+        this.tradeableAssets = tradeableAssets
 
         this.ohlcCache = new OhlcCache(this.client, assets)
         await this.ohlcCache.load()

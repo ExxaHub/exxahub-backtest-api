@@ -9,16 +9,20 @@
   "main": "./dist/index.js",
   "repository": "https://github.com/dpods/mainsail.git",
   "scripts": {
-    "pkg": "bun build ./src/index.ts --outdir ./dist"
+    "pkg": "bun build ./src/index.ts --outdir ./dist",
+    "dev": "bun --watch run ./src/api/index.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/express": "^5.0.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
-    "ulid": "^2.3.0"
+    "express": "^4.21.2",
+    "ulid": "^2.3.0",
+    "zod": "^3.24.1"
   }
 }
