@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  exxa_backtester:
+    build: .
+    container_name: exxa_backtester
+    ports:
+      - "3000:3000"
+    networks:
+      - exxa_network
+    env_file:
+      - .env
+    command: ["bun", "run", "./src/api/index.ts"]
+    # command: ["ls", "-lah"]
+
+  database:
+    image: 'postgres:16.4-alpine3.20'
+    container_name: exxa_backtester_db
+    ports:
+      - 5432:5432
+    networks:
+      - exxa_network
+    environment:
+        PGPASSWORD: '${DB_PASSWORD:-secret}'
+        POSTGRES_DB: '${DB_DATABASE}'
+        POSTGRES_USER: '${DB_USERNAME}'
+        POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+    volumes:
+        - 'db:/var/lib/postgresql/data'
+    healthcheck:
+        test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
+        retries: 3
+        timeout: 5s
+
+networks:
+  exxa_network:
+    name: exxa
+
+volumes:
+  db:
+    driver: local

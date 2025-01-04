@@ -4,7 +4,7 @@ const HealthController = () => import('./controllers/HealthController')
 const BacktestController = () => import('./controllers/BacktestController')
 
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.use(express.json());
 
@@ -28,5 +28,5 @@ app.get('/api/v1/health', handle(HealthController, 'show'))
 app.post('/api/v1/backtest', handle(BacktestController, 'create'))
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Exxa Backtester listening on port ${port}`)
 })
