@@ -1,7 +1,7 @@
 import {type Request, type Response} from 'express'
 import { createBacktestRequestSchema } from '../schemas/CreateBacktestRequest'
-import type { ZodError } from 'zod'
 import { BacktestService } from '../services/BacktestService'
+import { validateSchema } from '../utils'
 
 export default class BacktestController {
     backtestService: BacktestService
@@ -11,18 +11,8 @@ export default class BacktestController {
     }
 
     async create(req: Request, res: Response) {
-      let backtestConfig
-      try {
-        backtestConfig = createBacktestRequestSchema.parse(req.body)
-      } catch (e) {
-        return res.status(400).json({
-          message: 'Bad Request',
-          errors: (e as ZodError).issues
-        })
-      }
-
+      const backtestConfig = validateSchema(createBacktestRequestSchema, req.body)
       const results = await this.backtestService.run(backtestConfig)
-
       return res.json(results)
     }
 }

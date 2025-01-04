@@ -23,7 +23,8 @@ const handle = (moduleLoader: any, method: string) => async (req: Request, res: 
     } catch (e) {
         const error = (e as HttpError)
         return res.status(error.statusCode).json({
-            error: error.message
+            message: error.message,
+            errors: error.errors
         })
     }
 };
