@@ -1,4 +1,12 @@
-import { type Symphony, type SymphonyNode, type TradingBotNode, type TradingBotNodeCondition, type TradingBotNodeIfThenElse, TradingBotNodeType } from "../types";
+import { HttpError } from "../../api/errors";
+import { 
+  type Symphony, 
+  type SymphonyNode, 
+  type TradingBotNode, 
+  type TradingBotNodeCondition, 
+  type TradingBotNodeIfThenElse, 
+  TradingBotNodeType 
+} from "../types";
 import { ulid } from "ulid";
 
 export class SymphonyAdapter {
@@ -23,7 +31,7 @@ export class SymphonyAdapter {
       
           case 'wt-cash-equal': {
             return {
-                id: this.getId('weight'),
+                id: this.getId(),
                 node_type: TradingBotNodeType.weight_cash_equal,
                 children: node.children!.flatMap((child) => this.parseNode(child))
             }
@@ -31,7 +39,7 @@ export class SymphonyAdapter {
       
           case 'wt-cash-specified': {
             return {
-                id: this.getId('weight'),
+                id: this.getId(),
                 node_type: TradingBotNodeType.weight_cash_specified,
                 children: node.children!.flatMap((child) => this.parseNode(child))
             }
@@ -43,7 +51,7 @@ export class SymphonyAdapter {
                     num: node.weight?.num!,
                     den: node.weight?.den!
                 },
-                id: this.getId('group'),
+                id: this.getId(),
                 node_type: TradingBotNodeType.group,
                 name: node.name!,
                 children: node.children!.flatMap((child) => this.parseNode(child))
@@ -58,13 +66,17 @@ export class SymphonyAdapter {
             return {
                 ticker: node.ticker!,
                 name: node.ticker!,
-                id: this.getId('asset'),
+                id: this.getId(),
                 node_type: TradingBotNodeType.asset
             }
           }
+
+          case 'filter': {
+            throw new HttpError(400, `Cannot convert symphony to trading bot. Sorts/filters are not supported.`);
+          }
       
           default:
-            throw new Error(`Unknown step: ${node.step}`);
+            throw new HttpError(400, `Unknown step: ${node.step}`);
         }
     }
 
@@ -73,7 +85,7 @@ export class SymphonyAdapter {
         const elseBlock = node.children![1]
     
         let condition: TradingBotNodeCondition = {
-            id: this.getId('cond'),
+            id: this.getId(),
             node_type: TradingBotNodeType.condition,
             lhs_fn: ifBlock['lhs-fn']!,
             lhs_fn_params: ifBlock['lhs-window-days'] ? { window: parseInt(ifBlock['lhs-window-days']) } : ifBlock['lhs-fn-params']!,
@@ -94,7 +106,7 @@ export class SymphonyAdapter {
         elseChildren = elseBlock.children!.flatMap((child) => this.parseNode(child));
 
         return  {
-            id: this.getId('if'),
+            id: this.getId(),
             node_type: TradingBotNodeType.if_then_else,
             condition_type: "allOf",
             conditions: [condition],
@@ -103,7 +115,7 @@ export class SymphonyAdapter {
         }
     }
 
-    private getId(prefix: string): string {
-        return `${prefix}_${ulid().toLowerCase()}`
+    private getId(): string {
+        return `node_${ulid().toLowerCase()}`
     }
 }

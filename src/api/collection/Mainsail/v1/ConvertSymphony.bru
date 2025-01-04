@@ -1,0 +1,108 @@
+meta {
+  name: /adapters/symphony
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/api/v1/adapters/symphony
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "asset_class": "EQUITIES",
+      "asset_classes": [
+          "EQUITIES"
+      ],
+      "children": [
+          {
+              "children": [
+                  {
+                      "children": [
+                          {
+                              "children": [
+                                  {
+                                      "children": [
+                                          {
+                                              "children": [
+                                                  {
+                                                      "children": [],
+                                                      "collapsed?": false,
+                                                      "exchange": "XNAS",
+                                                      "id": "75d209e7-7dfd-4b4c-874d-dae1d12ea4d5",
+                                                      "name": "ProShares UltraPro QQQ",
+                                                      "step": "asset",
+                                                      "ticker": "TQQQ"
+                                                  }
+                                              ],
+                                              "collapsed?": false,
+                                              "comparator": "gt",
+                                              "id": "14accb5f-1228-48eb-b49b-71182ff1b8f0",
+                                              "is-else-condition?": false,
+                                              "lhs-fn": "relative-strength-index",
+                                              "lhs-fn-params": {
+                                                  "window": 10
+                                              },
+                                              "lhs-val": "HYD",
+                                              "rhs-fn": "relative-strength-index",
+                                              "rhs-fn-params": {
+                                                  "window": 10
+                                              },
+                                              "rhs-val": "VPU",
+                                              "step": "if-child"
+                                          },
+                                          {
+                                              "children": [
+                                                  {
+                                                      "children": [],
+                                                      "children-count": 0,
+                                                      "collapsed?": false,
+                                                      "exchange": "ARCX",
+                                                      "id": "52d47474-7665-44cd-9e09-d5c143618fd6",
+                                                      "name": "SPDR Series Trust - SPDR Bloomberg 1-3 Month T-Bill ETF",
+                                                      "step": "asset",
+                                                      "ticker": "BIL"
+                                                  }
+                                              ],
+                                              "collapsed?": false,
+                                              "id": "54f16f40-289a-4dbc-b166-134a7ae34ddd",
+                                              "is-else-condition?": true,
+                                              "step": "if-child"
+                                          }
+                                      ],
+                                      "collapsed?": false,
+                                      "id": "a1bf878f-ab93-4ac7-8d21-c3bce7c3761a",
+                                      "step": "if"
+                                  }
+                              ],
+                              "collapsed?": false,
+                              "id": "34f71ff4-6b8e-46c4-92a2-034942a9ec77",
+                              "step": "wt-cash-equal"
+                          }
+                      ],
+                      "collapsed?": false,
+                      "id": "5e12f247-db41-4ee9-84a0-dd0e4e306ed2",
+                      "name": "10d RSI HYD > 10d RSI VPU",
+                      "step": "group",
+                      "weight": {
+                          "den": 100,
+                          "num": 100
+                      }
+                  }
+              ],
+              "id": "d44e0e51-51d0-409c-bb8a-f394dc4851da",
+              "step": "wt-cash-equal",
+              "suppress-incomplete-warnings?": true
+          }
+      ],
+      "description": "",
+      "id": "new",
+      "name": "New Symphony",
+      "rebalance": "daily",
+      "step": "root",
+      "suppress-incomplete-warnings?": false
+  }
+  
+}
