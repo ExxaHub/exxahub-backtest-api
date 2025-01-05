@@ -3,6 +3,7 @@ import {
   type Symphony, 
   type SymphonyNode, 
   type TradingBotNode, 
+  type TradingBotNodeAsset, 
   type TradingBotNodeCondition, 
   type TradingBotNodeIfThenElse, 
   TradingBotNodeType 
@@ -63,12 +64,21 @@ export class SymphonyAdapter {
           }
       
           case 'asset': {
-            return {
-                ticker: node.ticker!,
-                name: node.ticker!,
-                id: this.getId(),
-                node_type: TradingBotNodeType.asset
+            let newNode: TradingBotNodeAsset = {
+              ticker: node.ticker!,
+              name: node.ticker!,
+              id: this.getId(),
+              node_type: TradingBotNodeType.asset
             }
+
+            if (node.weight) {
+              newNode.weight = {
+                num: node.weight?.num!,
+                den: node.weight?.den!
+              }
+            }
+
+            return newNode
           }
 
           case 'filter': {
@@ -97,6 +107,8 @@ export class SymphonyAdapter {
           condition.rhs_fn = ifBlock['rhs-fn']
           condition.rhs_fn_params = ifBlock['rhs-window-days'] ? { window: parseInt(ifBlock['rhs-window-days']) } : ifBlock['rhs-fn-params']
           condition.rhs_val = ifBlock['rhs-val']
+        } else {
+          condition.rhs_val = ifBlock['rhs-val']
         }
     
         let thenChildren: TradingBotNode[] = []
@@ -105,7 +117,7 @@ export class SymphonyAdapter {
         let elseChildren: TradingBotNode[] = []
         elseChildren = elseBlock.children!.flatMap((child) => this.parseNode(child));
 
-        return  {
+        return {
             id: this.getId(),
             node_type: TradingBotNodeType.if_then_else,
             condition_type: "allOf",

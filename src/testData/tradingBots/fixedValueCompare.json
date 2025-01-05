@@ -1,0 +1,50 @@
+{
+  "description": "",
+  "name": "New Symphony",
+  "id": "new",
+  "node_type": "root",
+  "rebalance": "daily",
+  "version": "v1",
+  "children": [
+    {
+      "id": "node_01jgvsy2nmxyqc6n8s4h5pdy11",
+      "node_type": "wt-cash-equal",
+      "children": [
+        {
+          "id": "node_01jgvsy2np2nr0yvb3wv7jbzad",
+          "node_type": "if-then-else",
+          "condition_type": "allOf",
+          "conditions": [
+            {
+              "id": "node_01jgvsy2nn02fsqz82cyzsp9ht",
+              "node_type": "condition",
+              "lhs_fn": "relative-strength-index",
+              "lhs_fn_params": {
+                "window": 10
+              },
+              "lhs_val": "SPY",
+              "comparator": "gt",
+              "rhs_val": "80"
+            }
+          ],
+          "then_children": [
+            {
+              "ticker": "BIL",
+              "name": "BIL",
+              "id": "node_01jgvsy2nnv8rfzhh7bvvfp03c",
+              "node_type": "asset"
+            }
+          ],
+          "else_children": [
+            {
+              "ticker": "SPY",
+              "name": "SPY",
+              "id": "node_01jgvsy2npyqdrgfryjefswzgw",
+              "node_type": "asset"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

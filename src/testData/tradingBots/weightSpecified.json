@@ -1,0 +1,46 @@
+{
+  "description": "",
+  "name": "New Symphony",
+  "id": "new",
+  "node_type": "root",
+  "rebalance": "daily",
+  "version": "v1",
+  "children": [
+    {
+      "id": "node_01jgvtkg8rs1zawaypfm7rrxe6",
+      "node_type": "wt-cash-specified",
+      "children": [
+        {
+          "ticker": "SPY",
+          "name": "SPY",
+          "id": "node_01jgvtkg8s9wywcta1c4450vw3",
+          "node_type": "asset",
+          "weight": {
+            "num": "30",
+            "den": 100
+          }
+        },
+        {
+          "ticker": "QQQ",
+          "name": "QQQ",
+          "id": "node_01jgvtkg8sm5xznjd1njag036x",
+          "node_type": "asset",
+          "weight": {
+            "num": "45",
+            "den": 100
+          }
+        },
+        {
+          "ticker": "DIA",
+          "name": "DIA",
+          "id": "node_01jgvtkg8tzcfkhz5ar5cwwkvb",
+          "node_type": "asset",
+          "weight": {
+            "num": 25,
+            "den": 100
+          }
+        }
+      ]
+    }
+  ]
+}

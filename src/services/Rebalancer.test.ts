@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, jest } from "bun:test";
+import { describe, it, expect, beforeEach } from "bun:test";
 import { Rebalancer } from "./Rebalancer";
 import { OhlcCache } from "./OhlcCache";
 import { TiingoClient } from "../clients/TiingoClient";
@@ -40,7 +40,7 @@ describe("Rebalancer", () => {
   
   it("Defaults to 10,000 starting balance", () => {
     const rebalancer = new Rebalancer(mockOhlcCache)
-    expect(rebalancer.getPortfolioValue()).toEqual(10000);
+    expect(rebalancer.getBalance()).toEqual(10000);
   });
 
   it('Updates portfolio value correctly when holding the same asset over multiple rebalances', async () => {
@@ -59,7 +59,7 @@ describe("Rebalancer", () => {
       'QQQ': null
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10000);
+    expect(rebalancer.getBalance()).toEqual(10000);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 100,
@@ -73,7 +73,7 @@ describe("Rebalancer", () => {
       'QQQ': null
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10200);
+    expect(rebalancer.getBalance()).toEqual(10200);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 100,
@@ -87,7 +87,7 @@ describe("Rebalancer", () => {
       'QQQ': null
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(9800);
+    expect(rebalancer.getBalance()).toEqual(9800);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 100,
@@ -113,7 +113,7 @@ describe("Rebalancer", () => {
       'QQQ': null
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10000);
+    expect(rebalancer.getBalance()).toEqual(10000);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 100,
@@ -127,7 +127,7 @@ describe("Rebalancer", () => {
       'QQQ': 100
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10200);
+    expect(rebalancer.getBalance()).toEqual(10200);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 0,
@@ -146,7 +146,7 @@ describe("Rebalancer", () => {
       'QQQ': 100
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(11127.272727272728);
+    expect(rebalancer.getBalance()).toEqual(11127.27);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 0,
@@ -177,7 +177,7 @@ describe("Rebalancer", () => {
       'QQQ': null
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10000);
+    expect(rebalancer.getBalance()).toEqual(10000);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 100,
@@ -191,7 +191,7 @@ describe("Rebalancer", () => {
       'QQQ': 25
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10200);
+    expect(rebalancer.getBalance()).toEqual(10200);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 75,
@@ -211,14 +211,14 @@ describe("Rebalancer", () => {
 
     expect(
       rebalancer.getCurrentHoldings().SPY.value + rebalancer.getCurrentHoldings().QQQ.value
-    ).toEqual(rebalancer.getPortfolioValue())
+    ).toEqual(rebalancer.getBalance())
 
     await rebalancer.rebalance(dayjs('2024-01-03'), {
       'SPY': 50,
       'QQQ': 50
     })
 
-    expect(rebalancer.getPortfolioValue()).toEqual(10131.818181818182);
+    expect(rebalancer.getBalance()).toEqual(10131.82);
     expect(rebalancer.getCurrentHoldings()).toEqual({
       SPY: {
         percentage: 50,
@@ -236,7 +236,7 @@ describe("Rebalancer", () => {
     ).toEqual(100)
     
     expect(
-      rebalancer.getCurrentHoldings().SPY.value + rebalancer.getCurrentHoldings().QQQ.value
-    ).toEqual(rebalancer.getPortfolioValue())
+      parseFloat((rebalancer.getCurrentHoldings().SPY.value + rebalancer.getCurrentHoldings().QQQ.value).toFixed(2))
+    ).toEqual(rebalancer.getBalance())
   })
 });

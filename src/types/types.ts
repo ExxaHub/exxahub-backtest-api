@@ -72,6 +72,10 @@ export type TradingBotNodeWeightCashEqual = {
 
 export type TradingBotNodeWeightCashSpecified = {
     id: string,
+    weight?: {
+        num: number,
+        den: number
+    },
     node_type: TradingBotNodeType.weight_cash_specified,
     children: TradingBotNode[]
 }
@@ -82,6 +86,10 @@ export enum TradingBotNodeIfThenElseConditionType {
 }
 
 export type TradingBotNodeIfThenElse = {
+    weight?: {
+        num: number,
+        den: number
+    },
     id: string,
     node_type: TradingBotNodeType.if_then_else
     condition_type: "allOf" | "anyOf",
@@ -107,6 +115,10 @@ export type TradingBotNodeCondition = {
 }
 
 export type TradingBotNodeAsset = {
+    weight?: {
+        num: number,
+        den: number
+    },
     ticker: string,
     name: string,
     id: string,

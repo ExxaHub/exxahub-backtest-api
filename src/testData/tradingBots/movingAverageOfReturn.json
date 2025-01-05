@@ -1,0 +1,54 @@
+{
+    "description": "",
+    "name": "Test Algorithm",
+    "id": "new",
+    "node_type": "root",
+    "rebalance": "daily",
+    "version": "v1",
+    "children": [
+      {
+        "id": "node_01jgvs0249frj9d1gjap3rxqd3",
+        "node_type": "wt-cash-equal",
+        "children": [
+          {
+            "id": "node_01jgvs0249bpb2yv75caxtp2hx",
+            "node_type": "if-then-else",
+            "condition_type": "allOf",
+            "conditions": [
+              {
+                "id": "node_01jgvs0249z80k5zerm4dtfhwh",
+                "node_type": "condition",
+                "lhs_fn": "moving-average-return",
+                "lhs_fn_params": {
+                  "window": 10
+                },
+                "lhs_val": "SPY",
+                "comparator": "gt",
+                "rhs_fn": "moving-average-return",
+                "rhs_fn_params": {
+                  "window": 20
+                },
+                "rhs_val": "SPY"
+              }
+            ],
+            "then_children": [
+              {
+                "ticker": "SPY",
+                "name": "SPY",
+                "id": "node_01jgvs02498z5s1h009g1zddgy",
+                "node_type": "asset"
+              }
+            ],
+            "else_children": [
+              {
+                "ticker": "BIL",
+                "name": "BIL",
+                "id": "node_01jgvs0249a3d9sb060wvc2vx3",
+                "node_type": "asset"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
