@@ -1,5 +1,5 @@
-import express, {type Request, type Response, type NextFunction} from 'express'
-import type { HttpError } from './errors'
+import express from 'express'
+import { handleRequest } from './utils'
 
 const HealthController = () => import('./controllers/HealthController')
 const BacktestController = () => import('./controllers/BacktestController')
@@ -10,30 +10,11 @@ const port = process.env.PORT || 3000
 
 app.use(express.json());
 
-const handle = (moduleLoader: any, method: string) => async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const module = await moduleLoader();
-        const ControllerClass = module.default;
-        const controllerInstance = new ControllerClass();
-        if (typeof controllerInstance[method] === 'function') {
-            return await controllerInstance[method](req, res, next);
-        } else {
-            throw new Error(`Method "${method}" not found in controller`);
-        }
-    } catch (e) {
-        const error = (e as HttpError)
-        return res.status(error.statusCode).json({
-            message: error.message,
-            errors: error.errors
-        })
-    }
-};
+app.get('/api/v1/health', handleRequest(HealthController, 'show'))
 
-app.get('/api/v1/health', handle(HealthController, 'show'))
+app.post('/api/v1/backtests', handleRequest(BacktestController, 'create'))
 
-app.post('/api/v1/backtests', handle(BacktestController, 'create'))
-
-app.post('/api/v1/adapters/symphony', handle(AdapterController, 'symphony'))
+app.post('/api/v1/adapters/symphony', handleRequest(AdapterController, 'symphony'))
 
 app.listen(port, () => {
   console.log(`Exxa Backtester listening on port ${port}`)
