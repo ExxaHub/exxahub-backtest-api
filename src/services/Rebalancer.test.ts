@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, jest } from "bun:test";
 import { Rebalancer } from "./Rebalancer";
 import { OhlcCache } from "./OhlcCache";
-import { TiingoClient } from "./clients/TiingoClient";
+import { TiingoClient } from "../clients/TiingoClient";
 import dayjs, { Dayjs } from "dayjs";
-import type { OHLCBar } from "./types";
+import type { OHLCBar } from "../backtester/types";
 
 class MockOhlcCache extends OhlcCache {
   private barForDate: Record<string, Record<string, OHLCBar>> = {}

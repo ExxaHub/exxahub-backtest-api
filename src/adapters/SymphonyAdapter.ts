@@ -1,4 +1,4 @@
-import { HttpError } from "../../api/errors";
+import { HttpError } from "../api/errors";
 import { 
   type Symphony, 
   type SymphonyNode, 
@@ -6,7 +6,7 @@ import {
   type TradingBotNodeCondition, 
   type TradingBotNodeIfThenElse, 
   TradingBotNodeType 
-} from "../types";
+} from "../backtester/types";
 import { ulid } from "ulid";
 
 export class SymphonyAdapter {

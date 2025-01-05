@@ -14,6 +14,7 @@ export const handleRequest = (moduleLoader: any, method: string) => async (req: 
         }
     } catch (e) {
         const error = (e as HttpError)
+        console.error(error)
         return res.status(error.statusCode).json({
             message: error.message,
             errors: error.errors

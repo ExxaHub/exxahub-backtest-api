@@ -1,4 +1,4 @@
-import type { MarketDataProvider } from "../api/services/MarketDataClientProvider"
+import type { MarketDataProvider } from "../services/MarketDataClientProvider"
 
 const getMarketDataProvider = (): MarketDataProvider => {
     return process.env.MARKET_DATA_PROVIDER as MarketDataProvider

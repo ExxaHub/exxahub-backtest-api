@@ -1,9 +1,9 @@
-import { AlpacaStockClient } from "../../backtester/clients/AlpacaClient";
-import { TiingoClient } from "../../backtester/clients/TiingoClient";
-import { PolygonClient } from "../../backtester/clients/PolygonClient";
-import type { ClientInterface } from "../../backtester/types";
-import { getMarketDataProvider } from "../../config/marketDataProviders";
-import { HttpError } from "../errors";
+import { AlpacaStockClient } from "../clients/AlpacaClient";
+import { TiingoClient } from "../clients/TiingoClient";
+import { PolygonClient } from "../clients/PolygonClient";
+import type { ClientInterface } from "../backtester/types";
+import { getMarketDataProvider } from "../config/marketDataProviders";
+import { HttpError } from "../api/errors";
 
 export enum MarketDataProvider {
     Alpaca = 'alpaca',

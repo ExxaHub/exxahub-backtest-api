@@ -1,5 +1,5 @@
-import { tiingoApiToken } from "../../config/marketDataProviders";
-import type { ClientInterface, OHLCBar } from "../types";
+import { tiingoApiToken } from "../config/marketDataProviders";
+import type { ClientInterface, OHLCBar } from "../backtester/types";
 
 export type TiingoOHLCBar =    {
     date: string,

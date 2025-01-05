@@ -7,7 +7,7 @@ import {
   type TradingBotNodeIfThenElse,
   TradingBotNodeIfThenElseConditionType,
   type TradingBotNodeCondition
-} from "./types";
+} from "../backtester/types";
 
 enum WeightType {
   Equal = 'equal',
