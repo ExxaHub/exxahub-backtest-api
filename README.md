@@ -37,9 +37,6 @@ git clone git@github.com:ExxaHub/exxa-backtest-api.git
 cd exxa-backtest-api
 ```
 
-## Usage
-This project uses a Makefile to simplify running the application. Below are the available commands:
-
 ### Start the Application
 To build and run the application in a Docker container, use the make up command:
 
@@ -59,8 +56,24 @@ To stop the application and remove associated containers, use:
 make down
 ```
 
-Additional Commands
+### Additional Commands
 You can find other useful commands in the Makefile, such as:
+
+`make destroy` - Remove Docker volumes and resources (including the database)
+
+---
+
+## Usage
+
+After running the `make up` command, the backtest server will be accessible at http://localhost:3000
+
+## API Collection
+
+This project uses [Bruno](https://www.usebruno.com/), an open source API Client to document the API endpoints. 
+
+Once you have downloaded Bruno, you can open the API collection which is located at `src/api/collection/exxa` (you'll see a `bruno.json` file)
+
+---
 
 ## License
 This project is licensed under the [AGPL-3.0](./LICENSE) License.
