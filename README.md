@@ -14,6 +14,7 @@ An open-source backtest API server to test and validate trading algorithms using
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
+- [API Collection](#api-collection)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -66,6 +67,33 @@ You can find other useful commands in the Makefile, such as:
 ## Usage
 
 After running the `make up` command, the backtest server will be accessible at http://localhost:3000
+
+### Running backtests
+
+The backtest endpoint is located at `POST /api/v1/backtests`. 
+
+The payload for the request must match the following format:
+
+```json
+{
+  "starting_balance": 10000,
+  "start_date": "2024-01-02",
+  "end_date": "2025-01-02",
+  "trading_bot": { /* trading bot JSON */ }
+}
+```
+
+### Symphony Adapter
+
+The ExxaHub Backtest API provides an API endpoint to convert Composer Symphonies to the ExxaHub Trading Bot algorithm format. The symphony adapter endpoint is located at `POST /api/v1/adapters/symphony`. The endpoint will accept a Composer Symphony JSON payload and convert it to the ExxaHub Trading Bot JSON format, which is compatible with the backtest endpoint.
+
+The following Symphony node types are supported:
+- Asset
+- Group
+- Weight (Allocation)
+- If/Else (Conditional)
+
+⚠️ Note: The Filter node type is not supported by ExxaHub at this time because some of the functions that Composer allows you to sort on are not normalized, so it would be impossible to build an apples-to-apples comparison when sorting on certain sub-symphonies.
 
 ## API Collection
 
