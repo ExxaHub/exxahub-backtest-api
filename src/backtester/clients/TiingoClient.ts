@@ -1,4 +1,4 @@
-import { tiingoApiToken } from "../config/tiingo";
+import { tiingoApiToken } from "../../config/marketDataProviders";
 import type { ClientInterface, OHLCBar } from "../types";
 
 export type TiingoOHLCBar =    {

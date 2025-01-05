@@ -1,4 +1,4 @@
-import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/alpaca";
+import {alpacaApiKeyId, alpacaApiSecretKey} from "../../config/marketDataProviders";
 import { type ClientInterface, type OHLCBar } from "../types";
 
 export type AlpacaOHLCBar = {

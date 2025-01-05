@@ -1,4 +1,4 @@
-import {type Request, type Response} from 'express'
+import { type Request, type Response } from 'express'
 import { SymphonyAdapter } from '../../backtester'
 import type { Symphony } from '../../backtester/types'
 

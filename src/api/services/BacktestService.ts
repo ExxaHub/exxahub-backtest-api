@@ -1,5 +1,4 @@
-import { AlpacaStockClient, IndicatorCache, OhlcCache, SymphonyAdapter, TradingBotBacktester, TradingBotParser } from "../../backtester";
-import type { TradingBotNode } from "../../backtester/types";
+import { Backtester } from "../../backtester/Backtester";
 import type { BacktestConfig } from "../schemas/CreateBacktestRequest";
 import { MarketDataClientProvider } from "./MarketDataClientProvider";
 
@@ -12,7 +11,7 @@ export class BacktestService {
     async run(backtestConfig: BacktestConfig): Promise<any> {
         const client = this.marketDataClientProvider.getClient()
 
-        const backtester = new TradingBotBacktester(client)
+        const backtester = new Backtester(client)
         const results = await backtester.run(backtestConfig)
 
         return results

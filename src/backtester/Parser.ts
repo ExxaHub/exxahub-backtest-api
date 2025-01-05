@@ -1,5 +1,10 @@
-import type { Symphony, SymphonyNode, Indicator } from "./types";
-import { createHash } from "crypto";
+import { 
+  type Indicator, 
+  type TradingBotNode, 
+  TradingBotNodeType, 
+  type TradingBotNodeIfThenElse, 
+  type TradingBotNodeCondition 
+} from "./types";
 
 export type ParsedAssetsAndIndicators = {
   assets: string[],
@@ -12,8 +17,8 @@ export class Parser {
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
 
-  parse(algorithm: Symphony): ParsedAssetsAndIndicators {
-    this.parseNode(algorithm)
+  parse(node: TradingBotNode): ParsedAssetsAndIndicators {
+    this.parseNode(node)
     
     return {
       assets: Array.from(this.assets),
@@ -22,73 +27,68 @@ export class Parser {
     }
   }
 
-  private parseNode(node: SymphonyNode): void {
-    switch (node.step) {
-      case "root": {
+  private parseNode(node: TradingBotNode): void {
+    switch (node.node_type) {
+      case TradingBotNodeType.root: {
         node.children!.flatMap(childNode => this.parseNode(childNode));
         break
       }
   
-      case 'wt-cash-equal': {
+      case TradingBotNodeType.weight_cash_equal: {
         node.children!.flatMap((child) => this.parseNode(child))
         break
       }
   
-      case 'wt-cash-specified': {
+      case TradingBotNodeType.weight_cash_specified: {
         node.children!.flatMap((child) => this.parseNode(child))
         break
       }
   
-      case 'group': {
+      case TradingBotNodeType.group: {
         node.children!.flatMap((child) => this.parseNode(child));
         break
       }
   
-      case 'if': {
-        this.evaluateCondition(node)
+      case TradingBotNodeType.if_then_else: {
+        this.evaluateConditions(node)
         break
       }
   
-      case 'asset': {
+      case TradingBotNodeType.asset: {
         this.assets.add(node.ticker!)
         this.tradeableAssets.add(node.ticker!)
         break
       }
   
       default:
-        console.warn(`Unknown step: ${node.step}`);
+        console.warn(`Unknown step: ${node.node_type}`);
     }
   }
 
-  private evaluateCondition(node: SymphonyNode, parentWeight: number = 100): void {
-    const ifBlock = node.children![0]
-    const elseBlock = node.children![1]
+  private evaluateConditions(node: TradingBotNodeIfThenElse, parentWeight: number = 100): void {
+    node.conditions.flatMap(child => this.evaluateCondition(child));
+    node.then_children.flatMap(child => this.parseNode(child));
+    node.else_children.flatMap(child => this.parseNode(child));
+  }
 
+  private evaluateCondition(node: TradingBotNodeCondition): void {
     const lhs = {
-      ticker: ifBlock['lhs-val']!,
-      fn: ifBlock['lhs-fn']!,
-      params: ifBlock['lhs-window-days'] ? { window: parseInt(ifBlock['lhs-window-days']) } : ifBlock['lhs-fn-params']!
+      ticker: node.lhs_val,
+      fn: node.lhs_fn,
+      params: node.lhs_fn_params
     }
     this.assets.add(lhs.ticker)
     this.indicators.set(this.generateHash(lhs), lhs)
-
-    if (!ifBlock['rhs-fixed-value?']) {
+    
+    if (node.lhs_fn) {
       const rhs = {
-        ticker: ifBlock['rhs-val']!,
-        fn: ifBlock['rhs-fn']!,
-        params: ifBlock['rhs-window-days'] ? { window: parseInt(ifBlock['rhs-window-days']) } : ifBlock['rhs-fn-params']!
+        ticker: node.rhs_val!,
+        fn: node.rhs_fn!,
+        params: node.rhs_fn_params!
       }
       this.assets.add(rhs.ticker)
       this.indicators.set(this.generateHash(rhs), rhs)
     }
-
-    ifBlock.children!.flatMap((child) =>
-      this.parseNode(child)
-    );
-
-    elseBlock.children!.flatMap((child) =>
-      this.parseNode(child)
-    );
   }
 
   /**
@@ -97,9 +97,10 @@ export class Parser {
    * @returns A fixed-length hash string.
    */
   generateHash(input: string | object): string {
-    const hash = createHash("sha256");
+    const hasher = new Bun.CryptoHasher("sha256");
+    // const hash = createHash("sha256");
     const data = typeof input === "string" ? input : JSON.stringify(input);
-    hash.update(data);
-    return hash.digest("hex");
+    hasher.update(data);
+    return hasher.digest("hex");
   }
 }

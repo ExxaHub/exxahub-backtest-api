@@ -1,9 +1,12 @@
 import dayjs, { Dayjs } from "dayjs";
 import type { IndicatorCache } from "./IndicatorCache";
-import type { 
-  Symphony,
-  SymphonyNode,
-  AllocationAsset
+import { 
+  type AllocationAsset,
+  type TradingBotNode,
+  TradingBotNodeType,
+  type TradingBotNodeIfThenElse,
+  TradingBotNodeIfThenElseConditionType,
+  type TradingBotNodeCondition
 } from "./types";
 
 enum WeightType {
@@ -26,7 +29,7 @@ export class Interpreter {
     this.date = dayjs().format('YYYY-MM-DD')
   }
 
-  evaluate(algorithm: Symphony, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
+  evaluate(algorithm: TradingBotNode, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
     this.indicatorCache = indicatorCache
     this.date = date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
     const rawAllocations = this.evaluateNode(algorithm)
@@ -34,89 +37,103 @@ export class Interpreter {
   }
 
   private evaluateNode(
-    node: SymphonyNode,
+    node: TradingBotNode,
     weightType: WeightType = WeightType.Equal,
     parentWeight: number = 100
   ): unknown {
-    if (weightType === WeightType.Specified) {
+    if ('weight' in node && weightType === WeightType.Specified) {
       parentWeight = (node.weight!.num / node.weight!.den) * 100
     }
 
-    switch (node.step) {
-      case "root": {
+    switch (node.node_type) {
+      case TradingBotNodeType.root: {
         return node.children!.flatMap(childNode => this.evaluateNode(childNode, weightType, parentWeight));
       }
   
-      case 'wt-cash-equal': {
+      case TradingBotNodeType.weight_cash_equal: {
         const equalWeight = parentWeight / node.children!.length;
         return node.children!.flatMap((child) => this.evaluateNode(child, WeightType.Equal, equalWeight))
       }
   
-      case 'wt-cash-specified': {
+      case TradingBotNodeType.weight_cash_specified: {
         return node.children!.flatMap((child) => this.evaluateNode(child, WeightType.Specified))
       }
   
-      case 'group': {
+      case TradingBotNodeType.group: {
         return node.children!.flatMap((child) =>
           this.evaluateNode(child, weightType, parentWeight)
         );
       }
   
-      case 'if': {
-        return this.evaluateCondition(node, weightType, parentWeight)
+      case TradingBotNodeType.if_then_else: {
+        return this.evaluateConditions(node, weightType, parentWeight)
       }
   
-      case 'asset': {
+      case TradingBotNodeType.asset: {
         return [
           {
             ticker: node.ticker,
             name: node.name,
-            exchange: node.exchange,
             percentage: parentWeight,
           },
         ];
       }
   
       default:
-        console.warn(`Unknown step: ${node.step}`);
+        console.warn(`Unknown step: ${node.node_type}`);
     }
   
     return [];
   }
 
-  private evaluateCondition(node: SymphonyNode, weightType: WeightType, parentWeight: number = 100): unknown {
-    const ifBlock = node.children![0]
-    const elseBlock = node.children![1]
-  
-    const lhsParams = ifBlock['lhs-window-days'] ? { window: parseInt(ifBlock['lhs-window-days']) } : ifBlock['lhs-fn-params']!
-    const rhsParams = ifBlock['rhs-window-days'] ? { window: parseInt(ifBlock['rhs-window-days']) } : ifBlock['rhs-fn-params']!
-
-    const lhsValue = this.getIndicatorValue(ifBlock['lhs-val'], ifBlock['lhs-fn'], lhsParams);
-    const rhsValue = ifBlock['rhs-fixed-value?'] 
-      ? parseInt(ifBlock['rhs-val']!) 
-      : this.getIndicatorValue(ifBlock['rhs-val'], ifBlock['rhs-fn'], rhsParams);
-    const comparator = ifBlock.comparator || "eq"
-  
-    const comparison = this.compare(lhsValue, rhsValue, comparator);
-
-    // console.log('IF', {
-    //   lhs: `${ifBlock['lhs-val']} ${ifBlock['lhs-fn']} ${JSON.stringify(lhsParams)}`,
-    //   lhs_value: lhsValue,
-    //   comparator: comparator,
-    //   rhs: `${ifBlock['rhs-val']} ${ifBlock['rhs-fn']} ${JSON.stringify(rhsParams)}`,
-    //   rhs_value: rhsValue,
-    //   result: comparison
-    // })
-
-    if (comparison) {
-      return ifBlock.children!.flatMap((child) =>
-        this.evaluateNode(child, weightType, parentWeight)
-      );
-    } else {
-      return elseBlock.children!.flatMap((child) =>
-        this.evaluateNode(child, weightType, parentWeight)
-      );
+  private evaluateConditions(node: TradingBotNodeIfThenElse, weightType: WeightType, parentWeight: number = 100): unknown {
+    const conditionResults: boolean[] = []
+    for (const condition of node.conditions) {
+      conditionResults.push(this.evaluateCondition(condition))
     }
+
+    const allAreTrue = (values: boolean[]): boolean => {
+      return values.every(value => value === true);
+    }
+
+    const anyAreTrue = (values: boolean[]): boolean => {
+      return values.some(value => value === true);
+    }
+
+    if (node.condition_type === TradingBotNodeIfThenElseConditionType.AllOf) {
+      if (allAreTrue(conditionResults)) {
+        return node.then_children.flatMap((child) =>
+          this.evaluateNode(child, weightType, parentWeight)
+        );
+      } else {
+        return node.else_children.flatMap((child) =>
+          this.evaluateNode(child, weightType, parentWeight)
+        );
+      }
+    } else if (node.condition_type === TradingBotNodeIfThenElseConditionType.AnyOf) {
+      if (anyAreTrue(conditionResults)) {
+        return node.then_children.flatMap((child) =>
+          this.evaluateNode(child, weightType, parentWeight)
+        );
+      } else {
+        return node.else_children.flatMap((child) =>
+          this.evaluateNode(child, weightType, parentWeight)
+        );
+      }
+    }
+  }
+
+  private evaluateCondition(condition: TradingBotNodeCondition): boolean {
+    const lhsParams = condition.lhs_fn_params
+    const rhsParams = condition.rhs_fn_params
+
+    const lhsValue = this.getIndicatorValue(condition.lhs_val, condition.lhs_fn, lhsParams);
+    const rhsValue = condition.rhs_val
+      ? parseInt(condition.rhs_val) 
+      : this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, rhsParams);
+    const comparator = condition.comparator
+  
+    return this.compare(lhsValue, rhsValue, comparator);
   }
   
   private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
