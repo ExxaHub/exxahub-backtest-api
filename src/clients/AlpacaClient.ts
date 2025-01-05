@@ -1,5 +1,5 @@
 import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/marketDataProviders";
-import { type ClientInterface, type OHLCBar } from "../backtester/types";
+import { type ClientInterface, type OHLCBar } from "../types/types";
 
 export type AlpacaOHLCBar = {
     c: number;

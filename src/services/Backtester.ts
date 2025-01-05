@@ -1,9 +1,8 @@
-import type { Symphony, ClientInterface, TradingBotNode } from "../backtester/types";
+import type { ClientInterface, TradingBotNode } from "../types/types";
 import { OhlcCache } from './OhlcCache'
 import { IndicatorCache } from './IndicatorCache'
 import dayjs, { type Dayjs } from "dayjs";
 import { Rebalancer } from "./Rebalancer";
-import { toCurrency } from "../backtester/Utils";
 import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
 import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";

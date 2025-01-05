@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs"
-import type { ClientInterface, OHLCBar } from "../backtester/types"
+import type { ClientInterface, OHLCBar } from "../types/types"
 
 export class OhlcCache {
   private client: ClientInterface

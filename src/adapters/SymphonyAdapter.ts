@@ -6,7 +6,7 @@ import {
   type TradingBotNodeCondition, 
   type TradingBotNodeIfThenElse, 
   TradingBotNodeType 
-} from "../backtester/types";
+} from "../types/types";
 import { ulid } from "ulid";
 
 export class SymphonyAdapter {

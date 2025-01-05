@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { polygonApiToken } from "../config/marketDataProviders";
-import type { ClientInterface, OHLCBar } from "../backtester/types";
+import type { ClientInterface, OHLCBar } from "../types/types";
 
 type PolygonOHLCBar = {
     c: number,

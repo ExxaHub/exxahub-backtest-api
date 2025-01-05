@@ -4,7 +4,7 @@ import {
   TradingBotNodeType, 
   type TradingBotNodeIfThenElse, 
   type TradingBotNodeCondition 
-} from "../backtester/types";
+} from "../types/types";
 
 export type ParsedAssetsAndIndicators = {
   assets: string[],

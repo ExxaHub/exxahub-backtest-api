@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { Parser } from "./Parser";
-import type { Symphony } from "../backtester/types";
+import type { Symphony } from "../types/types";
 
 import cumulativeReturnJson from '../backtester/testSymphonies/cumulativeReturn.json'
 import exponentialMovingAverageOfPriceJson from '../backtester/testSymphonies/exponentialMovingAverageOfPrice.json'

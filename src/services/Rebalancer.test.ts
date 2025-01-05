@@ -3,7 +3,7 @@ import { Rebalancer } from "./Rebalancer";
 import { OhlcCache } from "./OhlcCache";
 import { TiingoClient } from "../clients/TiingoClient";
 import dayjs, { Dayjs } from "dayjs";
-import type { OHLCBar } from "../backtester/types";
+import type { OHLCBar } from "../types/types";
 
 class MockOhlcCache extends OhlcCache {
   private barForDate: Record<string, Record<string, OHLCBar>> = {}

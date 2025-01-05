@@ -9,7 +9,7 @@ import { relativeStrengthIndex} from "../indicators/relativeStrengthIndex"
 import { standardDeviationOfPrice } from "../indicators/standardDeviationOfPrice"
 import { standardDeviationOfReturn } from "../indicators/standardDeviationOfReturn"
 import type { OhlcCache } from "./OhlcCache"
-import type { Indicator } from "../backtester/types"
+import type { Indicator } from "../types/types"
 
 export class IndicatorCache {
   private ohlcCache: OhlcCache

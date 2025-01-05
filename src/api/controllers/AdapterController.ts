@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express'
 import { SymphonyAdapter } from '../../adapters/SymphonyAdapter'
-import type { Symphony } from '../../backtester/types'
+import type { Symphony } from '../../types/types'
 
 export default class AdapterController {
     async symphony(req: Request, res: Response) {

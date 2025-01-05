@@ -1,7 +1,7 @@
 import { describe, it, expect, mock } from "bun:test";
 import { AlpacaStockClient } from "../clients/AlpacaClient";
 import { OhlcCache } from "./OhlcCache";
-import type { Symphony, OHLCBar } from "../backtester/types";
+import type { Symphony, OHLCBar } from "../types/types";
 import { IndicatorCache } from "./IndicatorCache";
 import { Parser } from "./Parser";
 import { Interpreter } from "./Interpreter";

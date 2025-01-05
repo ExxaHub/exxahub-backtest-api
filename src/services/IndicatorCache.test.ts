@@ -1,7 +1,7 @@
 import { describe, it, expect, mock } from "bun:test";
 import { AlpacaStockClient } from "../clients/AlpacaClient";
 import { OhlcCache } from "./OhlcCache";
-import type { OHLCBar } from "../backtester/types";
+import type { OHLCBar } from "../types/types";
 import { IndicatorCache } from "./IndicatorCache";
 
 const alpacaStockClient = new AlpacaStockClient()
