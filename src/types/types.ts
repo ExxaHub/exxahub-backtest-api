@@ -16,7 +16,7 @@ export interface SymphonyNode {
     comparator?: string;
     'is-else-condition'?: boolean;
     children?: SymphonyNode[];
-    weight?: { num: number; den: number };
+    weight?: { num: number | string; den: number | string };
     collapsed?: boolean;
     rebalance?: string;
     description?: string;

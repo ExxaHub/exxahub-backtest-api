@@ -49,8 +49,8 @@ export class SymphonyAdapter {
           case 'group': {
             return {
                 weight: {
-                    num: node.weight?.num!,
-                    den: node.weight?.den!
+                    num: typeof node.weight?.num! === 'string' ? parseInt(node.weight?.num!) : node.weight?.num!,
+                    den: typeof node.weight?.den! === 'string' ? parseInt(node.weight?.den!) : node.weight?.den!,
                 },
                 id: this.getId(),
                 node_type: TradingBotNodeType.group,
@@ -73,8 +73,8 @@ export class SymphonyAdapter {
 
             if (node.weight) {
               newNode.weight = {
-                num: node.weight?.num!,
-                den: node.weight?.den!
+                num: typeof node.weight?.num! === 'string' ? parseInt(node.weight?.num!) : node.weight?.num!,
+                den: typeof node.weight?.den! === 'string' ? parseInt(node.weight?.den!) : node.weight?.den!,
               }
             }
 
