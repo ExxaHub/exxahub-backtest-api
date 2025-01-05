@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Exxa",
+  "name": "ExxaHub Backtest API",
   "type": "collection",
   "ignore": [
     "node_modules",

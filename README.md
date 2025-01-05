@@ -1,7 +1,7 @@
 <br />
 <img src="assets/images/logo-4x.png" width="80"/>
 
-### Exxa Backtest API - Open-source Stock Trading Backtest API. 
+### ExxaHub Backtest API - Open-source Stock Trading Backtest API. 
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
 
@@ -33,8 +33,8 @@ Before you begin, ensure you have the following installed:
 Clone the repository to your local machine:
 
 ```bash
-git clone git@github.com:ExxaHub/exxa-backtest-api.git
-cd exxa-backtest-api
+git clone git@github.com:ExxaHub/exxahub-backtest-api.git
+cd exxahub-backtest-api
 ```
 
 ### Start the Application
