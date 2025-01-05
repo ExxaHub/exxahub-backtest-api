@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import type { OHLCBar } from "../types";
+import type { OHLCBar } from "../types/types";
 import { standardDeviationOfPrice } from "./standardDeviationOfPrice";
 
 describe("stdDev", () => {

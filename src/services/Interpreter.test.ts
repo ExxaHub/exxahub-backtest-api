@@ -13,7 +13,7 @@ const indicatorCache = new IndicatorCache(ohlcCache, [])
 
 describe("Interpreter", () => {
   it("Evaluates a weight equal algorithm correctly", async () => {
-    const algorithm: Symphony = await import('../backtester/testSymphonies/weightEqual.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/weightEqual.json') as unknown as Symphony;
 
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
@@ -24,7 +24,7 @@ describe("Interpreter", () => {
   });
 
   it("Evaluates a weight specified algorithm correctly", async () => {
-    const algorithm: Symphony = await import('../backtester/testSymphonies/weightSpecified.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/weightSpecified.json') as unknown as Symphony;
 
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
@@ -44,7 +44,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/cumulativeReturn.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/cumulativeReturn.json') as unknown as Symphony;
 
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
@@ -62,7 +62,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/cumulativeReturn.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/cumulativeReturn.json') as unknown as Symphony;
 
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
@@ -80,7 +80,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/exponentialMovingAverageOfPrice.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/exponentialMovingAverageOfPrice.json') as unknown as Symphony;
 
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
@@ -98,7 +98,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/exponentialMovingAverageOfPrice.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/exponentialMovingAverageOfPrice.json') as unknown as Symphony;
 
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
@@ -116,7 +116,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/maxDrawdown.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/maxDrawdown.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -133,7 +133,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/maxDrawdown.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/maxDrawdown.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -150,7 +150,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/movingAverageOfPrice.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/movingAverageOfPrice.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -167,7 +167,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/movingAverageOfPrice.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/movingAverageOfPrice.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -184,7 +184,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/movingAverageOfReturn.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/movingAverageOfReturn.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -201,7 +201,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/movingAverageOfReturn.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/movingAverageOfReturn.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -218,7 +218,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/relativeStrengthIndex.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/relativeStrengthIndex.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -235,7 +235,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/relativeStrengthIndex.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/relativeStrengthIndex.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -252,7 +252,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/standardDeviationOfPrice.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/standardDeviationOfPrice.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -269,7 +269,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/standardDeviationOfPrice.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/standardDeviationOfPrice.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -286,7 +286,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/standardDeviationOfReturn.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/standardDeviationOfReturn.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -303,7 +303,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/standardDeviationOfReturn.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/standardDeviationOfReturn.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -319,7 +319,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/fixedValueCompare.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/fixedValueCompare.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
@@ -335,7 +335,7 @@ describe("Interpreter", () => {
       }
     });
 
-    const algorithm: Symphony = await import('../backtester/testSymphonies/fixedValueCompare.json') as unknown as Symphony;
+    const algorithm: Symphony = await import('../testData/fixedValueCompare.json') as unknown as Symphony;
     const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 

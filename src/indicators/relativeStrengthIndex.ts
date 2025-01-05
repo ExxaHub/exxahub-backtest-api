@@ -1,4 +1,4 @@
-import type {OHLCBar} from "../types";
+import type {OHLCBar} from "../types/types";
 import dayjs, { type Dayjs } from "dayjs";
 
 type Params = { 

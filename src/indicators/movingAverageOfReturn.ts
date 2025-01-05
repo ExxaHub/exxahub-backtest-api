@@ -1,4 +1,4 @@
-import type { OHLCBar } from "../types";
+import type { OHLCBar } from "../types/types";
 
 type Params = { 
     window: number; 

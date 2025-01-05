@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { relativeStrengthIndex } from "./relativeStrengthIndex";
-import type { OHLCBar } from "../types";
+import type { OHLCBar } from "../types/types";
 
 // Mock data for tests
 const mockBars: OHLCBar[] = [

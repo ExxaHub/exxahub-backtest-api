@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { cumulativeReturn } from "./cumulativeReturn";
-import type { OHLCBar } from "../types";
+import type { OHLCBar } from "../types/types";
 
 describe("cumulativeReturn", () => {
   const bars: OHLCBar[] = [

@@ -10,6 +10,16 @@ export type AlpacaOHLCBar = {
     v: number;
 }
 
+type AlpacaHistoricalBarsRequest = {
+    symbols: string,
+    timeframe: string,
+    start: string,
+    limit: string,
+    adjustment: string,
+    feed: string,
+    sort: string,
+    page_token?: string
+}
 export type AlpacaHistoricalBarsResponse =
     {
         "bars": {
@@ -139,14 +149,14 @@ export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterfa
         let bars: OHLCBar[] = []
         let resp: AlpacaHistoricalBarsResponse | undefined
         do {
-            const params = {
+            const params: AlpacaHistoricalBarsRequest = {
                 symbols: symbol,
                 timeframe: '1Day',
                 start: '1990-01-01',
                 limit: '1000',
                 adjustment: 'all',
                 feed: 'sip',
-                sort: 'asc'
+                sort: 'asc',
             }
 
             if (resp && resp.next_page_token) {

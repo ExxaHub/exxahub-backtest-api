@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { maxDrawdown } from "./maxDrawdown";
-import type { OHLCBar } from "../types";
+import type { OHLCBar } from "../types/types";
 
 describe("maxDrawdown", () => {
     const mockBars: OHLCBar[] = [

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { exponentialMovingAverageOfPrice } from "./exponentialMovingAverageOfPrice";
-import type { OHLCBar } from "../types";
+import type { OHLCBar } from "../types/types";
 
 describe("exponentialMovingAverageOfPrice", () => {
   const bars: OHLCBar[] = [

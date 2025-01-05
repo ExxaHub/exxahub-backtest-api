@@ -2,14 +2,14 @@ import { describe, it, expect } from "bun:test";
 import { Parser } from "./Parser";
 import type { Symphony } from "../types/types";
 
-import cumulativeReturnJson from '../backtester/testSymphonies/cumulativeReturn.json'
-import exponentialMovingAverageOfPriceJson from '../backtester/testSymphonies/exponentialMovingAverageOfPrice.json'
-import maxDrawdownJson from '../backtester/testSymphonies/maxDrawdown.json'
-import movingAverageOfPriceJson from '../backtester/testSymphonies/movingAverageOfPrice.json'
-import movingAverageOfReturnJson from '../backtester/testSymphonies/movingAverageOfReturn.json'
-import relativeStrengthIndexJson from '../backtester/testSymphonies/relativeStrengthIndex.json'
-import standardDeviationOfPriceJson from '../backtester/testSymphonies/standardDeviationOfPrice.json'
-import standardDeviationOfReturnJson from '../backtester/testSymphonies/standardDeviationOfReturn.json'
+import cumulativeReturnJson from '../testData/cumulativeReturn.json'
+import exponentialMovingAverageOfPriceJson from '../testData/exponentialMovingAverageOfPrice.json'
+import maxDrawdownJson from '../testData/maxDrawdown.json'
+import movingAverageOfPriceJson from '../testData/movingAverageOfPrice.json'
+import movingAverageOfReturnJson from '../testData/movingAverageOfReturn.json'
+import relativeStrengthIndexJson from '../testData/relativeStrengthIndex.json'
+import standardDeviationOfPriceJson from '../testData/standardDeviationOfPrice.json'
+import standardDeviationOfReturnJson from '../testData/standardDeviationOfReturn.json'
 
 describe("Parser", () => {
   it("Parses cumulativeReturn RSI indicators correctly", () => {
