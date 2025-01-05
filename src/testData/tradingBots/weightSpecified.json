@@ -7,13 +7,13 @@
   "version": "v1",
   "children": [
     {
-      "id": "node_01jgvtkg8rs1zawaypfm7rrxe6",
+      "id": "node_01jgvw3zx9ey6ma6dfp2t1q8ra",
       "node_type": "wt-cash-specified",
       "children": [
         {
           "ticker": "SPY",
           "name": "SPY",
-          "id": "node_01jgvtkg8s9wywcta1c4450vw3",
+          "id": "node_01jgvw3zxa6tr6hfj1ddd6njwv",
           "node_type": "asset",
           "weight": {
             "num": "30",
@@ -23,7 +23,7 @@
         {
           "ticker": "QQQ",
           "name": "QQQ",
-          "id": "node_01jgvtkg8sm5xznjd1njag036x",
+          "id": "node_01jgvw3zxa9anx02fsz53edk16",
           "node_type": "asset",
           "weight": {
             "num": "45",
@@ -33,7 +33,7 @@
         {
           "ticker": "DIA",
           "name": "DIA",
-          "id": "node_01jgvtkg8tzcfkhz5ar5cwwkvb",
+          "id": "node_01jgvw3zxaxvt8z3s2543s9yj4",
           "node_type": "asset",
           "weight": {
             "num": 25,

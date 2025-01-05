@@ -128,9 +128,9 @@ export class Interpreter {
     const rhsParams = condition.rhs_fn_params
 
     const lhsValue = this.getIndicatorValue(condition.lhs_val, condition.lhs_fn, lhsParams);
-    const rhsValue = condition.rhs_val
-      ? parseInt(condition.rhs_val) 
-      : this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, rhsParams);
+    const rhsValue = condition.rhs_fn
+      ? this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, rhsParams)
+      : parseInt(condition.rhs_val!) 
     const comparator = condition.comparator
   
     return this.compare(lhsValue, rhsValue, comparator);

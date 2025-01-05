@@ -1,48 +1,48 @@
 {
-    "description": "",
-    "name": "New Symphony",
-    "id": "new",
-    "node_type": "root",
-    "rebalance": "daily",
-    "version": "v1",
-    "children": [
-      {
-        "id": "node_01jgvs2dw2kd9x64js3cfpq1bp",
-        "node_type": "wt-cash-equal",
-        "children": [
-          {
-            "weight": {},
-            "id": "node_01jgvs2dw2s8h79xqnagtjmgxm",
-            "node_type": "group",
-            "name": "Group",
-            "children": [
-              {
-                "id": "node_01jgvs2dw2e635eqcx6bj492kr",
-                "node_type": "wt-cash-equal",
-                "children": [
-                  {
-                    "ticker": "SPY",
-                    "name": "SPY",
-                    "id": "node_01jgvs2dw2trq9d59eat8pdp3t",
-                    "node_type": "asset"
-                  },
-                  {
-                    "ticker": "QQQ",
-                    "name": "QQQ",
-                    "id": "node_01jgvs2dw288mjmss7s22h3ad3",
-                    "node_type": "asset"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "ticker": "DIA",
-            "name": "DIA",
-            "id": "node_01jgvs2dw2arqzf9vsf3g2g17b",
-            "node_type": "asset"
-          }
-        ]
-      }
-    ]
-  }
+  "description": "",
+  "name": "New Symphony",
+  "id": "new",
+  "node_type": "root",
+  "rebalance": "daily",
+  "version": "v1",
+  "children": [
+    {
+      "id": "node_01jgvw3jev64q8rhgn1hq8w98b",
+      "node_type": "wt-cash-equal",
+      "children": [
+        {
+          "weight": {},
+          "id": "node_01jgvw3jev745kxft0fx518by8",
+          "node_type": "group",
+          "name": "Group",
+          "children": [
+            {
+              "id": "node_01jgvw3jevj8x6mkc2dw5qy8g7",
+              "node_type": "wt-cash-equal",
+              "children": [
+                {
+                  "ticker": "SPY",
+                  "name": "SPY",
+                  "id": "node_01jgvw3jewbq413bcqy558zyta",
+                  "node_type": "asset"
+                },
+                {
+                  "ticker": "QQQ",
+                  "name": "QQQ",
+                  "id": "node_01jgvw3jewbfexa5d0vps8e6pm",
+                  "node_type": "asset"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ticker": "DIA",
+          "name": "DIA",
+          "id": "node_01jgvw3jewnc2p4evqv0vhj96k",
+          "node_type": "asset"
+        }
+      ]
+    }
+  ]
+}

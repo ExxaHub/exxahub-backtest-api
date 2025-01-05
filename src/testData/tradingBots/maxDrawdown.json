@@ -1,54 +1,54 @@
 {
-    "description": "",
-    "name": "Test Algorithm",
-    "id": "new",
-    "node_type": "root",
-    "rebalance": "daily",
-    "version": "v1",
-    "children": [
-      {
-        "id": "node_01jgvrz579bjdn1pbh4f0szr9s",
-        "node_type": "wt-cash-equal",
-        "children": [
-          {
-            "id": "node_01jgvrz57a409w0ejjxstv9ecn",
-            "node_type": "if-then-else",
-            "condition_type": "allOf",
-            "conditions": [
-              {
-                "id": "node_01jgvrz5792m6mz5whsjmmvtbn",
-                "node_type": "condition",
-                "lhs_fn": "max-drawdown",
-                "lhs_fn_params": {
-                  "window": 10
-                },
-                "lhs_val": "SPY",
-                "comparator": "gt",
-                "rhs_fn": "max-drawdown",
-                "rhs_fn_params": {
-                  "window": 20
-                },
-                "rhs_val": "SPY"
-              }
-            ],
-            "then_children": [
-              {
-                "ticker": "SPY",
-                "name": "SPY",
-                "id": "node_01jgvrz57asg6n6wwhwsa0yhqw",
-                "node_type": "asset"
-              }
-            ],
-            "else_children": [
-              {
-                "ticker": "BIL",
-                "name": "BIL",
-                "id": "node_01jgvrz57a8jh5ej2zpfpcycmy",
-                "node_type": "asset"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+  "description": "",
+  "name": "Test Algorithm",
+  "id": "new",
+  "node_type": "root",
+  "rebalance": "daily",
+  "version": "v1",
+  "children": [
+    {
+      "id": "node_01jgvw0xj8400xzccbr22exw3h",
+      "node_type": "wt-cash-equal",
+      "children": [
+        {
+          "id": "node_01jgvw0xj9zw4yjrvpxxd67df3",
+          "node_type": "if-then-else",
+          "condition_type": "allOf",
+          "conditions": [
+            {
+              "id": "node_01jgvw0xj8bbyrxztg5fk5gtzj",
+              "node_type": "condition",
+              "lhs_fn": "max-drawdown",
+              "lhs_fn_params": {
+                "window": 10
+              },
+              "lhs_val": "SPY",
+              "comparator": "gt",
+              "rhs_fn": "max-drawdown",
+              "rhs_fn_params": {
+                "window": 20
+              },
+              "rhs_val": "SPY"
+            }
+          ],
+          "then_children": [
+            {
+              "ticker": "SPY",
+              "name": "SPY",
+              "id": "node_01jgvw0xj8ggz81yxs0b2rk726",
+              "node_type": "asset"
+            }
+          ],
+          "else_children": [
+            {
+              "ticker": "BIL",
+              "name": "BIL",
+              "id": "node_01jgvw0xj94gqm0z8jm335jtr0",
+              "node_type": "asset"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

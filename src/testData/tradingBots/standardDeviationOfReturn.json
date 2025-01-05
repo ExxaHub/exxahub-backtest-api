@@ -7,16 +7,16 @@
   "version": "v1",
   "children": [
     {
-      "id": "node_01jgvv5t12tme401cdt484hejf",
+      "id": "node_01jgvw35hgdtt9brpkx33j92qy",
       "node_type": "wt-cash-equal",
       "children": [
         {
-          "id": "node_01jgvv5t14k524grzfvkb8bddh",
+          "id": "node_01jgvw35hhp1fmvefxx9sqq1ef",
           "node_type": "if-then-else",
           "condition_type": "allOf",
           "conditions": [
             {
-              "id": "node_01jgvv5t12sxjp2h94jjx6eg3q",
+              "id": "node_01jgvw35hhwq41wdr6s8d6txy4",
               "node_type": "condition",
               "lhs_fn": "standard-deviation-return",
               "lhs_fn_params": {
@@ -35,7 +35,7 @@
             {
               "ticker": "SPY",
               "name": "SPY",
-              "id": "node_01jgvv5t13g3bf0ajc0jgprjae",
+              "id": "node_01jgvw35hhn5hwffah1p1hhh4r",
               "node_type": "asset"
             }
           ],
@@ -43,14 +43,10 @@
             {
               "ticker": "BIL",
               "name": "BIL",
-              "id": "node_01jgvv5t14zf7py7v6b2k4he52",
+              "id": "node_01jgvw35hh9a5vbqcn7bgc35rd",
               "node_type": "asset"
             }
-          ],
-          "weight": {
-            "num": 100,
-            "den": 100
-          }
+          ]
         }
       ]
     }
