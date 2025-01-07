@@ -20,6 +20,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
     "dayjs": "^1.11.13",
     "express": "^4.21.2",
     "ulid": "^2.3.0",

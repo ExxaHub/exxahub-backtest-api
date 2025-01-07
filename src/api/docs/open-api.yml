@@ -1,0 +1,340 @@
+openapi: 3.0.3
+info:
+  title: ExxaHub Backtest API
+  description: An open-source backtest API server to test and validate trading algorithms using historical stock market data.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+  
+paths:
+  /health:
+    get:
+      summary: Check system healthy and accessible
+      description: Get system health.
+      responses:
+        '200':
+          description: Healthcheck response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthcheckResponse'
+
+  /backtests:
+    post:
+      summary: Generate a new backtest for a trading bot
+      description: Generate a new backtest for a trading bot
+      requestBody:
+        description: The backtest configuration.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BacktestRequest'
+      responses:
+        '200':
+          description: The backtest results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BacktestResponse'
+
+  /adapters/symphony:
+    post:
+      summary: Convert a Composer Symphony to a Trading Bot
+      description: Convert a Composer Symphony to a Trading Bot
+      requestBody:
+        description: The symphony JSON
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: The trading bot JSON
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SymphonyAdapterResponse'                
+
+components:
+  schemas:
+    HealthcheckResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The status of the system.
+      required:
+        - status
+
+    BacktestRequest:
+      type: object
+      required:
+        - starting_balance
+        - start_date
+        - end_date
+        - trading_bot
+      properties:
+        starting_balance:
+          type: number
+          description: The starting balance for the backtest.
+        start_date:
+          type: string
+          description: The starting date for the backtest in format YYYY-MM-DD
+        end_date:
+          type: string
+          description: The ending date for the backtest in format YYYY-MM-DD.
+        trading_bot:
+          type: object
+          description: The trading bot JSON.
+          required:
+            - name
+            - id
+            - description
+            - node_type
+            - rebalance
+            - version
+            - children
+          properties:
+            name:
+              type: string
+            id:
+              type: string
+            description:
+              type: string
+            node_type: 
+              type: string
+              enum: ['root']
+            rebalance:
+              type: string
+              enum: ['daily']
+            version:
+              type: string
+              enum: ['v1']
+            children: 
+              type: array
+              minItems: 1
+              items:
+                $ref: '#/components/schemas/TradingBotNode'
+
+    BacktestResponse:
+      type: object
+
+    SymphonyAdapterResponse:
+      type: object
+      description: The trading bot JSON.
+      required:
+        - name
+        - id
+        - description
+        - node_type
+        - rebalance
+        - version
+        - children
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        description:
+          type: string
+        node_type: 
+          type: string
+          enum: ['root']
+        rebalance:
+          type: string
+          enum: ['daily']
+        version:
+          type: string
+          enum: ['v1']
+        children: 
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNode'
+
+    TradingBotNode:
+      type: object
+      anyOf:
+        - $ref: '#/components/schemas/TradingBotNodeGroup'
+        - $ref: '#/components/schemas/TradingBotNodeWeightCashEqual'
+        - $ref: '#/components/schemas/TradingBotNodeWeightCashSpecified'
+        - $ref: '#/components/schemas/TradingBotNodeIfThenElse'
+        - $ref: '#/components/schemas/TradingBotNodeCondition'
+        - $ref: '#/components/schemas/TradingBotNodeAsset'
+
+    TradingBotNodeGroup:
+      type: object
+      required:
+        - id
+        - node_type
+        - name
+        - children
+      properties:
+        weight:
+          type: object
+          properties:
+            num: 
+              type: number
+            den: 
+              type: number
+        id:
+          type: string
+        node_type: 
+          type: string
+          enum: ['group']
+        name: 
+          type: string
+        children: 
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNode'
+    
+    TradingBotNodeWeightCashEqual:
+      type: object
+      required:
+        - id
+        - node_type
+        - children
+      properties:
+        id:
+          type: string
+        node_type: 
+          type: string
+          enum: ['wt-cash-equal']
+        children: 
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNode'
+
+    TradingBotNodeWeightCashSpecified:
+      type: object
+      required:
+        - id
+        - node_type
+        - children
+      properties:
+        id:
+          type: string
+        node_type: 
+          type: string
+          enum: ['wt-cash-specified']
+        weight:
+          type: object
+          properties:
+            num: 
+              type: number
+            den: 
+              type: number
+        children: 
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNode'
+
+    TradingBotNodeIfThenElse:
+      type: object
+      required:
+        - id
+        - node_type
+        - condition_type
+        - conditions
+        - then_children
+        - else_children
+      properties:
+        weight:
+          type: object
+          properties:
+            num: 
+              type: number
+            den: 
+              type: number
+        id:
+          type: string
+        node_type:
+          type: string
+          enum: ['if-then-else']
+        condition_type: 
+          type: string
+          enum: ["allOf", "anyOf"]
+        conditions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNodeCondition'
+        then_children:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNode'
+        else_children:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TradingBotNode'
+
+    TradingBotNodeCondition:
+      type: object
+      required:
+        - id
+        - node_type
+        - lhs_fn
+        - lhs_fn_params
+        - lhs_val
+        - comparator
+      properties:
+        id:
+          type: string
+        node_type:
+          type: string
+          enum: ['condition']
+        lhs_fn:
+          type: string
+        lhs_fn_params: 
+          type: object
+          properties:
+            window: 
+              type: number
+        lhs_val:
+          type: string
+        rhs_fn:
+          type: string
+        rhs_fn_params:
+          type: object
+          properties:
+            window: 
+              type: number
+        rhs_val:
+          type: string
+        comparator: 
+          type: string
+          enum: ["gt", "lt", "eq"]
+
+    TradingBotNodeAsset:
+      type: object
+      required:
+        - ticker
+        - name
+        - id
+        - node_type
+      properties:
+        weight:
+          type: object
+          properties:
+            num: 
+              type: number
+            den: 
+              type: number
+        ticker:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        node_type:
+          type: string
+          enum: ['asset']

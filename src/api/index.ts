@@ -1,9 +1,10 @@
 import express from 'express'
 import { handleRequest } from './utils'
 
-const HealthController = () => import('./controllers/HealthController')
-const BacktestController = () => import('./controllers/BacktestController')
 const AdapterController = () => import('./controllers/AdapterController')
+const BacktestController = () => import('./controllers/BacktestController')
+const DocsController = () => import('./controllers/DocsController')
+const HealthController = () => import('./controllers/HealthController')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -11,6 +12,8 @@ const port = process.env.PORT || 3000
 app.use(express.json());
 
 app.get('/api/v1/health', handleRequest(HealthController, 'show'))
+
+app.get('/api/v1/docs', handleRequest(DocsController, 'show'))
 
 app.post('/api/v1/backtests', handleRequest(BacktestController, 'create'))
 
