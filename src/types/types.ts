@@ -43,13 +43,21 @@ export enum TradingBotNodeType {
     asset = 'asset'
 }
 
+export enum TradingBotRebalanceType {
+    Daily = 'daily'
+}
+
+export enum TradingBotVersion {
+    V1 = 'v1'
+}
+
 export interface TradingBotNodeRoot {
     description: string;
     name: string;
     id: string;
     node_type: TradingBotNodeType.root;
-    rebalance: string;
-    version: 'v1';
+    rebalance: TradingBotRebalanceType;
+    version: TradingBotVersion;
     children: TradingBotNode[];
 }
 
