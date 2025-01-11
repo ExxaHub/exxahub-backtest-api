@@ -101,9 +101,9 @@ The ExxaHub Backtest API provides an API endpoint to convert Composer Symphonies
 
 The following Symphony node types are supported:
 - Asset
-- Group
-- Weight (Allocation)
-- If/Else (Conditional)
+- Group (Equal and Specified)
+- Weight
+- If/Else
 
 ⚠️ Note: The Filter node type is not supported by ExxaHub at this time because some of the functions that Composer allows you to sort on are not normalized, so it would be impossible to build an apples-to-apples comparison when sorting on certain sub-symphonies.
 
