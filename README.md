@@ -1,9 +1,12 @@
 <div align="center">
-<img src="assets/images/exxa-logo-2x.png" height="60"/>
+<a href="https://www.exxahub.com/">
+  <img src="assets/images/exxa-logo-2x.png" height="60"/>
+</a>
 
 ### ExxaHub Backtest API - Open-source Stock Trading Backtest API. 
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/website-exxahub.com-orange.svg)](LICENSE)
 
 An open-source backtest API server to test and validate trading algorithms using historical stock market data. 
 
