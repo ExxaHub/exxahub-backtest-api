@@ -16,6 +16,7 @@ An open-source backtest API server to test and validate trading algorithms using
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
+- [Market Data Providers](#market-data-providers)
 - [API Collection](#api-collection)
 - [Contributing](#contributing)
 - [License](#license)
@@ -38,6 +39,12 @@ Clone the repository to your local machine:
 ```bash
 git clone git@github.com:ExxaHub/exxahub-backtest-api.git
 cd exxahub-backtest-api
+```
+
+Create a local .env file from the example
+
+```bash
+cp .env.example .env
 ```
 
 ### Start the Application
@@ -96,6 +103,33 @@ The following Symphony node types are supported:
 - If/Else (Conditional)
 
 ⚠️ Note: The Filter node type is not supported by ExxaHub at this time because some of the functions that Composer allows you to sort on are not normalized, so it would be impossible to build an apples-to-apples comparison when sorting on certain sub-symphonies.
+
+## Market Data Providers
+
+The ExxaHub Backtest API supports the following providers
+
+- [x] Alpaca
+- [x] Tiingo
+- [x] Polygon.io
+
+You can configure which data provider to load market data from by configuring the `MARKET_DATA_PROVIDER` env variable in your `.env` file.
+
+Depending on which Market Data Provider you have configured, you'll also need to set your API key credentials specific to that provider.
+
+```bash
+# Available values: alpaca | tiingo | polygon
+MARKET_DATA_PROVIDER=alpaca
+
+# Required if MARKET_DATA_PROVIDER=alpaca
+ALPACA_API_KEY_ID=
+ALPACA_API_SECRET_KEY=
+
+# Required if MARKET_DATA_PROVIDER=tiingo
+TIINGO_API_KEY=
+
+# Required if MARKET_DATA_PROVIDER=polygon
+POLYGON_API_KEY=
+```
 
 ## API Collection
 
