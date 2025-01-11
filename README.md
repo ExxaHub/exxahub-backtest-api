@@ -6,7 +6,7 @@
 ### ExxaHub Backtest API - Open-source Stock Trading Backtest API. 
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
-[![License](https://img.shields.io/badge/website-exxahub.com-orange.svg)](LICENSE)
+[![License](https://img.shields.io/badge/website-exxahub.com-orange.svg)](https://www.exxahub.com/)
 
 An open-source backtest API server to test and validate trading algorithms using historical stock market data. 
 
