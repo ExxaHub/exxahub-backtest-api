@@ -2,7 +2,7 @@ up:
 	docker-compose \
         -f docker-compose.yml \
         -f docker-compose.local.yml \
-        up
+        up --force-recreate --remove-orphans
 
 build:
 	docker-compose \
@@ -14,7 +14,7 @@ down:
 	docker-compose \
         -f docker-compose.yml \
         -f docker-compose.local.yml \
-        down
+        down --remove-orphans
 
 destroy:
 	docker-compose \
