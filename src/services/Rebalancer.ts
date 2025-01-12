@@ -59,7 +59,7 @@ export class Rebalancer {
         this.balanceHistory.push(this.portfolioValue)
     }
 
-    rebalance(date: Dayjs, newAllocations: Allocations): void {
+    rebalance(date: string, newAllocations: Allocations): void {
         // update portfolio value based on current day's close
         this.updatePortfolioValue(date)
         
@@ -130,7 +130,7 @@ export class Rebalancer {
         return newHoldings
     }
 
-    private updatePortfolioValue(date: Dayjs): void {
+    private updatePortfolioValue(date: string): void {
         if (Object.keys(this.currentHoldings).length === 0) {
             this.setPortfolioValue(INITIAL_PORTFOLIO_VALUE)
             return 
@@ -145,7 +145,7 @@ export class Rebalancer {
         this.setPortfolioValue(newValue)
     }
 
-    private getTickerPriceOnDate(ticker: string, date: Dayjs): number {
+    private getTickerPriceOnDate(ticker: string, date: string): number {
         const bar = this.ohlcCache.getBarForDate(ticker, date)
         if (!bar) {
             throw new Error('No bar available to update holdings')

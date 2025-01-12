@@ -7,6 +7,7 @@ export class OhlcCache {
   private tickers: string[]
   private cachedOhlcBars: Map<string, OHLCBar[]> = new Map<string, OHLCBar[]>()
   private cachedOhlcBarDates: Set<string> = new Set<string>()
+  private cachedOhlcBarsByDate: Map<string, Record<string, OHLCBar>> = new Map<string, Record<string, OHLCBar>>()
   private loaded: boolean = false
 
   constructor(client: ClientInterface, tickers: string[]) {
@@ -17,12 +18,20 @@ export class OhlcCache {
   async load(): Promise<void> {
     const bars = await this.getTickerBars()
 
+    const indexByDate = (ohlcBars: OHLCBar[]): Record<string, OHLCBar> => {
+      const ohlcObject: Record<string, OHLCBar> = {};
+      
+      ohlcBars.forEach(bar => {
+        ohlcObject[bar.date] = bar
+        this.cachedOhlcBarDates.add(bar.date)
+      });
+    
+      return ohlcObject;
+    }
+
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, ohlcBars)
-
-      for (const ohlcBar of ohlcBars) {
-        this.cachedOhlcBarDates.add(ohlcBar.date)
-      }
+      this.cachedOhlcBarsByDate.set(ticker, indexByDate(ohlcBars))
     }
 
     this.loaded = true
@@ -53,9 +62,12 @@ export class OhlcCache {
     return bars
   }
 
-  getBarForDate(ticker: string, date: Dayjs): OHLCBar | undefined {
-    let bars = this.cachedOhlcBars.get(ticker)
-    return bars?.find(bar => bar.date === date.format('YYYY-MM-DD'))
+  getBarForDate(ticker: string, date: string): OHLCBar | undefined {
+    const bars = this.cachedOhlcBarsByDate.get(ticker)
+    if (!bars) {
+      throw new Error(`No bars available for ticker: ${ticker}`)
+    }
+    return bars[date]
   }
 
   getTickers(): string[] {
