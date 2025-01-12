@@ -7,12 +7,19 @@ import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
 import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";
 
+export type AllocationResult = { 
+    date: string,
+    tickers: {
+        [key: string]: number | null
+    }
+}
+
 type BacktestResults = {
     date_from?: string,
     date_to?: string,
     starting_balance?: number
     ending_balance?: number,
-    allocation_history?: { [key: string]: string | number | null }[]
+    allocation_history?: AllocationResult[]
     balance_history?: number[]
     ticker_start_dates?: { [key: string]: string }
 }
@@ -26,7 +33,7 @@ export class Backtester {
     private defaultBacktestStartDate: string
     private defaultBacktestEndDate: string
     
-    private allocationResults: { [key: string]: string | number | null }[] = []
+    private allocationResults: AllocationResult[] = []
     private backtestResults: BacktestResults = {}
 
     private tickerStartDates: Record<string, string> = {}
@@ -77,10 +84,10 @@ export class Backtester {
             
             this.allocationResults.push({
                 date: currentDate.format('YYYY-MM-DD'),
-                ...allocations
+                tickers: allocations
             })
 
-            rebalancer.rebalance(currentDate, allocations)
+            rebalancer.rebalance(currentDate.format('YYYY-MM-DD'), allocations)
 
             if (currentDate.isSame(toDate)) {
                 break

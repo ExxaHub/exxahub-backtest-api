@@ -1,7 +1,0 @@
-version: '3.8'
-
-services:
-  exxa_backtester:
-    volumes:
-      - .:/usr/src/app
-    command: ["bun", "--watch", "run", "./src/api/index.ts"]

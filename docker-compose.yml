@@ -1,20 +1,22 @@
 version: '3.8'
 
 services:
-  exxa_backtester:
+  backtester:
     build: .
-    container_name: exxa_backtester
+    container_name: backtester
     ports:
       - "3000:3000"
     networks:
       - exxa_network
     env_file:
       - .env
-    command: ["bun", "run", "./src/api/index.ts"]
+    volumes:
+      - .:/usr/src/app
+    command: ["bun", "--watch", "run", "./src/api/index.ts"]
 
   database:
     image: 'postgres:16.4-alpine3.20'
-    container_name: exxa_backtester_db
+    container_name: backtester_db
     ports:
       - 5432:5432
     networks:
