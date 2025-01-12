@@ -1,0 +1,1 @@
+export const table = 'ohlc_metadata';

@@ -10,7 +10,9 @@
   "repository": "https://github.com/dpods/mainsail.git",
   "scripts": {
     "pkg": "bun build ./src/index.ts --outdir ./dist",
-    "dev": "bun --watch run ./src/api/index.ts"
+    "dev": "bun --watch run ./src/api/index.ts",
+    "migrate:make": "bun run ./src/db/bin/migrate-make",
+    "migrate:latest": "bun run ./src/db/bin/migrate-latest"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -23,6 +25,8 @@
     "@apidevtools/swagger-parser": "^10.1.0",
     "dayjs": "^1.11.13",
     "express": "^4.21.2",
+    "knex": "^3.1.0",
+    "pg": "^8.13.1",
     "ulid": "^2.3.0",
     "zod": "^3.24.1"
   }
