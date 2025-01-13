@@ -46,8 +46,9 @@ services:
       - .env
     healthcheck:
         test: ["CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
-        retries: 3
-        timeout: 5s
+        interval: 1s
+        timeout: 1s
+        retries: 10
 
 networks:
   exxa_network:
