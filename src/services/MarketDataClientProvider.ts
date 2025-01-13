@@ -15,6 +15,7 @@ export class MarketDataClientProvider {
     getClient(): ClientInterface {
         const provider: MarketDataProvider = getMarketDataProvider()
 
+        console.log(`MarketDataClientProvider.getClient: provider=${provider}`)
         switch(provider) {
             case MarketDataProvider.Alpaca: 
                 return new AlpacaStockClient()

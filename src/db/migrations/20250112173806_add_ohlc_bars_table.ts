@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
         table.decimal('high', 10, 2).notNullable();
         table.decimal('low', 10, 2).notNullable();
         table.decimal('close', 10, 2).notNullable();
-        table.integer('volume').notNullable();
+        table.decimal('volume', 12, 2).notNullable();
 
         table.unique(['symbol', 'date'], { indexName: 'symbol_date_unique_idx'});
     })
