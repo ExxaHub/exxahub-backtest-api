@@ -48,7 +48,7 @@ export class Backtester {
     }
 
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
-        await this.loadData(backtestConfig)
+        await this.loadData(backtestConfig.trading_bot as TradingBotNode, backtestConfig.start_date, backtestConfig.end_date)
 
         if (!this.indicatorCache) {
             throw new Error('Indicator cache has not been initialized.')
@@ -61,7 +61,7 @@ export class Backtester {
         if (!this.tradeableAssets) {
             throw new Error('Tradable assets cache has not been initialized.')
         }
-        
+
         // Iterate over each day starting from the backtest start date
         let fromDate = this.calculateBacktestStartDate(backtestConfig.start_date)
         let currentDate = fromDate.clone()
@@ -104,15 +104,15 @@ export class Backtester {
         return this.backtestResults
     }
 
-    async loadData(backtestConfig: BacktestConfig): Promise<void> {
+    async loadData(tradingBot: TradingBotNode, fromDate: Dayjs, toDate: Dayjs): Promise<void> {
         const parser = new Parser()
 
-        const { assets, tradeableAssets, indicators } = parser.parse(backtestConfig.trading_bot as TradingBotNode)
+        const { assets, tradeableAssets, indicators } = parser.parse(tradingBot)
 
         this.tradeableAssets = tradeableAssets
 
         this.ohlcCache = new OhlcCache(this.client, assets)
-        await this.ohlcCache.load()
+        await this.ohlcCache.load(fromDate, toDate)
 
         this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
         await this.indicatorCache.load()

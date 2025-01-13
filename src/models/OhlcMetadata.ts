@@ -1,1 +1,3 @@
-export const table = 'ohlc_metadata';
+import { schema } from '../db';
+
+export const table = `${schema}.ohlc_metadata`;

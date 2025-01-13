@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/marketDataProviders";
 import { type ClientInterface, type OHLCBar } from "../types/types";
 
@@ -14,6 +15,7 @@ type AlpacaHistoricalBarsRequest = {
     symbols: string,
     timeframe: string,
     start: string,
+    end?: string,
     limit: string,
     adjustment: string,
     feed: string,
@@ -145,18 +147,22 @@ export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterfa
         }
     }
 
-    private async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
+    async getBarsForSymbol(symbol: string, startDate?: string, endDate?: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: AlpacaHistoricalBarsResponse | undefined
         do {
             const params: AlpacaHistoricalBarsRequest = {
                 symbols: symbol,
                 timeframe: '1Day',
-                start: '1990-01-01',
+                start: startDate ?? '1990-01-01',
                 limit: '1000',
                 adjustment: 'all',
                 feed: 'sip',
                 sort: 'asc',
+            }
+
+            if (endDate) {
+                params.end = endDate
             }
 
             if (resp && resp.next_page_token) {
