@@ -94,7 +94,7 @@ export class Backtester {
             currentDate = this.getNextMarketDate(currentDate)
         }
 
-        this.backtestResults.starting_balance = this.startingBalance
+        this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
         this.backtestResults.balance_history = rebalancer.getBalanceHistory()
         this.backtestResults.allocation_history = this.allocationResults
