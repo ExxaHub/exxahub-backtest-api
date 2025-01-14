@@ -29,13 +29,15 @@ const INITIAL_PORTFOLIO_VALUE = 10_000
 
 export class Rebalancer {
     private ohlcCache: OhlcCache
+    private initialPortfolioValue: number
     private portfolioValue: number
     private currentHoldings: Holdings = {}
     private balanceHistory: number[] = []
 
     constructor(ohlcCache: OhlcCache, portfolioValue?: number) {
         this.ohlcCache = ohlcCache
-        this.portfolioValue = portfolioValue ?? INITIAL_PORTFOLIO_VALUE
+        this.initialPortfolioValue = portfolioValue ?? INITIAL_PORTFOLIO_VALUE
+        this.portfolioValue = this.initialPortfolioValue
     }
 
     getCurrentHoldings(): Holdings {
@@ -132,7 +134,7 @@ export class Rebalancer {
 
     private updatePortfolioValue(date: string): void {
         if (Object.keys(this.currentHoldings).length === 0) {
-            this.setPortfolioValue(INITIAL_PORTFOLIO_VALUE)
+            this.setPortfolioValue(this.initialPortfolioValue)
             return 
         }
 

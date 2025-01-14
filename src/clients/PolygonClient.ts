@@ -97,7 +97,7 @@ export class PolygonClient implements ClientInterface {
         return bars
     }
 
-    private async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
+    async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: PolygonAggregateBarsResponse
 

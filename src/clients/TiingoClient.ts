@@ -17,6 +17,14 @@ export type TiingoOHLCBar =    {
     splitFactor: number
 }
 
+type TiingoDailyBarsRequest = {
+    resampleFreq: 'daily',
+    startDate: string,
+    endDate?: string,
+    format: 'json',
+    sort: 'date'
+}
+
 export type TiingoLastPriceResponse = Array<{
     ticker: string,
     timestamp: string
@@ -89,15 +97,23 @@ export class TiingoClient implements ClientInterface {
         return bars
     }
 
-    private async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
+    async getBarsForSymbol(symbol: string, startDate?: string, endDate?: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: TiingoOHLCBar[]
         
-        const params = {
+        const params: TiingoDailyBarsRequest = {
             resampleFreq: 'daily',
             startDate: '1990-01-01',
             format: 'json',
             sort: 'date'
+        }
+
+        if (startDate) {
+            params.startDate = startDate
+        }
+
+        if (endDate) {
+            params.endDate = endDate
         }
 
         resp = await this.get<TiingoOHLCBar[]>(`/daily/${symbol}/prices`, params)

@@ -2,7 +2,7 @@ PROJECT_NAME := exxahub
 
 .PHONY: loadtest
 
-up:
+up: generate-creds
 	docker-compose \
         -f docker-compose.yml \
 		-p ${PROJECT_NAME} \
@@ -32,3 +32,9 @@ loadtest:
 		-f docker-compose.loadtest.yml \
 		-p ${PROJECT_NAME} \
 		run --rm loadtester run /app/test.js
+
+generate-creds:
+	docker-compose \
+		-f docker-compose.yml \
+		-p ${PROJECT_NAME} \
+		run --rm backtester bun run generate:dbcreds

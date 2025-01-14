@@ -14,6 +14,20 @@ services:
       - .:/usr/src/app
     command: ["bun", "--watch", "run", "./src/api/index.ts"]
 
+  migrations:
+    build: .
+    container_name: migrations
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - exxa_network
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    command: ["bun", "run", "migrate:latest"]
+
   database:
     image: 'postgres:16.4-alpine3.20'
     container_name: backtester_db
@@ -22,16 +36,19 @@ services:
     networks:
       - exxa_network
     environment:
-        PGPASSWORD: '${DB_PASSWORD:-secret}'
-        POSTGRES_DB: '${DB_DATABASE}'
-        POSTGRES_USER: '${DB_USERNAME}'
-        POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        PGPASSWORD: '${DB_PASS}'
+        POSTGRES_DB: '${DB_NAME}'
+        POSTGRES_USER: '${DB_USER}'
+        POSTGRES_PASSWORD: '${DB_PASS}'
     volumes:
         - 'db:/var/lib/postgresql/data'
+    env_file:
+      - .env
     healthcheck:
-        test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
-        retries: 3
-        timeout: 5s
+        test: ["CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
+        interval: 1s
+        timeout: 1s
+        retries: 10
 
 networks:
   exxa_network:

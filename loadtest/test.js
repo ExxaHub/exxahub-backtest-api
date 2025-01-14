@@ -13,7 +13,7 @@ export const options = {
 
 const payload = JSON.stringify({
     "starting_balance": 10000,
-    "start_date": "2024-01-02",
+    "start_date": "2016-01-04",
     "end_date": "2026-01-02",
     "trading_bot": {
       "name": "New Trading Bot",
@@ -70,7 +70,7 @@ const payload = JSON.stringify({
                                       ],
                                       "else_children": [
                                           {
-                                              "ticker": "KMLM",
+                                              "ticker": "SQQQ",
                                               "exchange": "ARCX",
                                               "name": "ProShares Short QQQ",
                                               "id": "72463f12-d3da-44f7-86aa-9f83dd176ae1",

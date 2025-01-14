@@ -159,6 +159,7 @@ export type Indicator = {
 
 export interface ClientInterface {
     getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}>
+    getBarsForSymbol(symbol: string, dateStart: string, dateEnd?: string): Promise<{symbol: string, bars: OHLCBar[]}>
     getCurrentPriceForSymbol(symbol: string): Promise<Record<string, number>>
 }
 
