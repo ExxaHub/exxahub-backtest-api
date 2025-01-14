@@ -45,6 +45,20 @@ export class Backtester {
         this.defaultBacktestEndDate = dayjs().format('YYYY-MM-DD')
     }
 
+    private async loadData(tradingBot: TradingBotNode, fromDate: string, toDate: string): Promise<void> {
+        const parser = new Parser()
+
+        const { assets, tradeableAssets, indicators } = parser.parse(tradingBot)
+
+        this.tradeableAssets = tradeableAssets
+
+        this.ohlcCache = new OhlcCache(this.client, assets)
+        await this.ohlcCache.load(fromDate, toDate)
+
+        this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
+        await this.indicatorCache.load()
+    }
+
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
         await this.loadData(backtestConfig.trading_bot as TradingBotNode, backtestConfig.start_date, backtestConfig.end_date)
 
@@ -100,20 +114,6 @@ export class Backtester {
         this.backtestResults.allocation_history = this.allocationResults
 
         return this.backtestResults
-    }
-
-    async loadData(tradingBot: TradingBotNode, fromDate: string, toDate: string): Promise<void> {
-        const parser = new Parser()
-
-        const { assets, tradeableAssets, indicators } = parser.parse(tradingBot)
-
-        this.tradeableAssets = tradeableAssets
-
-        this.ohlcCache = new OhlcCache(this.client, assets)
-        await this.ohlcCache.load(fromDate, toDate)
-
-        this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
-        await this.indicatorCache.load()
     }
 
     private calculateBacktestStartDate(backtestConfigStartDate?: string): Dayjs {

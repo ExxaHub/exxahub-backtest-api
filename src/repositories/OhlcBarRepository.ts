@@ -23,6 +23,27 @@ export class OhlcBarRepository {
         }
     }
 
+    async getMinMaxBarDates(tickers: string[]): Promise<{ [key: string]: { minDate: string, maxDate: string } }> {
+        try {
+            const results = await db(table)
+                .select('symbol')
+                .min('date as min_date')
+                .max('date as max_date')
+                .whereIn('symbol', tickers)
+                .groupBy('symbol')
+
+            const minMaxDates: { [key: string]: { minDate: string, maxDate: string } } = {}
+            results.forEach(result => {
+                minMaxDates[result.symbol] = { minDate: result.min_date, maxDate: result.max_date }
+            })
+
+            return minMaxDates
+        } catch (error) {
+            console.error('Error getting min/max bar dates:', error)
+            return {}
+        }
+    }
+
     async saveBars(ticker: string, bars: OHLCBar[]): Promise<boolean> {
         try { 
             const barsToSave = bars.map(bar => {
@@ -36,8 +57,6 @@ export class OhlcBarRepository {
                     volume: bar.volume
                 }
             })
-
-            console.log('barsToSave:', barsToSave.length)
             
             await db(table)
                 .insert(barsToSave)
@@ -52,20 +71,19 @@ export class OhlcBarRepository {
     }
 
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
-        console.log('querying bars for date range:', fromDate, toDate)
         try {
             const results = await db(table)
                 .select('*')
                 .whereIn('symbol', tickers)
                 .where('date', '>=', fromDate)
                 .where('date', '<=', toDate)
+                .orderBy('date', 'asc')
 
             const bars: { [key: string]: OHLCBar[] } = {}
             results.forEach(result => {
                 if (bars[result.symbol] === undefined) {
                     bars[result.symbol] = []
                 }
-
                 bars[result.symbol].push({
                     close: result.close,
                     high: result.high,

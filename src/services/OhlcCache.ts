@@ -87,7 +87,6 @@ export class OhlcCache {
     ])
 
     const bars = this.ohlcBarService.getBarsForDateRange(this.tickers, fromDate, toDate)
-    // const bars = await this.client.getBarsForSymbols(this.tickers)
     
     return bars
   }
@@ -98,7 +97,6 @@ export class OhlcCache {
     for (const ticker of this.tickers) {
       if (lastBarDates[ticker] === undefined) {
         tickersToBackfill.push(ticker)
-        console.log('backfilling bars for', ticker)
       }
     }
 
@@ -119,7 +117,7 @@ export class OhlcCache {
     const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
     for (const ticker of this.tickers) {
-      if (dayjs(lastBarDates[ticker]).isBefore(today.startOf('day'))) {
+      if (dayjs(lastBarDates[ticker]).isBefore(today.subtract(1, 'day').startOf('day'))) {
         tickersToUpdate.push({ ticker: ticker, lastDate: lastBarDates[ticker] })
       }
     }
