@@ -38,8 +38,6 @@ export class Rebalancer {
         this.ohlcCache = ohlcCache
         this.initialPortfolioValue = portfolioValue ?? INITIAL_PORTFOLIO_VALUE
         this.portfolioValue = this.initialPortfolioValue
-
-        console.log('portfolioValue', portfolioValue, this.portfolioValue)
     }
 
     getCurrentHoldings(): Holdings {
