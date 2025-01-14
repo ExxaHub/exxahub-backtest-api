@@ -1,4 +1,4 @@
-import { db, metadataSchema, migrationsDirectory, migrationsExtension, migrationsTableName } from "..";
+import { db, migrationsDirectory, migrationsExtension, migrationsTableName } from "../db";
 
 console.log('Running migrations')
 

@@ -1,4 +1,4 @@
-import { db, migrationsDirectory, migrationsExtension } from "..";
+import { db, migrationsDirectory, migrationsExtension } from "../db";
 
 const name = process.argv[2]
 
