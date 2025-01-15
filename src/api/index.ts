@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express'
 
-const maxWorkers = 4; // Define the size of the worker pool
+const maxWorkers = 6; // Define the size of the worker pool
 const workers: Worker[] = []; // Array to hold worker threads
 const taskQueue: { req: Request, res: Response }[] = []; // Queue to hold pending requests
 
