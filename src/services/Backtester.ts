@@ -21,8 +21,7 @@ export type BacktestResults = {
     date_to?: string,
     starting_balance?: number
     ending_balance?: number,
-    allocation_history?: AllocationResult[]
-    balance_history?: number[]
+    history?: AllocationResult[]
     ticker_start_dates?: { [key: string]: string }
     metrics?: BacktestMetrics
 }
@@ -117,7 +116,7 @@ export class Backtester {
 
         this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
-        this.backtestResults.allocation_history = this.allocationResults
+        this.backtestResults.history = this.allocationResults
         this.backtestResults.metrics = this.backtestMetricsService.getMetrics(this.backtestResults)
 
         return this.backtestResults
