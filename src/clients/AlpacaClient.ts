@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/marketDataProviders";
 import { type ClientInterface, type OHLCBar } from "../types/types";
 
