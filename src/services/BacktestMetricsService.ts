@@ -24,11 +24,11 @@ export class BacktestMetricsService {
         throw new Error("Starting and ending balance must be defined.");
     }
 
-    if (backtestResults.allocation_history === undefined) {
+    if (backtestResults.history === undefined) {
         throw new Error("Balance history must be defined.");
     }
 
-    const balanceHistory = backtestResults.allocation_history.map(r => r.value)
+    const balanceHistory = backtestResults.history.map(r => r.value)
 
     const dailyReturns = this.calculateDailyReturns(balanceHistory);
     const cumulativeReturnMetric = cumulativeReturn(backtestResults.starting_balance, backtestResults.ending_balance);
@@ -44,8 +44,8 @@ export class BacktestMetricsService {
         max_drawdown: maximumDrawdown(balanceHistory) * 100,
         calmer: calmerMetric * 100,
         sharpe: sharpeMetric,
-        tailing_1_month: trailingPercentChange(backtestResults.allocation_history, 1, 'month'),
-        tailing_3_month: trailingPercentChange(backtestResults.allocation_history, 3, 'month'),
+        tailing_1_month: trailingPercentChange(backtestResults.history, 1, 'month'),
+        tailing_3_month: trailingPercentChange(backtestResults.history, 3, 'month'),
     }
   }
 
