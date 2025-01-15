@@ -1,0 +1,90 @@
+meta {
+  name: /backtests-worker
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/api/v1/backtests-worker
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "starting_balance": 100000,
+    "start_date": "2011-01-04",
+    "end_date": "2026-01-02",
+    "trading_bot": {
+    "description": "",
+    "name": "New Symphony",
+    "id": "new",
+    "node_type": "root",
+    "rebalance": "daily",
+    "version": "v1",
+    "children": [
+      {
+        "id": "node_01jhg6r8hbh7x4vjk0jz5qr3m4",
+        "node_type": "wt-cash-equal",
+        "children": [
+          {
+            "weight": {
+              "num": 100,
+              "den": 100
+            },
+            "id": "node_01jhg6r8hc653nq3hcb2qv828p",
+            "node_type": "group",
+            "name": "10d RSI HYD > 10d RSI IYZ",
+            "children": [
+              {
+                "id": "node_01jhg6r8hczwqb7gmbz256y0b9",
+                "node_type": "wt-cash-equal",
+                "children": [
+                  {
+                    "id": "node_01jhg6r8hdc3pm0wxc0qv1mk9v",
+                    "node_type": "if-then-else",
+                    "condition_type": "allOf",
+                    "conditions": [
+                      {
+                        "id": "node_01jhg6r8hd4e8kn073p3w3aw5f",
+                        "node_type": "condition",
+                        "lhs_fn": "relative-strength-index",
+                        "lhs_fn_params": {
+                          "window": 10
+                        },
+                        "lhs_val": "HYD",
+                        "comparator": "gt",
+                        "rhs_fn": "relative-strength-index",
+                        "rhs_fn_params": {
+                          "window": 10
+                        },
+                        "rhs_val": "IYZ"
+                      }
+                    ],
+                    "then_children": [
+                      {
+                        "ticker": "TQQQ",
+                        "name": "TQQQ",
+                        "id": "node_01jhg6r8hd9pje11cvx90zjery",
+                        "node_type": "asset"
+                      }
+                    ],
+                    "else_children": [
+                      {
+                        "ticker": "PSQ",
+                        "name": "PSQ",
+                        "id": "node_01jhg6r8hdp40j0twcpz6vwkkc",
+                        "node_type": "asset"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  }
+}
