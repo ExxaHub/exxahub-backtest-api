@@ -1,33 +1,41 @@
 import dayjs from "dayjs";
+import type { AllocationResult } from "../services/Backtester";
 
-/**
- * Calculates the percent change in value over a trailing period (e.g., 1 day, 3 days, 6 days),
- * given an array of daily values.
- * 
- * @param values - An array of values (each representing a day's value, most recent value last).
- * @param daysAgo - The number of days to look back for the start of the period.
- * @returns The percent change in value over the trailing period.
- */
-export const trailingPercentChange = (values: number[], lookbackValue: number, lookbackInterval: 'day' | 'month' | 'year'): number => {
-    const today = dayjs()
-    const daysAgo = Math.abs(today.subtract(lookbackValue, lookbackInterval).diff(today, 'day'))
+export const trailingPercentChange = (
+    values: AllocationResult[], 
+    lookbackValue: number, 
+    lookbackInterval: 'day' | 'month' | 'year'
+): number => {
+    // Step 1: Get today's date and calculate the target date based on the lookback period
+    const today = dayjs();
+    const targetDate = today.subtract(lookbackValue, lookbackInterval);
 
-    console.log('daysAgo', daysAgo, lookbackValue, lookbackInterval)
+    // Step 2: Find the most recent data point (today's data point)
+    const mostRecentValue = values[values.length - 1];
 
-    if (values.length < 2) {
-        throw new Error("At least two data points are required.");
+    if (!mostRecentValue) {
+        throw new Error("At least one data point is required.");
     }
 
-    // Ensure daysAgo is within the bounds of the available data
-    if (daysAgo >= values.length) {
-        throw new Error("Not enough data points to calculate the percent change for the specified period.");
+    // Step 3: Find the value closest to the target date (from the specified lookback period)
+    let startValue: number | null = null;
+
+    // Iterate over the values array in reverse to find the closest date before or on the target date
+    for (let i = values.length - 1; i >= 0; i--) {
+        const value = values[i];
+
+        const valueDate = dayjs(value.date);
+        if (valueDate.isBefore(targetDate) || valueDate.isSame(targetDate, 'day')) {
+            startValue = value.value;
+            break;
+        }
     }
 
-    // Get the start value (daysAgo days ago) and the end value (most recent value)
-    const startValue = values[values.length - 1 - daysAgo];  // Value from 'daysAgo' days ago
-    const endValue = values[values.length - 1];  // Most recent value
+    if (startValue === null) {
+        throw new Error("No data point found for the specified lookback period.");
+    }
 
-    // Calculate and return the percent change
-    const percentChange = ((endValue - startValue) / startValue) * 100;
+    // Step 4: Calculate the percent change
+    const percentChange = ((mostRecentValue.value - startValue) / startValue) * 100;
     return percentChange;
-}
+};

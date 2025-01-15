@@ -44,8 +44,8 @@ export class BacktestMetricsService {
         max_drawdown: maximumDrawdown(balanceHistory) * 100,
         calmer: calmerMetric * 100,
         sharpe: sharpeMetric,
-        tailing_1_month: trailingPercentChange(balanceHistory, 1, 'month'),
-        tailing_3_month: trailingPercentChange(balanceHistory, 3, 'month'),
+        tailing_1_month: trailingPercentChange(backtestResults.allocation_history, 1, 'month'),
+        tailing_3_month: trailingPercentChange(backtestResults.allocation_history, 3, 'month'),
     }
   }
 
