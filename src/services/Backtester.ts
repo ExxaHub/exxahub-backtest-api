@@ -6,15 +6,17 @@ import { Rebalancer } from "./Rebalancer";
 import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
 import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";
+import { BacktestMetricsService, type BacktestMetrics } from "./BacktestMetricsService";
 
 export type AllocationResult = { 
     date: string,
+    value: number,
     tickers: {
         [key: string]: number | null
     }
 }
 
-type BacktestResults = {
+export type BacktestResults = {
     date_from?: string,
     date_to?: string,
     starting_balance?: number
@@ -22,6 +24,7 @@ type BacktestResults = {
     allocation_history?: AllocationResult[]
     balance_history?: number[]
     ticker_start_dates?: { [key: string]: string }
+    metrics?: BacktestMetrics
 }
 
 export class Backtester {
@@ -32,6 +35,7 @@ export class Backtester {
 
     private defaultBacktestStartDate: string
     private defaultBacktestEndDate: string
+    private backtestMetricsService: BacktestMetricsService
     
     private allocationResults: AllocationResult[] = []
     private backtestResults: BacktestResults = {}
@@ -43,6 +47,8 @@ export class Backtester {
 
         this.defaultBacktestStartDate = dayjs().subtract(1, 'year').format('YYYY-MM-DD')
         this.defaultBacktestEndDate = dayjs().format('YYYY-MM-DD')
+
+        this.backtestMetricsService = new BacktestMetricsService()
     }
 
     private async loadData(tradingBot: TradingBotNode, fromDate: string, toDate: string): Promise<void> {
@@ -94,12 +100,13 @@ export class Backtester {
                 currentDate
             )
             
+            rebalancer.rebalance(currentDate.format('YYYY-MM-DD'), allocations)
+
             this.allocationResults.push({
                 date: currentDate.format('YYYY-MM-DD'),
-                tickers: allocations
+                tickers: allocations,
+                value: rebalancer.getBalance()
             })
-
-            rebalancer.rebalance(currentDate.format('YYYY-MM-DD'), allocations)
 
             if (currentDate.isSame(toDate)) {
                 break
@@ -110,8 +117,8 @@ export class Backtester {
 
         this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
-        this.backtestResults.balance_history = rebalancer.getBalanceHistory()
         this.backtestResults.allocation_history = this.allocationResults
+        this.backtestResults.metrics = this.backtestMetricsService.getMetrics(this.backtestResults)
 
         return this.backtestResults
     }
