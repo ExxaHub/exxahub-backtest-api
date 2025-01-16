@@ -11,11 +11,11 @@ class WorkerPool {
     }
 
     init(workerPath: string) {
-        // Initialize the worker pool
         for (let i = 0; i < this.maxWorkers; i++) {
             const worker = new Worker(workerPath);
             this.workers.push(worker);
         }
+        console.log('Worker pool initialized with', this.maxWorkers, 'workers');
     }
 
     getWorkers() {
