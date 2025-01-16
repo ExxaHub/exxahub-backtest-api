@@ -1,7 +1,7 @@
-import { MarketDataClientProvider } from "../services/MarketDataClientProvider";
-import { Backtester } from '../services/Backtester'
-import { createBacktestRequestSchema } from './schemas/CreateBacktestRequest'
-import { validateSchema } from './utils'
+import { MarketDataClientProvider } from "../../services/MarketDataClientProvider";
+import { Backtester } from '../../services/Backtester'
+import { createBacktestRequestSchema } from '../schemas/CreateBacktestRequest'
+import { validateSchema } from '../utils'
 
 // prevents TS errors
 declare var self: Worker;
