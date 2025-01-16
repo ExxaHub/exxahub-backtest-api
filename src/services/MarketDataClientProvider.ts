@@ -14,8 +14,6 @@ export enum MarketDataProvider {
 export class MarketDataClientProvider {
     getClient(): ClientInterface {
         const provider: MarketDataProvider = getMarketDataProvider()
-
-        console.log(`Market Data Provider: ${provider}`)
         
         switch(provider) {
             case MarketDataProvider.Alpaca: 

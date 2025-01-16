@@ -1,10 +1,13 @@
-import express from 'express'
+import express, { type Request, type Response } from 'express'
 import { handleRequest } from './utils'
+import { workerPool } from './workers/workerPool'
 
 const AdapterController = () => import('./controllers/AdapterController')
 const BacktestController = () => import('./controllers/BacktestController')
 const DocsController = () => import('./controllers/DocsController')
 const HealthController = () => import('./controllers/HealthController')
+
+workerPool.init('./src/api/workers/backtester.ts')
 
 const app = express()
 const port = process.env.PORT || 3000
