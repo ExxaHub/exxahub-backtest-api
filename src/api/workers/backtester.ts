@@ -8,7 +8,11 @@ const marketDataClientProvider = new MarketDataClientProvider()
 const client = marketDataClientProvider.getClient()
 
 self.onmessage = async (event: MessageEvent) => {
-    const backtester = new Backtester(client)
-    const results = await backtester.run(event.data)
-    postMessage(results);
+    try {
+        const backtester = new Backtester(client)
+        const results = await backtester.run(event.data)
+        postMessage(results);
+    } catch (error) {
+        postMessage({ error: (error as Error).message });
+    }
 };

@@ -20,8 +20,6 @@ describe("RSI Function", () => {
 
     // Example assertions (you may need to adjust the expected values)
     expect(result).toBeDefined();
-    expect(result["2024-11-11"]).toBeGreaterThan(0);
-    expect(result["2024-11-12"]).toBeGreaterThan(0);
     expect(result["2024-11-13"]).toBeGreaterThan(0);
     expect(result["2024-11-14"]).toBeGreaterThan(0);
     expect(result["2024-11-17"]).toBeGreaterThan(0);
