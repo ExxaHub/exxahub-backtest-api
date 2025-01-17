@@ -79,6 +79,7 @@ export class OhlcCache {
     return Array.from(this.cachedOhlcBars.keys())
   }
 
+  @logPerformance()
   private async getTickerBars(fromDate: string, toDate: string): Promise<{[key: string]: OHLCBar[]}> {
     // Get the last bar dates for each ticker
     const lastBarDates = await this.ohlcBarService.getLastBarDates(this.tickers)

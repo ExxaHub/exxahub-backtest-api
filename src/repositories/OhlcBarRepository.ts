@@ -23,27 +23,6 @@ export class OhlcBarRepository {
         }
     }
 
-    async getMinMaxBarDates(tickers: string[]): Promise<{ [key: string]: { minDate: string, maxDate: string } }> {
-        try {
-            const results = await db(table)
-                .select('symbol')
-                .min('date as min_date')
-                .max('date as max_date')
-                .whereIn('symbol', tickers)
-                .groupBy('symbol')
-
-            const minMaxDates: { [key: string]: { minDate: string, maxDate: string } } = {}
-            results.forEach(result => {
-                minMaxDates[result.symbol] = { minDate: result.min_date, maxDate: result.max_date }
-            })
-
-            return minMaxDates
-        } catch (error) {
-            console.error('Error getting min/max bar dates:', error)
-            return {}
-        }
-    }
-
     async saveBars(ticker: string, bars: OHLCBar[]): Promise<boolean> {
         try { 
             const barsToSave = bars.map(bar => {

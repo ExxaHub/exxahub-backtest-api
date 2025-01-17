@@ -1,4 +1,22 @@
 import "reflect-metadata";
+import { logger } from "../services/Logger";
+
+// const timers = new Map<string, number>();
+
+// const timerStart = (label: string) => {
+//   timers.set(label, Date.now());
+// };
+
+// const timerStop = (label: string) => {
+//   const start = timers.get(label);
+//   if (start) {
+//     const duration = Date.now() - start;
+//     logger.info('perf', `[${duration}ms] ${label}`)
+//     timers.delete(label);
+//   } else {
+//     console.warn(`Timer '${label}' does not exist`);
+//   }
+// };
 
 export function logPerformance() {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
@@ -6,7 +24,7 @@ export function logPerformance() {
 
     descriptor.value = function (...args: any[]) {
       const timerLabel = `${target.constructor.name}::${propertyKey}`;
-      console.time(timerLabel);
+      logger.profile(timerLabel);
 
       try {
         // Call the original method
@@ -16,20 +34,20 @@ export function logPerformance() {
         if (result instanceof Promise) {
           return result
             .then((value) => {
-              console.timeEnd(timerLabel); // Stop the timer after successful resolution
+              logger.profile(timerLabel); // Stop the timer after successful resolution
               return value;
             })
             .catch((error) => {
-              console.timeEnd(timerLabel); // Stop the timer even if there's an error
+              logger.profile(timerLabel); // Stop the timer even if there's an error
               throw error; // Re-throw the error
             });
         }
 
         // For synchronous methods, just stop the timer
-        console.timeEnd(timerLabel);
+        logger.profile(timerLabel);
         return result;
       } catch (error) {
-        console.timeEnd(timerLabel); // Stop the timer even if there's an error
+        logger.profile(timerLabel); // Stop the timer even if there's an error
         throw error; // Re-throw the error
       }
     };
