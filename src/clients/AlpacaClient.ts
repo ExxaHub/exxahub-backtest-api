@@ -1,4 +1,5 @@
 import {alpacaApiKeyId, alpacaApiSecretKey} from "../config/marketDataProviders";
+import { logPerformance } from "../decorators/performance";
 import { type ClientInterface, type OHLCBar } from "../types/types";
 
 export type AlpacaOHLCBar = {
@@ -113,6 +114,7 @@ export class AlpacaBaseClient {
 }
 
 export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterface {
+    @logPerformance()
     async getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
@@ -136,6 +138,7 @@ export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterfa
         return bars
     }
 
+    @logPerformance()
     async getCurrentPriceForSymbol(symbol: string): Promise<Record<string, number>> {
         const params = {}
 
@@ -146,6 +149,7 @@ export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterfa
         }
     }
 
+    @logPerformance()
     async getBarsForSymbol(symbol: string, startDate?: string, endDate?: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: AlpacaHistoricalBarsResponse | undefined

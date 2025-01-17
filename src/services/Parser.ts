@@ -1,3 +1,4 @@
+import { logPerformance } from "../decorators/performance";
 import { 
   type Indicator, 
   type TradingBotNode, 
@@ -17,6 +18,7 @@ export class Parser {
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
 
+  @logPerformance()
   parse(node: TradingBotNode): ParsedAssetsAndIndicators {
     this.parseNode(node)
     

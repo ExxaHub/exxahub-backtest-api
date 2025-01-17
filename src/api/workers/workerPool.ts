@@ -6,20 +6,18 @@ class WorkerPool {
     private workers: Worker[] = [];
     private taskQueue: { req: Request, res: Response }[] = [];
 
+    private workerPath = './src/api/workers/backtester.ts'
+
     constructor() {
         this.maxWorkers = os.cpus().length ?? 1;   
     }
 
-    init(workerPath: string) {
+    init() {
         for (let i = 0; i < this.maxWorkers; i++) {
-            const worker = new Worker(workerPath);
+            const worker = new Worker(this.workerPath);
             this.workers.push(worker);
         }
         console.log('Worker pool initialized with', this.maxWorkers, 'workers');
-    }
-
-    getWorkers() {
-        return this.workers;
     }
 
     queue(req: Request, res: Response) {
@@ -27,7 +25,7 @@ class WorkerPool {
         this.processNextTask();
     }
 
-    processNextTask() {
+    private processNextTask() {
         if (this.taskQueue.length === 0) {
           return 
         }

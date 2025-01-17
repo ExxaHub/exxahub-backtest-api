@@ -8,6 +8,7 @@ import {
   TradingBotNodeIfThenElseConditionType,
   type TradingBotNodeCondition
 } from "../types/types";
+import { logPerformance } from "../decorators/performance";
 
 enum WeightType {
   Equal = 'equal',

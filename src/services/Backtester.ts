@@ -7,6 +7,7 @@ import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
 import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";
 import { BacktestMetricsService, type BacktestMetrics } from "./BacktestMetricsService";
+import { logPerformance } from "../decorators/performance";
 
 export type AllocationResult = { 
     date: string,
@@ -50,6 +51,7 @@ export class Backtester {
         this.backtestMetricsService = new BacktestMetricsService()
     }
 
+    @logPerformance()
     private async loadData(tradingBot: TradingBotNode, fromDate: string, toDate: string): Promise<void> {
         const parser = new Parser()
 
@@ -64,6 +66,7 @@ export class Backtester {
         await this.indicatorCache.load()
     }
 
+    @logPerformance()
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
         await this.loadData(backtestConfig.trading_bot as TradingBotNode, backtestConfig.start_date, backtestConfig.end_date)
 
@@ -122,6 +125,7 @@ export class Backtester {
         return this.backtestResults
     }
 
+    @logPerformance()
     private calculateBacktestStartDate(backtestConfigStartDate?: string): Dayjs {
         if (!this.ohlcCache || !this.ohlcCache.isLoaded()) {
             throw new Error('OHLC data has not been loaded.')

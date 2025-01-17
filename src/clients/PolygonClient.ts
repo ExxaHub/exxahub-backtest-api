@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { polygonApiToken } from "../config/marketDataProviders";
 import type { ClientInterface, OHLCBar } from "../types/types";
+import { logPerformance } from "../decorators/performance";
 
 type PolygonOHLCBar = {
     c: number,
@@ -75,6 +76,7 @@ export class PolygonClient implements ClientInterface {
         return await response.json() as T;
     }
 
+    @logPerformance()
     async getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
@@ -97,6 +99,7 @@ export class PolygonClient implements ClientInterface {
         return bars
     }
 
+    @logPerformance()
     async getBarsForSymbol(symbol: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: PolygonAggregateBarsResponse
@@ -118,6 +121,7 @@ export class PolygonClient implements ClientInterface {
         return { symbol, bars }
     }
 
+    @logPerformance()
     async getCurrentPriceForSymbol(symbol: string): Promise<Record<string, number>> {
         const params = {}
 

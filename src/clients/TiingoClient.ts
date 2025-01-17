@@ -1,4 +1,5 @@
 import { tiingoApiToken } from "../config/marketDataProviders";
+import { logPerformance } from "../decorators/performance";
 import type { ClientInterface, OHLCBar } from "../types/types";
 
 export type TiingoOHLCBar =    {
@@ -75,6 +76,7 @@ export class TiingoClient implements ClientInterface {
         return await response.json() as T;
     }
 
+    @logPerformance()
     async getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 
@@ -97,6 +99,7 @@ export class TiingoClient implements ClientInterface {
         return bars
     }
 
+    @logPerformance()
     async getBarsForSymbol(symbol: string, startDate?: string, endDate?: string): Promise<{symbol: string, bars: OHLCBar[]}> {
         let bars: OHLCBar[] = []
         let resp: TiingoOHLCBar[]
@@ -123,6 +126,7 @@ export class TiingoClient implements ClientInterface {
         return { symbol, bars }
     }
 
+    @logPerformance()
     async getCurrentPriceForSymbol(symbol: string): Promise<Record<string, number>> {
         const params = {}
 

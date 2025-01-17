@@ -10,6 +10,7 @@ import { standardDeviationOfPrice } from "../indicators/standardDeviationOfPrice
 import { standardDeviationOfReturn } from "../indicators/standardDeviationOfReturn"
 import type { OhlcCache } from "./OhlcCache"
 import type { Indicator } from "../types/types"
+import { logPerformance } from "../decorators/performance"
 
 export class IndicatorCache {
   private ohlcCache: OhlcCache
@@ -23,6 +24,7 @@ export class IndicatorCache {
     this.indicators = indicators
   }
 
+  @logPerformance()
   async load(): Promise<void> {
     for (const indicator of this.indicators) {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker)

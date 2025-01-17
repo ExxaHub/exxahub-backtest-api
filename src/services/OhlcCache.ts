@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs"
 import type { ClientInterface, OHLCBar } from "../types/types"
 import { OhlcBarService } from "./OhlcBarService"
+import { logPerformance } from "../decorators/performance";
 
 export class OhlcCache {
   private client: ClientInterface
@@ -18,6 +19,7 @@ export class OhlcCache {
     this.ohlcBarService = new OhlcBarService()
   }
 
+  @logPerformance()
   async load(fromDate: string, toDate: string): Promise<void> {
     const bars = await this.getTickerBars(fromDate, toDate)
 
