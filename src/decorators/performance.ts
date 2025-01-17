@@ -1,23 +1,6 @@
 import "reflect-metadata";
 import { logger } from "../services/Logger";
 
-// const timers = new Map<string, number>();
-
-// const timerStart = (label: string) => {
-//   timers.set(label, Date.now());
-// };
-
-// const timerStop = (label: string) => {
-//   const start = timers.get(label);
-//   if (start) {
-//     const duration = Date.now() - start;
-//     logger.info('perf', `[${duration}ms] ${label}`)
-//     timers.delete(label);
-//   } else {
-//     console.warn(`Timer '${label}' does not exist`);
-//   }
-// };
-
 export function logPerformance() {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;

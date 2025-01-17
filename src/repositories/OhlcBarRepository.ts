@@ -58,7 +58,7 @@ export class OhlcBarRepository {
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
         try {
             const results = await db(table)
-                .select('symbol', 'date', 'close')
+                .select('*')
                 .whereIn('symbol', tickers)
                 .where('ts', '>=', dayjs(fromDate).startOf('day').unix())
                 .where('ts', '<=', dayjs(toDate).startOf('day').unix())
@@ -71,7 +71,11 @@ export class OhlcBarRepository {
                 }
                 bars[result.symbol].push({
                     close: result.close,
+                    high: result.high,
+                    low: result.low,
+                    open: result.open,
                     date: result.date,
+                    volume: result.volume
                 })
             })
 
