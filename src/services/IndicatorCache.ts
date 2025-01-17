@@ -11,6 +11,7 @@ import { standardDeviationOfReturn } from "../indicators/standardDeviationOfRetu
 import type { OhlcCache } from "./OhlcCache"
 import type { Indicator } from "../types/types"
 import { logPerformance } from "../decorators/performance"
+import dayjs from "dayjs"
 
 export class IndicatorCache {
   private ohlcCache: OhlcCache
@@ -25,7 +26,9 @@ export class IndicatorCache {
   }
 
   @logPerformance()
-  async load(): Promise<void> {
+  async load(): Promise<Dayjs> {
+    let startDate = dayjs('1970-01-01')
+
     for (const indicator of this.indicators) {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker)
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
@@ -36,9 +39,14 @@ export class IndicatorCache {
       if (indicator.params.window) {
         this.largestWindow = Math.max(this.largestWindow, indicator.params.window)
       }
+
+      const calculatedIndicatorKeys = Object.keys(calculatedIndicator)
+      const indicatorStartDate = dayjs(calculatedIndicatorKeys[0])
+      startDate = indicatorStartDate.isAfter(startDate) ? indicatorStartDate : startDate
     }
 
     this.loaded = true
+    return startDate
   }
 
   isLoaded(): boolean {

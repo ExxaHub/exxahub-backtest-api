@@ -1,19 +1,23 @@
+import ts from 'typescript'
 import { db } from '../db'
+import { logPerformance } from '../decorators/performance'
 import { table } from '../models/OhlcBar'
 import { type OHLCBar } from '../types/types'
+import dayjs from 'dayjs'
 
 export class OhlcBarRepository {
+    @logPerformance()
     async getLastBarDates(tickers: string[]): Promise<{ [key: string]: string }> {
         try {
             const results = await db(table)
                 .select('symbol')
-                .max('date as last_date')
+                .max('ts as last_date')
                 .whereIn('symbol', tickers)
                 .groupBy('symbol')
 
             const lastDates: { [key: string]: string } = {}
             results.forEach(result => {
-                lastDates[result.symbol] = result.last_date
+                lastDates[result.symbol] = dayjs.unix(result.last_date).format('YYYY-MM-DD')
             })
 
             return lastDates
@@ -29,6 +33,7 @@ export class OhlcBarRepository {
                 return {
                     symbol: ticker, 
                     date: bar.date, 
+                    ts: dayjs(bar.date).startOf('day').unix(),  
                     open: bar.open, 
                     high: bar.high, 
                     low: bar.low, 
@@ -39,7 +44,7 @@ export class OhlcBarRepository {
             
             await db(table)
                 .insert(barsToSave)
-                .onConflict(['symbol', 'date'])
+                .onConflict(['symbol', 'ts'])
                 .merge()
 
             return true
@@ -49,14 +54,15 @@ export class OhlcBarRepository {
         }
     }
 
+    @logPerformance()
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
         try {
             const results = await db(table)
-                .select('*')
+                .select('symbol', 'date', 'close')
                 .whereIn('symbol', tickers)
-                .where('date', '>=', fromDate)
-                .where('date', '<=', toDate)
-                .orderBy('date', 'asc')
+                .where('ts', '>=', dayjs(fromDate).startOf('day').unix())
+                .where('ts', '<=', dayjs(toDate).startOf('day').unix())
+                .orderBy('ts', 'asc')
 
             const bars: { [key: string]: OHLCBar[] } = {}
             results.forEach(result => {
@@ -65,11 +71,7 @@ export class OhlcBarRepository {
                 }
                 bars[result.symbol].push({
                     close: result.close,
-                    high: result.high,
-                    low: result.low,
-                    open: result.open,
                     date: result.date,
-                    volume: result.volume
                 })
             })
 

@@ -23,23 +23,24 @@ export class OhlcCache {
   async load(fromDate: string, toDate: string): Promise<void> {
     const bars = await this.getTickerBars(fromDate, toDate)
 
-    const indexByDate = (ohlcBars: OHLCBar[]): Record<string, OHLCBar> => {
-      const ohlcObject: Record<string, OHLCBar> = {};
-      
-      ohlcBars.forEach(bar => {
-        ohlcObject[bar.date] = bar
-        this.cachedOhlcBarDates.add(bar.date)
-      });
-    
-      return ohlcObject;
-    }
-
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, ohlcBars)
-      this.cachedOhlcBarsByDate.set(ticker, indexByDate(ohlcBars))
+      this.cachedOhlcBarsByDate.set(ticker, this.indexByDate(ohlcBars))
     }
 
     this.loaded = true
+  }
+
+  @logPerformance()
+  private indexByDate(ohlcBars: OHLCBar[]): Record<string, OHLCBar> {
+    const ohlcObject: Record<string, OHLCBar> = {};
+    
+    ohlcBars.forEach(bar => {
+      ohlcObject[bar.date] = bar
+      this.cachedOhlcBarDates.add(bar.date)
+    });
+  
+    return ohlcObject;
   }
 
   isLoaded(): boolean {
