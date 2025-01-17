@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs"
 import type { ClientInterface, OHLCBar } from "../types/types"
 import { OhlcBarService } from "./OhlcBarService"
-import { logPerformance } from "../decorators/performance";
 
 export class OhlcCache {
   private client: ClientInterface
@@ -17,7 +16,6 @@ export class OhlcCache {
     this.ohlcBarService = new OhlcBarService()
   }
 
-  @logPerformance()
   async load(fromDate: string, toDate: string): Promise<void> {
     const bars = await this.getTickerBars(fromDate, toDate)
 
@@ -28,7 +26,6 @@ export class OhlcCache {
     this.loaded = true
   }
 
-  @logPerformance()
   private indexByDate(ohlcBars: OHLCBar[]): Map<string, OHLCBar> {
     const ohlcMap = new Map<string, OHLCBar>()
     
@@ -84,7 +81,6 @@ export class OhlcCache {
     return Array.from(this.cachedOhlcBars.keys())
   }
 
-  @logPerformance()
   private async getTickerBars(fromDate: string, toDate: string): Promise<{[key: string]: OHLCBar[]}> {
     const lastBarDates = await this.ohlcBarService.getLastBarDates(this.tickers)
 

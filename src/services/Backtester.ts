@@ -7,7 +7,6 @@ import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
 import type { BacktestConfig } from "../api/schemas/CreateBacktestRequest";
 import { BacktestMetricsService, type BacktestMetrics } from "./BacktestMetricsService";
-import { logPerformance } from "../decorators/performance";
 
 export type AllocationResult = { 
     date: string,
@@ -44,7 +43,6 @@ export class Backtester {
         this.backtestMetricsService = new BacktestMetricsService()
     }
 
-    @logPerformance()
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
         const parser = new Parser()
 
@@ -101,8 +99,15 @@ export class Backtester {
 
         this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
-        this.backtestResults.history = this.allocationResults
-        this.backtestResults.metrics = this.backtestMetricsService.getMetrics(this.backtestResults)
+        this.backtestResults.metrics = this.backtestMetricsService.getMetrics(
+            backtestConfig.starting_balance,
+            rebalancer.getBalance(),
+            this.allocationResults
+        )
+
+        if (backtestConfig.include.history) {
+            this.backtestResults.history = this.allocationResults
+        }
 
         return this.backtestResults
     }

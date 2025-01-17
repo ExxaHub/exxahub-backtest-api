@@ -1,12 +1,9 @@
-import ts from 'typescript'
 import { db } from '../db'
-import { logPerformance } from '../decorators/performance'
 import { table } from '../models/OhlcBar'
 import { type OHLCBar } from '../types/types'
 import dayjs from 'dayjs'
 
 export class OhlcBarRepository {
-    @logPerformance()
     async getLastBarDates(tickers: string[]): Promise<{ [key: string]: string }> {
         try {
             const results = await db(table)
@@ -54,7 +51,6 @@ export class OhlcBarRepository {
         }
     }
 
-    @logPerformance()
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
         try {
             const results = await db(table)

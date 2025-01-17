@@ -5,9 +5,9 @@ import { check, sleep } from 'k6';
 export const options = {
   stages: [
     // { duration: '5s', target: 1 }
-    { duration: '30s', target: 10 }, // Ramp-up to 10 users over 30 seconds
-    { duration: '1m', target: 10 },  // Stay at 10 users for 1 minute
-    { duration: '30s', target: 0 },  // Ramp-down to 0 users over 30 seconds
+    { duration: '10s', target: 10 }, // Ramp-up to 10 users over 30 seconds
+    { duration: '100s', target: 10 },  // Stay at 10 users for 1 minute
+    { duration: '10s', target: 0 },  // Ramp-down to 0 users over 30 seconds
   ],
 };
 
@@ -15,6 +15,9 @@ const payload = JSON.stringify({
     "starting_balance": 10000,
     "start_date": "2016-01-04",
     "end_date": "2026-01-02",
+    "include": {
+        "history": false
+    },
     "trading_bot": {
       "name": "New Trading Bot",
       "rebalance": "daily",

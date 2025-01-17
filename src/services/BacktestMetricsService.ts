@@ -1,4 +1,3 @@
-import { logPerformance } from "../decorators/performance";
 import { annualizedReturn } from "../metrics/annualizedReturn";
 import { calmerRatio } from "../metrics/calmerRatio";
 import { cumulativeReturn } from "../metrics/cumulativeReturn";
@@ -6,7 +5,7 @@ import { maximumDrawdown } from "../metrics/maximumDrawdown";
 import { sharpeRatio } from "../metrics/sharpeRatio";
 import { standardDeviationOfReturn } from "../metrics/standardDeviationOfReturn";
 import { trailingPercentChange } from "../metrics/trailingPercentChange";
-import type { BacktestResults } from "./Backtester"
+import type { AllocationResult } from "./Backtester"
 
 export type BacktestMetrics = {
     cumulative_return: number,
@@ -21,20 +20,15 @@ export type BacktestMetrics = {
 
 export class BacktestMetricsService {
 
-    @logPerformance()
-    public getMetrics(backtestResults: BacktestResults): BacktestMetrics {
-        if (backtestResults.starting_balance === undefined || backtestResults.ending_balance === undefined) {
+    public getMetrics(startingBalance: number, endingBalance: number, history: AllocationResult[]): BacktestMetrics {
+        if (startingBalance === undefined || endingBalance === undefined) {
             throw new Error("Starting and ending balance must be defined.");
         }
 
-        if (backtestResults.history === undefined) {
-            throw new Error("Balance history must be defined.");
-        }
-
-        const balanceHistory = backtestResults.history.map(r => r.value)
+        const balanceHistory = history.map(r => r.value)
 
         const dailyReturns = this.calculateDailyReturns(balanceHistory);
-        const cumulativeReturnMetric = cumulativeReturn(backtestResults.starting_balance, backtestResults.ending_balance);
+        const cumulativeReturnMetric = cumulativeReturn(startingBalance, endingBalance);
         const annualizedReturnMetric = annualizedReturn(cumulativeReturnMetric, balanceHistory.length, 252);
         const standardDeviationMetric = standardDeviationOfReturn(dailyReturns);
         const calmerMetric = calmerRatio(annualizedReturnMetric, standardDeviationMetric);
@@ -47,8 +41,8 @@ export class BacktestMetricsService {
             max_drawdown: maximumDrawdown(balanceHistory) * 100,
             calmer: calmerMetric * 100,
             sharpe: sharpeMetric,
-            tailing_1_month: trailingPercentChange(backtestResults.history, 1, 'month'),
-            tailing_3_month: trailingPercentChange(backtestResults.history, 3, 'month'),
+            tailing_1_month: trailingPercentChange(history, 1, 'month'),
+            tailing_3_month: trailingPercentChange(history, 3, 'month'),
         }
     }
 

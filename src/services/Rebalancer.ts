@@ -1,4 +1,3 @@
-import { logPerformance } from "../decorators/performance";
 import { type Allocations } from "./Interpreter"
 import type { OhlcCache } from "./OhlcCache";
 

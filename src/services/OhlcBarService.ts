@@ -1,18 +1,18 @@
-import dayjs from 'dayjs'
 import { OhlcBarRepository } from '../repositories/OhlcBarRepository'
 import { type OHLCBar } from '../types/types'
-import { logPerformance } from '../decorators/performance'
+import { OhlcBarSummaryRepository } from '../repositories/OhlcBarSummaryRepository'
 
 export class OhlcBarService {
     private ohlcBarRepository: OhlcBarRepository
+    private ohlcBarSummaryRepository: OhlcBarSummaryRepository
 
     constructor() { 
         this.ohlcBarRepository = new OhlcBarRepository()
+        this.ohlcBarSummaryRepository = new OhlcBarSummaryRepository()
     }
 
-    @logPerformance()
     async getLastBarDates(tickers: string[]): Promise<{ [key: string]: string }> {
-        return this.ohlcBarRepository.getLastBarDates(tickers)
+        return this.ohlcBarSummaryRepository.getLastBarDates(tickers)
     }
 
     async saveBars(bars: { [key: string]: OHLCBar[] }): Promise<void> {
@@ -23,9 +23,10 @@ export class OhlcBarService {
         }
 
         const results = await Promise.all(promises)
+
+        await this.ohlcBarSummaryRepository.refreshMaterializedView()
     }
 
-    @logPerformance()
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
         return this.ohlcBarRepository.getBarsForDateRange(tickers, fromDate, toDate)
     }

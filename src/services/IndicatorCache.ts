@@ -10,13 +10,12 @@ import { standardDeviationOfPrice } from "../indicators/standardDeviationOfPrice
 import { standardDeviationOfReturn } from "../indicators/standardDeviationOfReturn"
 import type { OhlcCache } from "./OhlcCache"
 import type { Indicator } from "../types/types"
-import { logPerformance } from "../decorators/performance"
 import dayjs from "dayjs"
 
 export class IndicatorCache {
   private ohlcCache: OhlcCache
   private indicators: Indicator[]
-  private cachedIndicators: Map<string, { [key: string]: number }> = new Map<string, { [key: string]: number }>()
+  private cachedIndicators: Map<string, Map<string, number>> = new Map<string, Map<string, number>>()
   private largestWindow = 0
   private loaded: boolean = false
 
@@ -25,16 +24,15 @@ export class IndicatorCache {
     this.indicators = indicators
   }
 
-  @logPerformance()
   async load(): Promise<Dayjs> {
     let startDate = dayjs('1970-01-01')
 
-    for (const indicator of this.indicators) {
+    const loadPromises = this.indicators.map(async (indicator) => {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker)
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
       const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
-      this.cachedIndicators.set(key, calculatedIndicator)
+      this.cachedIndicators.set(key, new Map(Object.entries(calculatedIndicator)))
 
       if (indicator.params.window) {
         this.largestWindow = Math.max(this.largestWindow, indicator.params.window)
@@ -43,7 +41,9 @@ export class IndicatorCache {
       const calculatedIndicatorKeys = Object.keys(calculatedIndicator)
       const indicatorStartDate = dayjs(calculatedIndicatorKeys[0])
       startDate = indicatorStartDate.isAfter(startDate) ? indicatorStartDate : startDate
-    }
+    })
+
+    await Promise.all(loadPromises)
 
     this.loaded = true
     return startDate
@@ -58,7 +58,7 @@ export class IndicatorCache {
   }
 
   async recalculateForDateRange(fromDate: Dayjs, toDate: Dayjs): Promise<void> {
-    for (const indicator of this.indicators) {
+    const recalculatePromises = this.indicators.map(async (indicator) => {
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
 
       if (indicator.params.window) {
@@ -69,8 +69,10 @@ export class IndicatorCache {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker, fromDate, toDate)
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
       const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
-      this.cachedIndicators.set(key, calculatedIndicator)
-    }
+      this.cachedIndicators.set(key, new Map(Object.entries(calculatedIndicator)))
+    })
+
+    await Promise.all(recalculatePromises)
   }
 
   getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
@@ -80,7 +82,7 @@ export class IndicatorCache {
     
     if (cachedIndicator) {
       if (date) {
-        const value = cachedIndicator[date]
+        const value = cachedIndicator.get(date)
 
         if (!value) {
           throw new Error(`Could not calculate indicator value for key: ${key} on date ${date}`)
@@ -88,14 +90,14 @@ export class IndicatorCache {
 
         return value
       } else {
-        const keys = Object.keys(cachedIndicator)
-        return cachedIndicator[keys[keys.length - 1]]
+        const keys = Array.from(cachedIndicator.keys())
+        return cachedIndicator.get(keys[keys.length - 1])!
       }
     }
-    throw new Error(`Unable for get cached indicator: ${key}`)
+    throw new Error(`Unable to get cached indicator: ${key}`)
   }
 
-  getIndicatorValues(ticker: string, fn: string, params: Record<string, any> = {}): { [key: string]: number } | undefined {
+  getIndicatorValues(ticker: string, fn: string, params: Record<string, any> = {}): Map<string, number> | undefined {
     const key = `${ticker}-${fn}-${params.window}`
     return this.cachedIndicators.get(key)
   }
@@ -136,8 +138,7 @@ export class IndicatorCache {
         throw new Error(`Could not print values for indicator: ${indicator}`)
       }
 
-      for (const date of Object.keys(values)) {
-        const value = values[date]
+      for (const [date, value] of values.entries()) {
         if (!tableData[date]) {
           tableData[date] = {}
         }
