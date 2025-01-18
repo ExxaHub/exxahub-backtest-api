@@ -83,12 +83,12 @@ export class OhlcCache {
 
   private async getTickerBars(fromDate: string, toDate: string): Promise<{[key: string]: OHLCBar[]}> {
     const lastBarDates = await this.ohlcBarService.getLastBarDates(this.tickers)
-
+    
     await Promise.all([
       this.backfillBars(lastBarDates),
       this.updateBars(lastBarDates)
     ])
-
+    
     return this.ohlcBarService.getBarsForDateRange(this.tickers, fromDate, toDate)
   }
 

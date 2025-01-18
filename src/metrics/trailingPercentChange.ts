@@ -6,27 +6,26 @@ export const trailingPercentChange = (
     lookbackValue: number, 
     lookbackInterval: 'day' | 'month' | 'year'
 ): number => {
-    // Step 1: Get today's date and calculate the target date based on the lookback period
-    const today = dayjs();
-    const targetDate = today.subtract(lookbackValue, lookbackInterval);
-
-    // Step 2: Find the most recent data point (today's data point)
+    // Step 1: Find the most recent data point (today's data point)
     const mostRecentValue = values[values.length - 1];
 
     if (!mostRecentValue) {
         throw new Error("At least one data point is required.");
     }
 
+    // Step 2: Get most revent date and calculate the target date based on the lookback period
+    const targetDate = dayjs(mostRecentValue.date).subtract(lookbackValue, lookbackInterval);
+
     // Step 3: Find the value closest to the target date (from the specified lookback period)
-    let startValue: number | null = null;
+    let startValue: AllocationResult | null = null;
 
     // Iterate over the values array in reverse to find the closest date before or on the target date
-    for (let i = values.length - 1; i >= 0; i--) {
+    for (let i = values.length - 2; i >= 0; i--) {
         const value = values[i];
 
         const valueDate = dayjs(value.date);
         if (valueDate.isBefore(targetDate) || valueDate.isSame(targetDate, 'day')) {
-            startValue = value.value;
+            startValue = value;
             break;
         }
     }
@@ -36,6 +35,6 @@ export const trailingPercentChange = (
     }
 
     // Step 4: Calculate the percent change
-    const percentChange = ((mostRecentValue.value - startValue) / startValue) * 100;
+    const percentChange = ((mostRecentValue.value - startValue.value) / startValue.value) * 100;
     return percentChange;
 };

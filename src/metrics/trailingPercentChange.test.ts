@@ -1,49 +1,43 @@
 import { describe, it, expect } from "bun:test";
 import { trailingPercentChange } from "./trailingPercentChange";
+import type { AllocationResult } from "../services/Backtester";
 
-// Tests
+// Sample data
+const sampleData: AllocationResult[] = [
+    { date: "2022-08-01", value: 100, tickers: {} },
+    { date: "2022-09-01", value: 120, tickers: {} },
+    { date: "2022-10-01", value: 100, tickers: {} },
+    { date: "2022-11-01", value: 110, tickers: {} },
+    { date: "2022-12-01", value: 90, tickers: {} },
+    { date: "2023-01-01", value: 100, tickers: {} },
+    { date: "2023-02-01", value: 110, tickers: {} },
+    { date: "2023-03-01", value: 120, tickers: {} },
+    { date: "2023-04-01", value: 130, tickers: {} },
+    { date: "2023-05-01", value: 140, tickers: {} },
+    { date: "2023-06-01", value: 150, tickers: {} },
+    { date: "2023-07-01", value: 160, tickers: {} },
+    { date: "2023-08-01", value: 170, tickers: {} },
+    { date: "2023-09-01", value: 180, tickers: {} },
+    { date: "2023-10-01", value: 190, tickers: {} },
+];
+
 describe("calculateTrailingPercentChangeFromDays", () => {
-
-    it("should calculate percent change for the last 1 day", () => {
-        const values = [100, 105, 110, 115, 120, 125, 130];  // Daily values
-        const result = trailingPercentChange(values, 1);
-        expect(result).toBeCloseTo(4.00); // (130 - 125) / 125 * 100 = 4%
-    });
-
-    it("should calculate percent change for the last 3 days", () => {
-        const values = [100, 105, 110, 115, 120, 125, 130];
-        const result = trailingPercentChange(values, 3);
-        expect(result).toBeCloseTo(13.043478260869565); // (130 - 115) / 115 * 100 = 13.04%
-    });
-
-    it("should calculate percent change for the last 6 days", () => {
-        const values = [100, 105, 110, 115, 120, 125, 130];
-        const result = trailingPercentChange(values, 6);
-        expect(result).toBeCloseTo(30.00); // (130 - 100) / 100 * 100 = 30%
-    });
-
     it("should throw an error if there are not enough data points", () => {
-        const values = [100]; // Only one data point
-        try {
-            trailingPercentChange(values, 1);
-        } catch (e) {
-            expect((e as Error).message).toBe("At least two data points are required.");
-        }
+        expect(() => trailingPercentChange([], 1, 'month')).toThrow("At least one data point is required.");
     });
 
-    it("should throw an error if daysAgo exceeds the number of available data points", () => {
-        const values = [100, 105, 110, 115]; // 4 data points
-        try {
-            trailingPercentChange(values, 5); // More than available data points
-        } catch (e) {
-            expect((e as Error).message).toBe("Not enough data points to calculate the percent change for the specified period.");
-        }
+    it("should calculate percent change for the last month", () => {
+        const result = trailingPercentChange(sampleData, 1, 'month');
+        expect(result).toBeCloseTo(5.56, 2); // ((190 - 180) / 180) * 100
     });
 
-    it("should calculate percent change for the last 2 days", () => {
-        const values = [100, 110]; // Only 2 data points
-        const result = trailingPercentChange(values, 1);
-        expect(result).toBeCloseTo(10.00); // (110 - 100) / 100 * 100 = 10%
+    it("should calculate percent change for the last 3 months", () => {
+        const result = trailingPercentChange(sampleData, 3, 'month');
+        expect(result).toBeCloseTo(18.75, 2); // ((190 - 160) / 160) * 100
     });
 
+    it("should calculate percent change for the last year", () => {
+        const result = trailingPercentChange(sampleData, 1, 'year');
+        expect(result).toBeCloseTo(90, 2); // ((190 - 100) / 100) * 100
+    });
 });

@@ -16,6 +16,7 @@ export class Parser {
   private indicators: Map<string, Indicator> = new Map()
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
+  private hasher = new Bun.CryptoHasher("sha256");
 
   parse(node: TradingBotNode): ParsedAssetsAndIndicators {
     this.parseNode(node)
@@ -29,23 +30,11 @@ export class Parser {
 
   private parseNode(node: TradingBotNode): void {
     switch (node.node_type) {
-      case TradingBotNodeType.root: {
-        node.children!.flatMap(childNode => this.parseNode(childNode));
-        break
-      }
-  
-      case TradingBotNodeType.weight_cash_equal: {
-        node.children!.flatMap((child) => this.parseNode(child))
-        break
-      }
-  
-      case TradingBotNodeType.weight_cash_specified: {
-        node.children!.flatMap((child) => this.parseNode(child))
-        break
-      }
-  
+      case TradingBotNodeType.root:
+      case TradingBotNodeType.weight_cash_equal:
+      case TradingBotNodeType.weight_cash_specified:
       case TradingBotNodeType.group: {
-        node.children!.flatMap((child) => this.parseNode(child));
+        node.children!.forEach(childNode => this.parseNode(childNode));
         break
       }
   
@@ -55,8 +44,10 @@ export class Parser {
       }
   
       case TradingBotNodeType.asset: {
-        this.assets.add(node.ticker!)
-        this.tradeableAssets.add(node.ticker!)
+        if (!this.assets.has(node.ticker!)) {
+          this.assets.add(node.ticker!)
+          this.tradeableAssets.add(node.ticker!)
+        }
         break
       }
   
@@ -66,9 +57,9 @@ export class Parser {
   }
 
   private evaluateConditions(node: TradingBotNodeIfThenElse, parentWeight: number = 100): void {
-    node.conditions.flatMap(child => this.evaluateCondition(child));
-    node.then_children.flatMap(child => this.parseNode(child));
-    node.else_children.flatMap(child => this.parseNode(child));
+    node.conditions.forEach(child => this.evaluateCondition(child));
+    node.then_children.forEach(child => this.parseNode(child));
+    node.else_children.forEach(child => this.parseNode(child));
   }
 
   private evaluateCondition(node: TradingBotNodeCondition): void {
@@ -77,8 +68,13 @@ export class Parser {
       fn: node.lhs_fn,
       params: node.lhs_fn_params
     }
-    this.assets.add(lhs.ticker)
-    this.indicators.set(this.generateHash(lhs), lhs)
+    if (!this.assets.has(lhs.ticker)) {
+      this.assets.add(lhs.ticker)
+    }
+    const lhsHash = this.generateHash(lhs);
+    if (!this.indicators.has(lhsHash)) {
+      this.indicators.set(lhsHash, lhs)
+    }
     
     if (node.lhs_fn) {
       const rhs = {
@@ -86,8 +82,13 @@ export class Parser {
         fn: node.rhs_fn!,
         params: node.rhs_fn_params!
       }
-      this.assets.add(rhs.ticker)
-      this.indicators.set(this.generateHash(rhs), rhs)
+      if (!this.assets.has(rhs.ticker)) {
+        this.assets.add(rhs.ticker)
+      }
+      const rhsHash = this.generateHash(rhs);
+      if (!this.indicators.has(rhsHash)) {
+        this.indicators.set(rhsHash, rhs)
+      }
     }
   }
 
@@ -97,10 +98,8 @@ export class Parser {
    * @returns A fixed-length hash string.
    */
   generateHash(input: string | object): string {
-    const hasher = new Bun.CryptoHasher("sha256");
-    // const hash = createHash("sha256");
     const data = typeof input === "string" ? input : JSON.stringify(input);
-    hasher.update(data);
-    return hasher.digest("hex");
+    this.hasher.update(data);
+    return this.hasher.digest("hex");
   }
 }
