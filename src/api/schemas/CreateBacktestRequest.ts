@@ -19,6 +19,9 @@ export const createBacktestRequestSchema = z.object({
     starting_balance: startingCapital,
     start_date: startDate,
     end_date: endDate,
+    include: z.object({
+        history: z.boolean(),
+    }),
 
     // JSON type - https://zod.dev/?id=json-type
     trading_bot: z.lazy(() =>

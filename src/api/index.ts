@@ -7,7 +7,7 @@ const BacktestController = () => import('./controllers/BacktestController')
 const DocsController = () => import('./controllers/DocsController')
 const HealthController = () => import('./controllers/HealthController')
 
-workerPool.init('./src/api/workers/backtester.ts')
+workerPool.init()
 
 const app = express()
 const port = process.env.PORT || 3000

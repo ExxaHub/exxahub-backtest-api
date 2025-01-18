@@ -1,45 +1,25 @@
 import { db } from '../db'
 import { table } from '../models/OhlcBar'
 import { type OHLCBar } from '../types/types'
+import dayjs from 'dayjs'
 
 export class OhlcBarRepository {
     async getLastBarDates(tickers: string[]): Promise<{ [key: string]: string }> {
         try {
             const results = await db(table)
                 .select('symbol')
-                .max('date as last_date')
+                .max('ts as last_date')
                 .whereIn('symbol', tickers)
                 .groupBy('symbol')
 
             const lastDates: { [key: string]: string } = {}
             results.forEach(result => {
-                lastDates[result.symbol] = result.last_date
+                lastDates[result.symbol] = dayjs.unix(result.last_date).format('YYYY-MM-DD')
             })
 
             return lastDates
         } catch (error) {
             console.error('Error getting last bar dates:', error)
-            return {}
-        }
-    }
-
-    async getMinMaxBarDates(tickers: string[]): Promise<{ [key: string]: { minDate: string, maxDate: string } }> {
-        try {
-            const results = await db(table)
-                .select('symbol')
-                .min('date as min_date')
-                .max('date as max_date')
-                .whereIn('symbol', tickers)
-                .groupBy('symbol')
-
-            const minMaxDates: { [key: string]: { minDate: string, maxDate: string } } = {}
-            results.forEach(result => {
-                minMaxDates[result.symbol] = { minDate: result.min_date, maxDate: result.max_date }
-            })
-
-            return minMaxDates
-        } catch (error) {
-            console.error('Error getting min/max bar dates:', error)
             return {}
         }
     }
@@ -50,6 +30,7 @@ export class OhlcBarRepository {
                 return {
                     symbol: ticker, 
                     date: bar.date, 
+                    ts: dayjs(bar.date).startOf('day').unix(),  
                     open: bar.open, 
                     high: bar.high, 
                     low: bar.low, 
@@ -60,7 +41,7 @@ export class OhlcBarRepository {
             
             await db(table)
                 .insert(barsToSave)
-                .onConflict(['symbol', 'date'])
+                .onConflict(['symbol', 'ts'])
                 .merge()
 
             return true
@@ -75,9 +56,9 @@ export class OhlcBarRepository {
             const results = await db(table)
                 .select('*')
                 .whereIn('symbol', tickers)
-                .where('date', '>=', fromDate)
-                .where('date', '<=', toDate)
-                .orderBy('date', 'asc')
+                .where('ts', '>=', dayjs(fromDate).startOf('day').unix())
+                .where('ts', '<=', dayjs(toDate).startOf('day').unix())
+                .orderBy('ts', 'asc')
 
             const bars: { [key: string]: OHLCBar[] } = {}
             results.forEach(result => {

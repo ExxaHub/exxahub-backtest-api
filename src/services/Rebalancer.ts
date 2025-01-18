@@ -1,6 +1,5 @@
 import { type Allocations } from "./Interpreter"
 import type { OhlcCache } from "./OhlcCache";
-import type { Dayjs } from "dayjs"
 
 type Holdings = {
     [key: string]: {
