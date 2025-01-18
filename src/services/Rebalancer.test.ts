@@ -15,8 +15,8 @@ class MockOhlcCache extends OhlcCache {
     this.barForDate[ticker][date.format('YYYY-MM-DD')] = bar
   }
 
-  getBarForDate(ticker: string, date: Dayjs): OHLCBar {
-    return this.barForDate[ticker][date.format('YYYY-MM-DD')]
+  getBarForDate(ticker: string, date: string): OHLCBar {
+    return this.barForDate[ticker][date]
   }
 }
 
@@ -54,7 +54,7 @@ describe("Rebalancer", () => {
     mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-02'), barWithClose(110))
     mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-03'), barWithClose(120))
     
-    await rebalancer.rebalance(dayjs('2024-01-01'), {
+    await rebalancer.rebalance('2024-01-01', {
       'SPY': 100,
       'QQQ': null
     })
@@ -68,7 +68,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    rebalancer.rebalance(dayjs('2024-01-02'), {
+    rebalancer.rebalance('2024-01-02', {
       'SPY': 100,
       'QQQ': null
     })
@@ -82,7 +82,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    rebalancer.rebalance(dayjs('2024-01-03'), {
+    rebalancer.rebalance('2024-01-03', {
       'SPY': 100,
       'QQQ': null
     })
@@ -108,7 +108,7 @@ describe("Rebalancer", () => {
     mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-02'), barWithClose(110))
     mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-03'), barWithClose(120))
     
-    await rebalancer.rebalance(dayjs('2024-01-01'), {
+    await rebalancer.rebalance('2024-01-01', {
       'SPY': 100,
       'QQQ': null
     })
@@ -122,7 +122,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    await rebalancer.rebalance(dayjs('2024-01-02'), {
+    await rebalancer.rebalance('2024-01-02', {
       'SPY': null,
       'QQQ': 100
     })
@@ -141,7 +141,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    await rebalancer.rebalance(dayjs('2024-01-03'), {
+    await rebalancer.rebalance('2024-01-03', {
       'SPY': null,
       'QQQ': 100
     })
@@ -172,7 +172,7 @@ describe("Rebalancer", () => {
     mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-02'), barWithClose(110))
     mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-03'), barWithClose(120))
     
-    await rebalancer.rebalance(dayjs('2024-01-01'), {
+    await rebalancer.rebalance('2024-01-01', {
       'SPY': 100,
       'QQQ': null
     })
@@ -186,7 +186,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    await rebalancer.rebalance(dayjs('2024-01-02'), {
+    await rebalancer.rebalance('2024-01-02', {
       'SPY': 75,
       'QQQ': 25
     })
@@ -213,7 +213,7 @@ describe("Rebalancer", () => {
       rebalancer.getCurrentHoldings().SPY.value + rebalancer.getCurrentHoldings().QQQ.value
     ).toEqual(rebalancer.getBalance())
 
-    await rebalancer.rebalance(dayjs('2024-01-03'), {
+    await rebalancer.rebalance('2024-01-03', {
       'SPY': 50,
       'QQQ': 50
     })
