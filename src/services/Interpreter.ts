@@ -22,16 +22,19 @@ export class Interpreter {
   private indicatorCache: IndicatorCache
   private date: string
   private tradeableAssets: string[]
+  private indicatorValueCache: Map<string, number>
 
   constructor(indicatorCache: IndicatorCache, tradeableAssets: string[]) {
     this.indicatorCache = indicatorCache
     this.tradeableAssets = tradeableAssets
     this.date = dayjs().format('YYYY-MM-DD')
+    this.indicatorValueCache = new Map()
   }
 
   evaluate(algorithm: TradingBotNode, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
     this.indicatorCache = indicatorCache
     this.date = date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+    this.indicatorValueCache.clear()
     const rawAllocations = this.evaluateNode(algorithm)
     return this.combineAllocationsByAsset(rawAllocations as AllocationAsset[])
   }
@@ -87,21 +90,13 @@ export class Interpreter {
   }
 
   private evaluateConditions(node: TradingBotNodeIfThenElse, weightType: WeightType, parentWeight: number = 100): unknown {
-    const conditionResults: boolean[] = []
-    for (const condition of node.conditions) {
-      conditionResults.push(this.evaluateCondition(condition))
-    }
+    const conditionResults = node.conditions.map(condition => this.evaluateCondition(condition))
 
-    const allAreTrue = (values: boolean[]): boolean => {
-      return values.every(value => value === true);
-    }
-
-    const anyAreTrue = (values: boolean[]): boolean => {
-      return values.some(value => value === true);
-    }
+    const allAreTrue = conditionResults.every(value => value === true);
+    const anyAreTrue = conditionResults.some(value => value === true);
 
     if (node.condition_type === TradingBotNodeIfThenElseConditionType.AllOf) {
-      if (allAreTrue(conditionResults)) {
+      if (allAreTrue) {
         return node.then_children.flatMap((child) =>
           this.evaluateNode(child, weightType, parentWeight)
         );
@@ -111,7 +106,7 @@ export class Interpreter {
         );
       }
     } else if (node.condition_type === TradingBotNodeIfThenElseConditionType.AnyOf) {
-      if (anyAreTrue(conditionResults)) {
+      if (anyAreTrue) {
         return node.then_children.flatMap((child) =>
           this.evaluateNode(child, weightType, parentWeight)
         );
@@ -124,12 +119,9 @@ export class Interpreter {
   }
 
   private evaluateCondition(condition: TradingBotNodeCondition): boolean {
-    const lhsParams = condition.lhs_fn_params
-    const rhsParams = condition.rhs_fn_params
-
-    const lhsValue = this.getIndicatorValue(condition.lhs_val, condition.lhs_fn, lhsParams);
+    const lhsValue = this.getIndicatorValue(condition.lhs_val, condition.lhs_fn, condition.lhs_fn_params);
     const rhsValue = condition.rhs_fn
-      ? this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, rhsParams)
+      ? this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, condition.rhs_fn_params)
       : parseInt(condition.rhs_val!) 
     const comparator = condition.comparator
   
@@ -137,7 +129,13 @@ export class Interpreter {
   }
   
   private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
-    return this.indicatorCache.getIndicatorValue(ticker, fn, params, this.date)
+    const cacheKey = `${ticker}-${fn}-${JSON.stringify(params)}-${this.date}`
+    if (this.indicatorValueCache.has(cacheKey)) {
+      return this.indicatorValueCache.get(cacheKey)!
+    }
+    const value = this.indicatorCache.getIndicatorValue(ticker, fn, params, this.date)
+    this.indicatorValueCache.set(cacheKey, value)
+    return value
   }
   
   private compare(lhs: number, rhs: number, comparator: string): boolean {
