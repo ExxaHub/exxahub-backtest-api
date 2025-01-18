@@ -38,6 +38,7 @@ export enum TradingBotNodeType {
     group = 'group',
     weight_cash_equal = 'wt-cash-equal',
     weight_cash_specified = 'wt-cash-specified',
+    weight_inverse_volatility = 'wt-inverse-volatility',
     if_then_else = 'if-then-else',
     condition = 'condition',
     asset = 'asset'
@@ -85,6 +86,16 @@ export type TradingBotNodeWeightCashSpecified = {
         den: number
     },
     node_type: TradingBotNodeType.weight_cash_specified,
+    children: TradingBotNode[]
+}
+
+export type TradingBotNodeWeightInverseVolatility = {
+    id: string,
+    node_type: TradingBotNodeType.weight_inverse_volatility,
+    params: {
+        frequency: number
+        interval: 'day'
+    },
     children: TradingBotNode[]
 }
 
