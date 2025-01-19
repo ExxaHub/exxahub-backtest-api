@@ -56,10 +56,19 @@ export class Backtester {
             largestWindow
         } = parser.parse(backtestConfig.trading_bot as TradingBotNode)
 
-        console.log('largestWindow:', largestWindow)
-
+        const today = dayjs()
         let fromDate = dayjs(backtestConfig.start_date)
         let toDate = dayjs(backtestConfig.end_date)
+
+        if (toDate.isAfter(today)) {
+            toDate = today
+        }
+
+        if (toDate.day() === 0) {
+            toDate = toDate.subtract(2, 'day')
+        } else if (toDate.day() === 6) {
+            toDate = toDate.subtract(1, 'day')
+        }
 
         this.ohlcCache = new OhlcCache(this.client, assets, largestWindow)
         const ohlcBarsFromDate = await this.ohlcCache.load(fromDate, toDate)

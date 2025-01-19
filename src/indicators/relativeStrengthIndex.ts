@@ -47,6 +47,5 @@ export const relativeStrengthIndex = (ticker: string, params: Params, bars: OHLC
         indicator[dates[i]] = parseFloat(RSI.toFixed(4));
     }
 
-    console.log('RSI', ticker, indicator)
     return indicator;
 };

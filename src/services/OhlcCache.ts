@@ -112,8 +112,15 @@ export class OhlcCache {
   }
 
   private async updateBars(lastBarDates: {[key: string]: string}): Promise<void> {
-    const today = dayjs()
-    const tickersToUpdate = this.tickers.filter(ticker => dayjs(lastBarDates[ticker]).isBefore(today.subtract(1, 'day').startOf('day')))
+    let lastMarketDay = dayjs()
+
+    if (lastMarketDay.day() === 0) {
+      lastMarketDay = lastMarketDay.subtract(2, 'day')
+    } else if (lastMarketDay.day() === 6) { 
+      lastMarketDay = lastMarketDay.subtract(1, 'day')
+    }
+
+    const tickersToUpdate = this.tickers.filter(ticker => dayjs(lastBarDates[ticker]).isBefore(lastMarketDay.startOf('day')))
 
     if (tickersToUpdate.length === 0) {
       return
