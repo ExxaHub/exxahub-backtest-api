@@ -6,8 +6,11 @@ import {
   TradingBotNodeType,
   type TradingBotNodeIfThenElse,
   TradingBotNodeIfThenElseConditionType,
-  type TradingBotNodeCondition
+  type TradingBotNodeCondition,
+  type TradingBotNodeWeightInverseVolatility,
+  type TradingBotNodeAsset
 } from "../types/types";
+import type { PreCalcCache } from "./PreCalcCache";
 
 enum WeightType {
   Equal = 'equal',
@@ -20,12 +23,14 @@ export type Allocations = {
 
 export class Interpreter {
   private indicatorCache: IndicatorCache
+  private preCalcCache: PreCalcCache
   private date: string
   private tradeableAssets: string[]
   private indicatorValueCache: Map<string, number>
 
-  constructor(indicatorCache: IndicatorCache, tradeableAssets: string[]) {
+  constructor(indicatorCache: IndicatorCache, preCalcCache: PreCalcCache, tradeableAssets: string[]) {
     this.indicatorCache = indicatorCache
+    this.preCalcCache = preCalcCache
     this.tradeableAssets = tradeableAssets
     this.date = dayjs().format('YYYY-MM-DD')
     this.indicatorValueCache = new Map()
@@ -60,6 +65,29 @@ export class Interpreter {
   
       case TradingBotNodeType.weight_cash_specified: {
         return node.children!.flatMap((child) => this.evaluateNode(child, WeightType.Specified))
+      }
+
+      case TradingBotNodeType.weight_inverse_volatility: {
+        const inverseVolatilities = node.children!.map(child => {
+          const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
+          return 1 / stdDev;
+        })
+        const totalInverseVolatility = inverseVolatilities.reduce((acc, val) => acc + val, 0)
+
+        return node.children!.flatMap((child) => {
+          const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
+          const inverseVolatility = 1 / stdDev;
+          const weight = (inverseVolatility / totalInverseVolatility) * 100
+          console.log('weight', {
+            date: this.date,
+            stdDev,
+            inverseVolatility,
+            totalInverseVolatility,
+            ticker: (child as TradingBotNodeAsset).ticker,
+            weight
+          })
+          return this.evaluateNode(child, WeightType.Specified, weight)
+        })
       }
   
       case TradingBotNodeType.group: {

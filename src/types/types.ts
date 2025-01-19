@@ -93,8 +93,7 @@ export type TradingBotNodeWeightInverseVolatility = {
     id: string,
     node_type: TradingBotNodeType.weight_inverse_volatility,
     params: {
-        frequency: number
-        interval: 'day'
+        window: number
     },
     children: TradingBotNode[]
 }
@@ -149,6 +148,7 @@ export type TradingBotNode =
     | TradingBotNodeGroup 
     | TradingBotNodeWeightCashEqual 
     | TradingBotNodeWeightCashSpecified
+    | TradingBotNodeWeightInverseVolatility
     | TradingBotNodeIfThenElse
     | TradingBotNodeCondition
     | TradingBotNodeAsset 
@@ -166,6 +166,12 @@ export type Indicator = {
     params: {
       window?: number
     }
+}
+
+export type PreCalc = {
+    fn: string,
+    params: { window: number }
+    node: TradingBotNode
 }
 
 export interface ClientInterface {

@@ -25,6 +25,9 @@ export class BacktestMetricsService {
             throw new Error("Starting and ending balance must be defined.");
         }
 
+        console.log('startingBalance', startingBalance)
+        console.log('endingBalance', endingBalance)
+
         const balanceHistory = history.map(r => r.value)
 
         const dailyReturns = this.calculateDailyReturns(balanceHistory);
@@ -46,18 +49,18 @@ export class BacktestMetricsService {
         }
     }
 
-  private calculateDailyReturns(balances: number[]): number[] {
-    if (balances.length < 2) {
-        throw new Error("At least two balances are required to calculate returns.");
-    }
+    private calculateDailyReturns(balances: number[]): number[] {
+        if (balances.length < 2) {
+            throw new Error("At least two balances are required to calculate returns.");
+        }
 
-    const returns: number[] = [];
-    
-    for (let i = 1; i < balances.length; i++) {
-        const dailyReturn = (balances[i] - balances[i - 1]) / balances[i - 1];
-        returns.push(dailyReturn * 100);
-    }
+        const returns: number[] = [];
+        
+        for (let i = 1; i < balances.length; i++) {
+            const dailyReturn = (balances[i] - balances[i - 1]) / balances[i - 1];
+            returns.push(dailyReturn * 100);
+        }
 
-    return returns;
-}
+        return returns;
+    }
 }

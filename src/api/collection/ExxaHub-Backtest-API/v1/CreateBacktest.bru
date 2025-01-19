@@ -19,75 +19,41 @@ body:json {
       "history": true
     },
     "trading_bot": {
-      "description": "",
-      "name": "New Symphony",
-      "id": "new",
-      "node_type": "root",
-      "rebalance": "daily",
-      "version": "v1",
-      "children": [
-        {
-          "id": "node_01jhg6r8hbh7x4vjk0jz5qr3m4",
-          "node_type": "wt-cash-equal",
-          "children": [
-            {
-              "weight": {
-                "num": 100,
-                "den": 100
-              },
-              "id": "node_01jhg6r8hc653nq3hcb2qv828p",
-              "node_type": "group",
-              "name": "10d RSI HYD > 10d RSI IYZ",
-              "children": [
-                {
-                  "id": "node_01jhg6r8hczwqb7gmbz256y0b9",
-                  "node_type": "wt-cash-equal",
-                  "children": [
-                    {
-                      "id": "node_01jhg6r8hdc3pm0wxc0qv1mk9v",
-                      "node_type": "if-then-else",
-                      "condition_type": "allOf",
-                      "conditions": [
-                        {
-                          "id": "node_01jhg6r8hd4e8kn073p3w3aw5f",
-                          "node_type": "condition",
-                          "lhs_fn": "relative-strength-index",
-                          "lhs_fn_params": {
-                            "window": 10
-                          },
-                          "lhs_val": "HYD",
-                          "comparator": "gt",
-                          "rhs_fn": "relative-strength-index",
-                          "rhs_fn_params": {
-                            "window": 10
-                          },
-                          "rhs_val": "IYZ"
-                        }
-                      ],
-                      "then_children": [
-                        {
-                          "ticker": "TQQQ",
-                          "name": "TQQQ",
-                          "id": "node_01jhg6r8hd9pje11cvx90zjery",
-                          "node_type": "asset"
-                        }
-                      ],
-                      "else_children": [
-                        {
-                          "ticker": "PSQ",
-                          "name": "PSQ",
-                          "id": "node_01jhg6r8hdp40j0twcpz6vwkkc",
-                          "node_type": "asset"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
+    "description": "",
+    "name": "Test Algorithm",
+    "id": "new",
+    "node_type": "root",
+    "rebalance": "daily",
+    "version": "v1",
+    "children": [
+      {
+        "id": "node_01jgvw35hgdtt9brpkx33j92qy",
+        "node_type": "wt-inverse-volatility",
+        "params": {
+          "window": 10
+        },
+        "children": [
+          {
+            "ticker": "QQQ",
+            "name": "QQQ",
+            "id": "node_01jgvw35hhn5hwffah1p1hhh4r",
+            "node_type": "asset"
+          },
+          {
+            "ticker": "QLD",
+            "name": "QLD",
+            "id": "node_01jgvwhwffah1p1hhh4r35hhn5",
+            "node_type": "asset"
+          },
+          {
+            "ticker": "TQQQ",
+            "name": "TQQQ",
+            "id": "node_01jgvw35hhn5hw1hhh4rffah1p",
+            "node_type": "asset"
+          }
+        ]
+      }
+    ]
+  }
   }
 }

@@ -3,19 +3,22 @@ import {
   type TradingBotNode, 
   TradingBotNodeType, 
   type TradingBotNodeIfThenElse, 
-  type TradingBotNodeCondition 
+  type TradingBotNodeCondition, 
+  type PreCalc
 } from "../types/types";
 
 export type ParsedAssetsAndIndicators = {
   assets: string[],
   tradeableAssets: string[],
-  indicators: Indicator[]
+  indicators: Indicator[],
+  preCalcs: PreCalc[]
 }
 
 export class Parser {
   private indicators: Map<string, Indicator> = new Map()
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
+  private preCalcs: Map<string, PreCalc> = new Map()
   private hasher = new Bun.CryptoHasher("sha256");
 
   parse(node: TradingBotNode): ParsedAssetsAndIndicators {
@@ -24,7 +27,8 @@ export class Parser {
     return {
       assets: Array.from(this.assets),
       tradeableAssets: Array.from(this.tradeableAssets),
-      indicators: Array.from(this.indicators.values())
+      indicators: Array.from(this.indicators.values()),
+      preCalcs: Array.from(this.preCalcs.values())
     }
   }
 
@@ -37,6 +41,18 @@ export class Parser {
         node.children!.forEach(childNode => this.parseNode(childNode));
         break
       }
+
+      case TradingBotNodeType.weight_inverse_volatility: {
+        node.children!.forEach(childNode => this.preCalcs.set(childNode.id, {
+          node: childNode,
+          fn: 'precalc-standard-deviation-return',
+          params: {
+            window: node.params.window
+          }
+        }))
+        node.children!.forEach(childNode => this.parseNode(childNode));
+        break
+      }
   
       case TradingBotNodeType.if_then_else: {
         this.evaluateConditions(node)
@@ -44,10 +60,8 @@ export class Parser {
       }
   
       case TradingBotNodeType.asset: {
-        if (!this.assets.has(node.ticker!)) {
-          this.assets.add(node.ticker!)
-          this.tradeableAssets.add(node.ticker!)
-        }
+        this.assets.add(node.ticker!)
+        this.tradeableAssets.add(node.ticker!)
         break
       }
   

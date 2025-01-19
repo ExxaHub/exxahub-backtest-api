@@ -16,14 +16,16 @@ export class OhlcCache {
     this.ohlcBarService = new OhlcBarService()
   }
 
-  async load(fromDate: string, toDate: string): Promise<void> {
-    const bars = await this.getTickerBars(fromDate, toDate)
+  async load(fromDate: Dayjs, toDate: Dayjs): Promise<{fromDate: Dayjs, toDate: Dayjs}> {
+    const bars = await this.getTickerBars(fromDate.format('YYYY-MM-DD'), toDate.format('YYYY-MM-DD'))
 
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, this.indexByDate(ohlcBars))
     }
 
     this.loaded = true
+
+    return { fromDate, toDate }
   }
 
   private indexByDate(ohlcBars: OHLCBar[]): Map<string, OHLCBar> {

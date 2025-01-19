@@ -149,6 +149,7 @@ export class Rebalancer {
     private getTickerPriceOnDate(ticker: string, date: string): number {
         const bar = this.ohlcCache.getBarForDate(ticker, date)
         if (!bar) {
+            console.log(`No bar available for ${ticker} on ${date}`)
             throw new Error('No bar available to update holdings')
         }
         return bar.close
