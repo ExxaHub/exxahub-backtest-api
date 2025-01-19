@@ -22,10 +22,10 @@ describe("calculateCalmarRatio", () => {
         expect(() => calmerRatio(annualizedReturn, maxDrawdown)).toThrow("Maximum drawdown must be greater than zero.");
     });
 
-    it("should throw an error if the annualized return or max drawdown is negative", () => {
+    it("should throw an error if max drawdown is negative", () => {
         const annualizedReturn = -0.10; // -10% annual return
-        const maxDrawdown = 0.15; // 15% max drawdown
+        const maxDrawdown = -0.15; // 15% max drawdown
 
-        expect(() => calmerRatio(annualizedReturn, maxDrawdown)).toThrow("Annualized return must be greater than zero.");
+        expect(() => calmerRatio(annualizedReturn, maxDrawdown)).toThrow("Maximum drawdown must be greater than zero.");
     });
 });

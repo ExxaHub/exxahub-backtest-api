@@ -213,10 +213,9 @@ describe("Parser", () => {
     expect(assets).toEqual(['SPY', 'BIL']);
     expect(preCalcs).toEqual([
       {
-        fn: 'precalc-standard-deviation',
+        fn: 'precalc-standard-deviation-return',
         params: {
-          frequency: 10,
-          interval: 'day'
+          window: 10,
         },
         node: {
           condition_type: "allOf",
@@ -258,7 +257,7 @@ describe("Parser", () => {
         }
       },
       {
-        fn: "precalc-standard-deviation",
+        fn: "precalc-standard-deviation-return",
         node: {
           condition_type: "allOf",
           conditions: [
@@ -298,8 +297,7 @@ describe("Parser", () => {
           ],
         },
         params: {
-          frequency: 10,
-          interval: "day",
+          window: 10,
         },
       }
     ]);

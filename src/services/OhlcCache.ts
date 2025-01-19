@@ -7,31 +7,42 @@ export class OhlcCache {
   private client: ClientInterface
   private ohlcBarService: OhlcBarService
   private tickers: string[]
-  private largestWindow: number
+  private largestIndicatorWindow: number
+  private largestPreCalcWindow: number
   private cachedOhlcBars: Map<string, Map<string, OHLCBar>> = new Map<string, Map<string, OHLCBar>>()
   private loaded: boolean = false
 
-  constructor(client: ClientInterface, tickers: string[], largestWindow: number) {
+  constructor(client: ClientInterface, tickers: string[], largestIndicatorWindow: number, largestPreCalcWindow: number) {
     this.client = client
     this.tickers = tickers
-    this.largestWindow = largestWindow
+    this.largestIndicatorWindow = largestIndicatorWindow
+    this.largestPreCalcWindow = largestPreCalcWindow
     this.ohlcBarService = new OhlcBarService()
   }
 
   async load(fromDate: Dayjs, toDate: Dayjs): Promise<Dayjs> {
-    const dateOffsets = await Promise.all(this.tickers.map(ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestWindow)))
-    const ohlcBarsFromDate = dateOffsets.reduce((max, current) =>
+    const dateOffsetsFullWindow = await Promise.all(this.tickers.map(
+      ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestIndicatorWindow + this.largestPreCalcWindow))
+    )
+    const ohlcBarsFromFullWindowDate = dateOffsetsFullWindow.reduce((max, current) =>
       dayjs(current).isAfter(dayjs(max)) ? current : max
     );
 
-    const bars = await this.getTickerBars(ohlcBarsFromDate, toDate.format('YYYY-MM-DD'))
+    const dateOffsetsPreCalcWindow = await Promise.all(this.tickers.map(
+      ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestPreCalcWindow))
+    )
+    const ohlcBarsFromPreCalcWindowDate = dateOffsetsPreCalcWindow.reduce((max, current) =>
+      dayjs(current).isAfter(dayjs(max)) ? current : max
+    );
+
+    const bars = await this.getTickerBars(ohlcBarsFromFullWindowDate, toDate.format('YYYY-MM-DD'))
 
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, this.indexByDate(ohlcBars))
     }
 
     this.loaded = true
-    return dayjs(ohlcBarsFromDate)
+    return dayjs(ohlcBarsFromPreCalcWindowDate)
   }
 
   private indexByDate(ohlcBars: OHLCBar[]): Map<string, OHLCBar> {

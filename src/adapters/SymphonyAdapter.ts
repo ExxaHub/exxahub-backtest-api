@@ -45,6 +45,17 @@ export class SymphonyAdapter {
                 children: node.children!.flatMap((child) => this.parseNode(child))
             }
           }
+
+          case 'wt-inverse-vol': {
+            return {
+                id: this.getId(),
+                node_type: TradingBotNodeType.weight_inverse_volatility,
+                params: {
+                    window: parseInt(node['window-days']!)
+                },
+                children: node.children!.flatMap((child) => this.parseNode(child))
+            }
+          }
       
           case 'group': {
             return {

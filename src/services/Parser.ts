@@ -12,7 +12,8 @@ export type ParsedAssetsAndIndicators = {
   tradeableAssets: string[],
   indicators: Indicator[],
   preCalcs: PreCalc[],
-  largestWindow: number
+  largestIndicatorWindow: number
+  largestPreCalcWindow: number
 }
 
 export class Parser {
@@ -20,7 +21,8 @@ export class Parser {
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
   private preCalcs: Map<string, PreCalc> = new Map()
-  private largestWindow = 0
+  private largestIndicatorWindow = 0
+  private largestPreCalcWindow = 0
   private hasher = new Bun.CryptoHasher("sha256");
 
   parse(node: TradingBotNode): ParsedAssetsAndIndicators {
@@ -31,7 +33,8 @@ export class Parser {
       tradeableAssets: Array.from(this.tradeableAssets),
       indicators: Array.from(this.indicators.values()),
       preCalcs: Array.from(this.preCalcs.values()),
-      largestWindow: this.largestWindow
+      largestIndicatorWindow: this.largestIndicatorWindow,
+      largestPreCalcWindow: this.largestPreCalcWindow
     }
   }
 
@@ -53,7 +56,7 @@ export class Parser {
             window: node.params.window
           }
         }))
-        this.largestWindow = Math.max(this.largestWindow, node.params.window)
+        this.largestPreCalcWindow = Math.max(this.largestPreCalcWindow, node.params.window)
         node.children!.forEach(childNode => this.parseNode(childNode));
         break
       }
@@ -112,8 +115,8 @@ export class Parser {
       }
     }
 
-    this.largestWindow = Math.max(this.largestWindow, node.lhs_fn_params?.window ?? 0)
-    this.largestWindow = Math.max(this.largestWindow, node.rhs_fn_params?.window ?? 0)
+    this.largestIndicatorWindow = Math.max(this.largestIndicatorWindow, node.lhs_fn_params?.window ?? 0)
+    this.largestIndicatorWindow = Math.max(this.largestIndicatorWindow, node.rhs_fn_params?.window ?? 0)
   }
 
   /**

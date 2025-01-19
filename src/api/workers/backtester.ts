@@ -13,6 +13,7 @@ self.onmessage = async (event: MessageEvent) => {
         const results = await backtester.run(event.data)
         postMessage(results);
     } catch (error) {
+        console.error(error);
         postMessage({ error: (error as Error).message });
     }
 };
