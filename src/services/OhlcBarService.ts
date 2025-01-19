@@ -15,6 +15,10 @@ export class OhlcBarService {
         return this.ohlcBarSummaryRepository.getLastBarDates(tickers)
     }
 
+    async getDateOffset(symbol: string, date: string, offset: number): Promise<string> {
+        return this.ohlcBarRepository.getDateOffset(symbol, date, offset)
+    }
+
     async saveBars(bars: { [key: string]: OHLCBar[] }): Promise<void> {
         const promises: Promise<boolean>[] = []
 

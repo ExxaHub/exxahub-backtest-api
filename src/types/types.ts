@@ -38,6 +38,7 @@ export enum TradingBotNodeType {
     group = 'group',
     weight_cash_equal = 'wt-cash-equal',
     weight_cash_specified = 'wt-cash-specified',
+    weight_inverse_volatility = 'wt-inverse-volatility',
     if_then_else = 'if-then-else',
     condition = 'condition',
     asset = 'asset'
@@ -85,6 +86,15 @@ export type TradingBotNodeWeightCashSpecified = {
         den: number
     },
     node_type: TradingBotNodeType.weight_cash_specified,
+    children: TradingBotNode[]
+}
+
+export type TradingBotNodeWeightInverseVolatility = {
+    id: string,
+    node_type: TradingBotNodeType.weight_inverse_volatility,
+    params: {
+        window: number
+    },
     children: TradingBotNode[]
 }
 
@@ -138,6 +148,7 @@ export type TradingBotNode =
     | TradingBotNodeGroup 
     | TradingBotNodeWeightCashEqual 
     | TradingBotNodeWeightCashSpecified
+    | TradingBotNodeWeightInverseVolatility
     | TradingBotNodeIfThenElse
     | TradingBotNodeCondition
     | TradingBotNodeAsset 
@@ -155,6 +166,12 @@ export type Indicator = {
     params: {
       window?: number
     }
+}
+
+export type PreCalc = {
+    fn: string,
+    params: { window: number }
+    node: TradingBotNode
 }
 
 export interface ClientInterface {

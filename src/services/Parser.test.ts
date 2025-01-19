@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { Parser } from "./Parser";
-import type { Symphony, TradingBotNode } from "../types/types";
+import { TradingBotNodeType, type Symphony, type TradingBotNode } from "../types/types";
 
 import cumulativeReturnJson from '../testData/tradingBots/cumulativeReturn.json'
 import exponentialMovingAverageOfPriceJson from '../testData/tradingBots/exponentialMovingAverageOfPrice.json'
@@ -10,6 +10,7 @@ import movingAverageOfReturnJson from '../testData/tradingBots/movingAverageOfRe
 import relativeStrengthIndexJson from '../testData/tradingBots/relativeStrengthIndex.json'
 import standardDeviationOfPriceJson from '../testData/tradingBots/standardDeviationOfPrice.json'
 import standardDeviationOfReturnJson from '../testData/tradingBots/standardDeviationOfReturn.json'
+import weightInversVolatilityJson from '../testData/tradingBots/weightInverseVolatility.json'
 
 describe("Parser", () => {
   it("Parses cumulativeReturn RSI indicators correctly", () => {
@@ -200,6 +201,106 @@ describe("Parser", () => {
           window: 20,
         },
         ticker: "SPY",
+      }
+    ]);
+  });
+
+  it("Parses weightInverseVolatility preCalcs correctly", () => {
+    const algorithm: TradingBotNode = weightInversVolatilityJson as unknown as TradingBotNode;
+    const parser = new Parser
+    const { assets, preCalcs } = parser.parse(algorithm)
+
+    expect(assets).toEqual(['SPY', 'BIL']);
+    expect(preCalcs).toEqual([
+      {
+        fn: 'precalc-standard-deviation',
+        params: {
+          frequency: 10,
+          interval: 'day'
+        },
+        node: {
+          condition_type: "allOf",
+          conditions: [
+            {
+              comparator: "gt",
+              id: "node_01jgvw35hhwq41wdr6s8d6txy4",
+              lhs_fn: "standard-deviation-return",
+              lhs_fn_params: {
+                window: 10,
+              },
+              lhs_val: "SPY",
+              node_type: TradingBotNodeType.condition,
+              rhs_fn: "standard-deviation-return",
+              rhs_fn_params: {
+                window: 20,
+              },
+              rhs_val: "SPY",
+            }
+          ],
+          else_children: [
+            {
+              id: "node_01jgvw35hh9a5vbqcn7bgc35rd",
+              name: "BIL",
+              node_type: TradingBotNodeType.asset,
+              ticker: "BIL",
+            }
+          ],
+          id: "node_01jgvw35hhp1fmvefxx9sqq1ef",
+          node_type: TradingBotNodeType.if_then_else,
+          then_children: [
+            {
+              id: "node_01jgvw35hhn5hwffah1p1hhh4r",
+              name: "SPY",
+              node_type: TradingBotNodeType.asset,
+              ticker: "SPY",
+            }
+          ],
+        }
+      },
+      {
+        fn: "precalc-standard-deviation",
+        node: {
+          condition_type: "allOf",
+          conditions: [
+            {
+              comparator: "gt",
+              id: "node_01jgvw27z0hy2q2q1es89ztvgt",
+              lhs_fn: "relative-strength-index",
+              lhs_fn_params: {
+                window: 10,
+              },
+              lhs_val: "SPY",
+              node_type: TradingBotNodeType.condition,
+              rhs_fn: "relative-strength-index",
+              rhs_fn_params: {
+                window: 20,
+              },
+              rhs_val: "SPY",
+            }
+          ],
+          else_children: [
+            {
+              id: "node_01jgvw27z0827jkxbsva3g1pew",
+              name: "BIL",
+              node_type: TradingBotNodeType.asset,
+              ticker: "BIL",
+            }
+          ],
+          id: "node_01jgvw27z1trbsxcnxeyqvj9v8",
+          node_type: TradingBotNodeType.if_then_else,
+          then_children: [
+            {
+              id: "node_01jgvw27z0xnamkvze3sbaaaba",
+              name: "SPY",
+              node_type: TradingBotNodeType.asset,
+              ticker: "SPY",
+            }
+          ],
+        },
+        params: {
+          frequency: 10,
+          interval: "day",
+        },
       }
     ]);
   });

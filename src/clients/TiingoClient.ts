@@ -59,6 +59,7 @@ export class TiingoClient implements ClientInterface {
     private async get<T>(endpoint: string, params: Record<string, string>): Promise<T> {
         params['token'] = tiingoApiToken()
         const urlParams = new URLSearchParams(params)
+        console.log('tiingo request', this.url(`${endpoint}?${urlParams.toString()}`))
         const response = await fetch(this.url(`${endpoint}?${urlParams.toString()}`), {
             method: "GET",
             headers: {

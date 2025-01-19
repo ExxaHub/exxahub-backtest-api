@@ -7,23 +7,31 @@ export class OhlcCache {
   private client: ClientInterface
   private ohlcBarService: OhlcBarService
   private tickers: string[]
+  private largestWindow: number
   private cachedOhlcBars: Map<string, Map<string, OHLCBar>> = new Map<string, Map<string, OHLCBar>>()
   private loaded: boolean = false
 
-  constructor(client: ClientInterface, tickers: string[]) {
+  constructor(client: ClientInterface, tickers: string[], largestWindow: number) {
     this.client = client
     this.tickers = tickers
+    this.largestWindow = largestWindow
     this.ohlcBarService = new OhlcBarService()
   }
 
-  async load(fromDate: string, toDate: string): Promise<void> {
-    const bars = await this.getTickerBars(fromDate, toDate)
+  async load(fromDate: Dayjs, toDate: Dayjs): Promise<Dayjs> {
+    const dateOffsets = await Promise.all(this.tickers.map(ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestWindow)))
+    const ohlcBarsFromDate = dateOffsets.reduce((max, current) =>
+      dayjs(current).isAfter(dayjs(max)) ? current : max
+    );
+
+    const bars = await this.getTickerBars(ohlcBarsFromDate, toDate.format('YYYY-MM-DD'))
 
     for (const [ticker, ohlcBars] of Object.entries(bars)) {
       this.cachedOhlcBars.set(ticker, this.indexByDate(ohlcBars))
     }
 
     this.loaded = true
+    return dayjs(ohlcBarsFromDate)
   }
 
   private indexByDate(ohlcBars: OHLCBar[]): Map<string, OHLCBar> {
@@ -104,8 +112,15 @@ export class OhlcCache {
   }
 
   private async updateBars(lastBarDates: {[key: string]: string}): Promise<void> {
-    const today = dayjs()
-    const tickersToUpdate = this.tickers.filter(ticker => dayjs(lastBarDates[ticker]).isBefore(today.subtract(1, 'day').startOf('day')))
+    let lastMarketDay = dayjs()
+
+    if (lastMarketDay.day() === 0) {
+      lastMarketDay = lastMarketDay.subtract(2, 'day')
+    } else if (lastMarketDay.day() === 6) { 
+      lastMarketDay = lastMarketDay.subtract(1, 'day')
+    }
+
+    const tickersToUpdate = this.tickers.filter(ticker => dayjs(lastBarDates[ticker]).isBefore(lastMarketDay.startOf('day')))
 
     if (tickersToUpdate.length === 0) {
       return

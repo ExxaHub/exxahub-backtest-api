@@ -1,3 +1,4 @@
+import { symbol } from 'zod'
 import { db } from '../db'
 import { table } from '../models/OhlcBar'
 import { type OHLCBar } from '../types/types'
@@ -21,6 +22,23 @@ export class OhlcBarRepository {
         } catch (error) {
             console.error('Error getting last bar dates:', error)
             return {}
+        }
+    }
+
+    async getDateOffset(symbol: string, date: string, offset: number): Promise<string> {
+        try {
+            const result = await db(table)
+                .select('*')
+                .where('symbol', symbol)
+                .where('ts', '<=', dayjs(date).startOf('day').unix())
+                .orderBy('ts', 'desc')
+                .offset(offset)
+                .limit(1)
+
+            return result[0].date
+        } catch (error) {
+            console.error('Error getting date offset:', error)
+            return date
         }
     }
 
