@@ -60,22 +60,19 @@ export class Backtester {
 
         let fromDate = dayjs(backtestConfig.start_date)
         let toDate = dayjs(backtestConfig.end_date)
-        let dates
 
         this.ohlcCache = new OhlcCache(this.client, assets, largestWindow)
-        dates = await this.ohlcCache.load(fromDate, toDate)
-        
-        fromDate = this.getNextMarketDate(dates.fromDate)
-        toDate = this.getLastMarketDate(dates.toDate)
+        const ohlcBarsFromDate = await this.ohlcCache.load(fromDate, toDate)
+
+        fromDate = this.getNextMarketDate(dayjs(backtestConfig.start_date))
+        toDate = this.getLastMarketDate(dayjs(backtestConfig.end_date))
 
         if (!this.ohlcCache.isLoaded()) {
             throw new Error('OHLC cache has not been initialized.')
         }
 
         this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
-        dates = await this.indicatorCache.load(fromDate, toDate)
-        fromDate = dates.fromDate
-        toDate = dates.toDate
+        await this.indicatorCache.load()
 
         if (!this.indicatorCache.isLoaded()) {
             throw new Error('Indicator cache has not been initialized.')
@@ -86,13 +83,11 @@ export class Backtester {
             this.indicatorCache, 
             tradeableAssets,
             preCalcs, 
-            fromDate, 
+            ohlcBarsFromDate, 
             toDate, 
             backtestConfig.starting_balance
         )
-        dates = await this.preCaclCache.load(fromDate, toDate)
-        fromDate = dates.fromDate
-        toDate = dates.toDate
+        await this.preCaclCache.load()
         
         if (!this.preCaclCache.isLoaded()) {
             throw new Error('PreCalc cache has not been initialized.')

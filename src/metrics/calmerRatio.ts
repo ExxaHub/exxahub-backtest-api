@@ -7,10 +7,6 @@
  * @throws An error if the annualized return or maximum drawdown is not positive.
  */
 export const calmerRatio = (annualizedReturn: number, maxDrawdown: number): number => {
-    if (annualizedReturn <= 0) {
-        throw new Error("Annualized return must be greater than zero.");
-    }
-
     // Step 3: Calculate the Calmar Ratio
     if (maxDrawdown <= 0) {
         throw new Error("Maximum drawdown must be greater than zero.");

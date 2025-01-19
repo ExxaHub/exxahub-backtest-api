@@ -17,7 +17,7 @@ export class PreCalcCache {
   private indicatorCache: IndicatorCache
   private tradeableAssets: string[]
   private preCalcs: PreCalc[]
-  private fromDate: Dayjs
+  private ohlcBarsFromDate: Dayjs
   private toDate: Dayjs
   private startingBalance: number
   private loaded: boolean = false
@@ -29,7 +29,7 @@ export class PreCalcCache {
     indicatorCache: IndicatorCache, 
     tradeableAssets: string[],
     preCalcs: PreCalc[],
-    fromDate: Dayjs,
+    ohlcBarsFromDate: Dayjs,
     toDate: Dayjs,
     startingBalance: number
   ) {
@@ -37,25 +37,22 @@ export class PreCalcCache {
     this.indicatorCache = indicatorCache
     this.tradeableAssets = tradeableAssets
     this.preCalcs = preCalcs
-    this.fromDate = fromDate
+    this.ohlcBarsFromDate = ohlcBarsFromDate
     this.toDate = toDate
     this.startingBalance = startingBalance
   }
 
-  async load(fromDate: Dayjs, toDate: Dayjs): Promise<{fromDate: Dayjs, toDate: Dayjs}> {
-    let maxWindow = 0
+  async load(): Promise<void> {
     const loadPromises = this.preCalcs.map(async (preCalc) => {
       const dailyReturns = this.calculateReturns(preCalc.node)
       const preCalcFn = this.getPreCalcFunction(preCalc.fn)
       const calculatedPreCalc = await preCalcFn(dailyReturns, preCalc.params)
       this.cachedPreCalcs.set(preCalc.node.id, new Map(Object.entries(calculatedPreCalc)))
-      maxWindow = Math.max(maxWindow, preCalc.params.window)
     })
 
     await Promise.all(loadPromises)
 
     this.loaded = true
-    return { fromDate, toDate }
   }
 
   isLoaded(): boolean {
@@ -76,7 +73,7 @@ export class PreCalcCache {
     const interpreter = new Interpreter(this.indicatorCache, this, this.tradeableAssets)
     const rebalancer = new Rebalancer(this.ohlcCache, this.startingBalance)
 
-    let currentDate = this.fromDate.clone()
+    let currentDate = this.ohlcBarsFromDate.clone()
     const allocationResults: AllocationResult[] = []
 
     while (currentDate <= this.toDate) {

@@ -24,7 +24,7 @@ export class IndicatorCache {
     this.indicators = indicators
   }
 
-  async load(fromDate: Dayjs, toDate: Dayjs): Promise<{fromDate: Dayjs, toDate: Dayjs}> {
+  async load(): Promise<void> {
     const loadPromises = this.indicators.map(async (indicator) => {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker)
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
@@ -35,16 +35,11 @@ export class IndicatorCache {
       if (indicator.params.window) {
         this.largestWindow = Math.max(this.largestWindow, indicator.params.window)
       }
-
-      const calculatedIndicatorKeys = Object.keys(calculatedIndicator)
-      const indicatorStartDate = dayjs(calculatedIndicatorKeys[0])
-      fromDate = indicatorStartDate.isAfter(fromDate) ? indicatorStartDate : fromDate
     })
 
     await Promise.all(loadPromises)
 
     this.loaded = true
-    return { fromDate, toDate }
   }
 
   isLoaded(): boolean {
