@@ -78,14 +78,6 @@ export class Interpreter {
           const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
           const inverseVolatility = 1 / stdDev;
           const weight = (inverseVolatility / totalInverseVolatility) * 100
-          console.log('weight', {
-            date: this.date,
-            stdDev,
-            inverseVolatility,
-            totalInverseVolatility,
-            ticker: (child as TradingBotNodeAsset).ticker,
-            weight
-          })
           return this.evaluateNode(child, WeightType.Specified, weight)
         })
       }

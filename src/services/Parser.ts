@@ -11,7 +11,8 @@ export type ParsedAssetsAndIndicators = {
   assets: string[],
   tradeableAssets: string[],
   indicators: Indicator[],
-  preCalcs: PreCalc[]
+  preCalcs: PreCalc[],
+  largestWindow: number
 }
 
 export class Parser {
@@ -19,6 +20,7 @@ export class Parser {
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
   private preCalcs: Map<string, PreCalc> = new Map()
+  private largestWindow = 0
   private hasher = new Bun.CryptoHasher("sha256");
 
   parse(node: TradingBotNode): ParsedAssetsAndIndicators {
@@ -28,7 +30,8 @@ export class Parser {
       assets: Array.from(this.assets),
       tradeableAssets: Array.from(this.tradeableAssets),
       indicators: Array.from(this.indicators.values()),
-      preCalcs: Array.from(this.preCalcs.values())
+      preCalcs: Array.from(this.preCalcs.values()),
+      largestWindow: this.largestWindow
     }
   }
 
@@ -50,6 +53,7 @@ export class Parser {
             window: node.params.window
           }
         }))
+        this.largestWindow = Math.max(this.largestWindow, node.params.window)
         node.children!.forEach(childNode => this.parseNode(childNode));
         break
       }
@@ -82,18 +86,21 @@ export class Parser {
       fn: node.lhs_fn,
       params: node.lhs_fn_params
     }
+    
     if (!this.assets.has(lhs.ticker)) {
       this.assets.add(lhs.ticker)
     }
+    
     const lhsHash = this.generateHash(lhs);
+    
     if (!this.indicators.has(lhsHash)) {
       this.indicators.set(lhsHash, lhs)
     }
     
-    if (node.lhs_fn) {
+    if (node.rhs_fn) {
       const rhs = {
         ticker: node.rhs_val!,
-        fn: node.rhs_fn!,
+        fn: node.rhs_fn,
         params: node.rhs_fn_params!
       }
       if (!this.assets.has(rhs.ticker)) {
@@ -104,6 +111,9 @@ export class Parser {
         this.indicators.set(rhsHash, rhs)
       }
     }
+
+    this.largestWindow = Math.max(this.largestWindow, node.lhs_fn_params?.window ?? 0)
+    this.largestWindow = Math.max(this.largestWindow, node.rhs_fn_params?.window ?? 0)
   }
 
   /**

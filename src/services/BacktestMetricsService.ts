@@ -25,9 +25,6 @@ export class BacktestMetricsService {
             throw new Error("Starting and ending balance must be defined.");
         }
 
-        console.log('startingBalance', startingBalance)
-        console.log('endingBalance', endingBalance)
-
         const balanceHistory = history.map(r => r.value)
 
         const dailyReturns = this.calculateDailyReturns(balanceHistory);

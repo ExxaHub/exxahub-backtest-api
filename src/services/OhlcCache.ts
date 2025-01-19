@@ -7,12 +7,14 @@ export class OhlcCache {
   private client: ClientInterface
   private ohlcBarService: OhlcBarService
   private tickers: string[]
+  private largestWindow: number
   private cachedOhlcBars: Map<string, Map<string, OHLCBar>> = new Map<string, Map<string, OHLCBar>>()
   private loaded: boolean = false
 
-  constructor(client: ClientInterface, tickers: string[]) {
+  constructor(client: ClientInterface, tickers: string[], largestWindow: number) {
     this.client = client
     this.tickers = tickers
+    this.largestWindow = largestWindow
     this.ohlcBarService = new OhlcBarService()
   }
 
@@ -24,7 +26,6 @@ export class OhlcCache {
     }
 
     this.loaded = true
-
     return { fromDate, toDate }
   }
 

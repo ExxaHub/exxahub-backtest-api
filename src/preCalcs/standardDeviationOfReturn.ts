@@ -1,7 +1,6 @@
 import type { DailyReturn } from "../services/PreCalcCache";
 
 export const standardDeviationOfReturn = (returns: DailyReturn[], params: { window: number }): Record<string, number> => {
-    console.log('standardDeviationOfReturn', returns.length)
     const { window } = params;
     
     if (window < 2) {

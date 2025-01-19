@@ -55,8 +55,6 @@ export class PreCalcCache {
     await Promise.all(loadPromises)
 
     this.loaded = true
-    console.log('maxWindow', maxWindow)
-    console.log('this.cachedPreCalcs', this.cachedPreCalcs)
     return { fromDate, toDate }
   }
 

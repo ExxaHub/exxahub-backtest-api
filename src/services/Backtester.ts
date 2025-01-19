@@ -52,14 +52,17 @@ export class Backtester {
             assets, 
             tradeableAssets, 
             indicators,
-            preCalcs
+            preCalcs,
+            largestWindow
         } = parser.parse(backtestConfig.trading_bot as TradingBotNode)
+
+        console.log('largestWindow:', largestWindow)
 
         let fromDate = dayjs(backtestConfig.start_date)
         let toDate = dayjs(backtestConfig.end_date)
         let dates
 
-        this.ohlcCache = new OhlcCache(this.client, assets)
+        this.ohlcCache = new OhlcCache(this.client, assets, largestWindow)
         dates = await this.ohlcCache.load(fromDate, toDate)
         
         fromDate = this.getNextMarketDate(dates.fromDate)
