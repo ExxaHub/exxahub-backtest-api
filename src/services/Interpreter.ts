@@ -68,15 +68,17 @@ export class Interpreter {
       }
 
       case TradingBotNodeType.weight_inverse_volatility: {
+        // We can't divide by stdDev if stdDev is zero, so we'll use a small number instead
+        const minStdDev = 0.00001
         const inverseVolatilities = node.children!.map(child => {
           const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
-          return 1 / stdDev;
+          return 1 / (stdDev === 0 ? minStdDev : stdDev);
         })
         const totalInverseVolatility = inverseVolatilities.reduce((acc, val) => acc + val, 0)
 
         return node.children!.flatMap((child) => {
           const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
-          const inverseVolatility = 1 / stdDev;
+          const inverseVolatility = 1 / (stdDev === 0 ? minStdDev : stdDev);
           const weight = (inverseVolatility / totalInverseVolatility) * 100
           return this.evaluateNode(child, WeightType.Specified, weight)
         })

@@ -124,7 +124,6 @@ export class PreCalcCache {
   }
 
   private calculateDailyReturns(allocationResults: AllocationResult[]): DailyReturn[] {
-    console.log('allocationResults', allocationResults); 
     if (allocationResults.length < 2) {
         throw new Error("At least two balances are required to calculate returns.");
     }
@@ -135,8 +134,6 @@ export class PreCalcCache {
         const dailyReturn = (allocationResults[i].value - allocationResults[i - 1].value) / allocationResults[i - 1].value;
         returns.push({ date: allocationResults[i].date, value: dailyReturn });
     }
-
-    console.log('daily returns', returns)
 
     return returns;
   }
