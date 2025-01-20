@@ -5,17 +5,20 @@ import type { Symphony, OHLCBar, TradingBotNode } from "../types/types";
 import { IndicatorCache } from "./IndicatorCache";
 import { Parser } from "./Parser";
 import { Interpreter } from "./Interpreter";
+import { PreCalcCache } from "./PreCalcCache";
+import dayjs from "dayjs";
 
 const parser = new Parser()
 const alpacaStockClient = new AlpacaStockClient()
-const ohlcCache = new OhlcCache(alpacaStockClient, [])
+const ohlcCache = new OhlcCache(alpacaStockClient, [], 10, 10)
 const indicatorCache = new IndicatorCache(ohlcCache, [])
+const preCalcCache = new PreCalcCache(ohlcCache, indicatorCache, [], [], dayjs(), dayjs(), 100)
 
 describe("Interpreter", () => {
   it("Evaluates a weight equal algorithm correctly", async () => {
     const algorithm: TradingBotNode = await import('../testData/tradingBots/weightEqual.json') as unknown as TradingBotNode;
 
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(25)
@@ -26,7 +29,7 @@ describe("Interpreter", () => {
   it("Evaluates a weight specified algorithm correctly", async () => {
     const algorithm: TradingBotNode = await import('../testData/tradingBots/weightSpecified.json') as unknown as TradingBotNode;
 
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(30)
@@ -46,7 +49,7 @@ describe("Interpreter", () => {
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/cumulativeReturn.json') as unknown as TradingBotNode;
 
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -64,7 +67,7 @@ describe("Interpreter", () => {
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/cumulativeReturn.json') as unknown as TradingBotNode;
 
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -82,7 +85,7 @@ describe("Interpreter", () => {
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/exponentialMovingAverageOfPrice.json') as unknown as TradingBotNode;
 
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -100,7 +103,7 @@ describe("Interpreter", () => {
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/exponentialMovingAverageOfPrice.json') as unknown as TradingBotNode;
 
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -117,7 +120,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/maxDrawdown.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -134,7 +137,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/maxDrawdown.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -151,7 +154,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/movingAverageOfPrice.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -168,7 +171,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/movingAverageOfPrice.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -185,7 +188,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/movingAverageOfReturn.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -202,7 +205,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/movingAverageOfReturn.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -219,7 +222,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/relativeStrengthIndex.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -236,7 +239,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/relativeStrengthIndex.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -253,7 +256,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/standardDeviationOfPrice.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -270,7 +273,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/standardDeviationOfPrice.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -287,7 +290,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/standardDeviationOfReturn.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -304,7 +307,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/standardDeviationOfReturn.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
@@ -320,7 +323,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/fixedValueCompare.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['SPY']).toEqual(100)
@@ -336,7 +339,7 @@ describe("Interpreter", () => {
     });
 
     const algorithm: TradingBotNode = await import('../testData/tradingBots/fixedValueCompare.json') as unknown as TradingBotNode;
-    const interpreter = new Interpreter(indicatorCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
+    const interpreter = new Interpreter(indicatorCache, preCalcCache, ['SPY', 'QQQ', 'DIA', 'BIL'])
     const allocations = interpreter.evaluate(algorithm, indicatorCache)
 
     expect(allocations['BIL']).toEqual(100)
