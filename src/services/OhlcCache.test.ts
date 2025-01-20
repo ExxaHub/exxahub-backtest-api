@@ -2,6 +2,7 @@ import { describe, it, expect, mock, jest } from "bun:test";
 import { AlpacaStockClient } from "../clients/AlpacaClient";
 import { OhlcCache } from "./OhlcCache";
 import type { OHLCBar } from "../types/types";
+import dayjs from "dayjs";
 
 const alpacaStockClient = new AlpacaStockClient()
 
@@ -10,6 +11,10 @@ mock.module("../repositories/OhlcBarRepository", () => {
     OhlcBarRepository: class {
       saveBars(ticker: string, bars: OHLCBar[]) {
         return Promise.resolve(true)
+      }
+
+      getDateOffset(symbol: string, date: string, offset: number) {
+        return Promise.resolve(date)
       }
 
       getBarsForDateRange(tickers: string[], fromDate: string, toDate: string) {
@@ -53,9 +58,9 @@ mock.module("../repositories/OhlcBarSummaryRepository", () => {
 
 describe("OhlcCache", () => {
   it("Loads OHLC bars from client", async () => {
-    const ohlcCache = new OhlcCache(alpacaStockClient, ['SPY', 'QQQ'])
+    const ohlcCache = new OhlcCache(alpacaStockClient, ['SPY', 'QQQ'], 10, 10)
 
-    await ohlcCache.load("2024-11-10", "2024-11-14")
+    await ohlcCache.load(dayjs("2024-11-10"), dayjs("2024-11-14"))
 
     expect(ohlcCache.getBars('SPY')).toEqual([
       { date: "2024-11-10", open: 100, high: 105, low: 95, close: 100, volume: 10 },
