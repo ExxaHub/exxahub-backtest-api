@@ -53,7 +53,8 @@ export class Backtester {
             tradeableAssets, 
             indicators,
             preCalcs,
-            largestWindow
+            largestIndicatorWindow,
+            largestPreCalcWindow
         } = parser.parse(backtestConfig.trading_bot as TradingBotNode)
 
         const today = dayjs()
@@ -70,8 +71,8 @@ export class Backtester {
             toDate = toDate.subtract(1, 'day')
         }
 
-        this.ohlcCache = new OhlcCache(this.client, assets, largestWindow)
-        const ohlcBarsFromDate = await this.ohlcCache.load(fromDate, toDate)
+        this.ohlcCache = new OhlcCache(this.client, assets, largestIndicatorWindow, largestPreCalcWindow)
+        const ohlcBarsFromPreCalcWindowDate = await this.ohlcCache.load(fromDate, toDate)
 
         fromDate = this.getNextMarketDate(dayjs(backtestConfig.start_date))
         toDate = this.getLastMarketDate(dayjs(backtestConfig.end_date))
@@ -92,7 +93,7 @@ export class Backtester {
             this.indicatorCache, 
             tradeableAssets,
             preCalcs, 
-            ohlcBarsFromDate, 
+            ohlcBarsFromPreCalcWindowDate,
             toDate, 
             backtestConfig.starting_balance
         )

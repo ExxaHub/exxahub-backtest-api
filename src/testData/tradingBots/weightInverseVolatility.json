@@ -10,8 +10,7 @@
       "id": "node_01jgvw35hgdtt9brpkx33j92qy",
       "node_type": "wt-inverse-volatility",
       "params": {
-        "frequency": 10,
-        "interval": "day"
+        "window": 10
       },
       "children": [
         {

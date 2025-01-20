@@ -17,7 +17,7 @@ export class PreCalcCache {
   private indicatorCache: IndicatorCache
   private tradeableAssets: string[]
   private preCalcs: PreCalc[]
-  private ohlcBarsFromDate: Dayjs
+  private fromDate: Dayjs
   private toDate: Dayjs
   private startingBalance: number
   private loaded: boolean = false
@@ -29,7 +29,7 @@ export class PreCalcCache {
     indicatorCache: IndicatorCache, 
     tradeableAssets: string[],
     preCalcs: PreCalc[],
-    ohlcBarsFromDate: Dayjs,
+    fromDate: Dayjs,
     toDate: Dayjs,
     startingBalance: number
   ) {
@@ -37,7 +37,7 @@ export class PreCalcCache {
     this.indicatorCache = indicatorCache
     this.tradeableAssets = tradeableAssets
     this.preCalcs = preCalcs
-    this.ohlcBarsFromDate = ohlcBarsFromDate
+    this.fromDate = fromDate
     this.toDate = toDate
     this.startingBalance = startingBalance
   }
@@ -73,7 +73,7 @@ export class PreCalcCache {
     const interpreter = new Interpreter(this.indicatorCache, this, this.tradeableAssets)
     const rebalancer = new Rebalancer(this.ohlcCache, this.startingBalance)
 
-    let currentDate = this.ohlcBarsFromDate.clone()
+    let currentDate = this.fromDate.clone()
     const allocationResults: AllocationResult[] = []
 
     while (currentDate <= this.toDate) {

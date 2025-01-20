@@ -15,6 +15,7 @@ export interface SymphonyNode {
     'rhs-fn-params'?: Record<string, any>;
     comparator?: string;
     'is-else-condition'?: boolean;
+    'window-days'?: string;
     children?: SymphonyNode[];
     weight?: { num: number | string; den: number | string };
     collapsed?: boolean;
