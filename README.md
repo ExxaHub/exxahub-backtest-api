@@ -91,6 +91,9 @@ The payload for the request must match the following format:
   "starting_balance": 10000,
   "start_date": "2024-01-02",
   "end_date": "2025-01-02",
+  "include": {
+    "history": true
+  },
   "trading_bot": { /* trading bot JSON */ }
 }
 ```
