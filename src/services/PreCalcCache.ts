@@ -6,6 +6,7 @@ import { Interpreter } from "./Interpreter"
 import { Rebalancer } from "./Rebalancer"
 import type { AllocationResult } from "./Backtester"
 import { standardDeviationOfReturn } from "../preCalcs/standardDeviationOfReturn"
+import { movingAverageOfReturn } from "../preCalcs/movingAverageOfReturn"
 
 export type DailyReturn = {
   date: string,
@@ -106,6 +107,8 @@ export class PreCalcCache {
     switch(fn) {
       case 'precalc-standard-deviation-return':
         return standardDeviationOfReturn
+      case 'precalc-moving-average-return':
+        return movingAverageOfReturn
       default:
         throw new Error(`Unknown preCalc function: ${fn}`)
     }
