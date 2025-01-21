@@ -104,11 +104,27 @@ The ExxaHub Backtest API provides an API endpoint to convert Composer Symphonies
 
 The following Symphony node types are supported:
 - Asset
-- Group (Equal and Specified)
+- Group
 - Weight
+  - Equal
+  - Specified
+  - Inverse Volatility
 - If/Else
-
-⚠️ Note: The Filter node type is not supported by ExxaHub at this time because some of the functions that Composer allows you to sort on are not normalized, so it would be impossible to build an apples-to-apples comparison when sorting on certain sub-symphonies.
+  - Cumulative Returne
+  - Current Price
+  - Exponential Moving Average of Price
+  - Max Drawdown
+  - Moving Average of Price
+  - Moving Average of Return
+  - Relative Strength Index
+  - Standard Deviation of Price
+  - Standard Deviation of Return
+- Filter
+  - Cumulative Return
+  - Max Drawdown
+  - Moving Average of Return
+  - Relative Strength Index
+  - Standard Deviation of Return
 
 ## Market Data Providers
 
