@@ -21,5 +21,4 @@ export const standardDeviationOfReturn = (returns: DailyReturn[], params: { wind
         indicator[returns[j].date] = standardDeviation;
     }
     return indicator;
-
 }

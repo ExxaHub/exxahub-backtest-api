@@ -1,0 +1,164 @@
+{
+    "description": "",
+    "name": "std dev sort test",
+    "id": "zDT9Z0JHIQC4lRPesIuH",
+    "node_type": "root",
+    "rebalance": "daily",
+    "version": "v1",
+    "children": [
+      {
+        "id": "node_01jj4vkferpgygd9c2wgxy5cky",
+        "node_type": "wt-cash-equal",
+        "children": [
+          {
+            "id": "node_01jj4vkfery26yffqx297k8dqb",
+            "node_type": "filter",
+            "sort": {
+              "fn": "moving-average-return",
+              "params": {
+                "window": 20
+              }
+            },
+            "select": {
+              "fn": "top",
+              "num": 2
+            },
+            "children": [
+              {
+                "id": "node_01jj4vkfer0n87xhwpn324b35k",
+                "node_type": "wt-cash-equal",
+                "children": [
+                  {
+                    "id": "node_01jj4vkfet09r4tmy2zdy38esx",
+                    "node_type": "if-then-else",
+                    "condition_type": "allOf",
+                    "conditions": [
+                      {
+                        "id": "node_01jj4vkfes120dv33dy54673as",
+                        "node_type": "condition",
+                        "lhs_fn": "moving-average-return",
+                        "lhs_fn_params": {
+                          "window": 5
+                        },
+                        "lhs_val": "QQQ",
+                        "comparator": "gt",
+                        "rhs_fn": "moving-average-return",
+                        "rhs_fn_params": {
+                          "window": 20
+                        },
+                        "rhs_val": "QQQ"
+                      }
+                    ],
+                    "then_children": [
+                      {
+                        "ticker": "QQQ",
+                        "name": "QQQ",
+                        "id": "node_01jj4vkfes5y929jxhw6d2vx25",
+                        "node_type": "asset"
+                      }
+                    ],
+                    "else_children": [
+                      {
+                        "ticker": "BIL",
+                        "name": "BIL",
+                        "id": "node_01jj4vkfethmt6nb066xzmsrth",
+                        "node_type": "asset"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "node_01jj4vkfetjwg1y88pd20kpdrt",
+                "node_type": "wt-cash-equal",
+                "children": [
+                  {
+                    "id": "node_01jj4vkfete34vasbssw7yfh8w",
+                    "node_type": "if-then-else",
+                    "condition_type": "allOf",
+                    "conditions": [
+                      {
+                        "id": "node_01jj4vkfetcq7t7ztb8ejmpv88",
+                        "node_type": "condition",
+                        "lhs_fn": "moving-average-return",
+                        "lhs_fn_params": {
+                          "window": 5
+                        },
+                        "lhs_val": "SPY",
+                        "comparator": "gt",
+                        "rhs_fn": "moving-average-return",
+                        "rhs_fn_params": {
+                          "window": 20
+                        },
+                        "rhs_val": "SPY"
+                      }
+                    ],
+                    "then_children": [
+                      {
+                        "ticker": "SPY",
+                        "name": "SPY",
+                        "id": "node_01jj4vkfetremnak942hjfb2yg",
+                        "node_type": "asset"
+                      }
+                    ],
+                    "else_children": [
+                      {
+                        "ticker": "BIL",
+                        "name": "BIL",
+                        "id": "node_01jj4vkfetvm4ntkws037v4bh1",
+                        "node_type": "asset"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "node_01jj4vkfetp9b3waswmnym6rkh",
+                "node_type": "wt-cash-equal",
+                "children": [
+                  {
+                    "id": "node_01jj4vkfevbax1zd1bckpyagc9",
+                    "node_type": "if-then-else",
+                    "condition_type": "allOf",
+                    "conditions": [
+                      {
+                        "id": "node_01jj4vkfet7g79scvpayhz8rcr",
+                        "node_type": "condition",
+                        "lhs_fn": "moving-average-return",
+                        "lhs_fn_params": {
+                          "window": 5
+                        },
+                        "lhs_val": "DIA",
+                        "comparator": "gt",
+                        "rhs_fn": "moving-average-return",
+                        "rhs_fn_params": {
+                          "window": 20
+                        },
+                        "rhs_val": "DIA"
+                      }
+                    ],
+                    "then_children": [
+                      {
+                        "ticker": "DIA",
+                        "name": "DIA",
+                        "id": "node_01jj4vkfetfxw7bb1knkg96a6d",
+                        "node_type": "asset"
+                      }
+                    ],
+                    "else_children": [
+                      {
+                        "ticker": "BIL",
+                        "name": "BIL",
+                        "id": "node_01jj4vkfev4hp5jvpsxsnb3a2p",
+                        "node_type": "asset"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

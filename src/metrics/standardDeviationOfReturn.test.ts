@@ -5,7 +5,7 @@ describe("standardDeviationOfReturn", () => {
     it("should calculate annualized volatility for daily returns", () => {
         const returns = [0.01, -0.005, 0.02, -0.01, 0.015];
         const result = standardDeviationOfReturn(returns);
-        expect(result).toBeCloseTo(0.1867, 2); // Approximately 18.67%
+        expect(result).toBeCloseTo(0.1867, ); // Approximately 18.67%
     });
 
     it("should throw an error for an empty returns array", () => {

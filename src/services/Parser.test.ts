@@ -11,6 +11,7 @@ import relativeStrengthIndexJson from '../testData/tradingBots/relativeStrengthI
 import standardDeviationOfPriceJson from '../testData/tradingBots/standardDeviationOfPrice.json'
 import standardDeviationOfReturnJson from '../testData/tradingBots/standardDeviationOfReturn.json'
 import weightInversVolatilityJson from '../testData/tradingBots/weightInverseVolatility.json'
+import filterAssets from '../testData/tradingBots/filterAssets.json'
 
 describe("Parser", () => {
   it("Parses cumulativeReturn RSI indicators correctly", () => {
@@ -298,6 +299,61 @@ describe("Parser", () => {
         },
         params: {
           window: 10,
+        },
+      }
+    ]);
+  });
+
+  it("Parses filter preCalcs correctly", () => {
+    const algorithm: TradingBotNode = filterAssets as unknown as TradingBotNode;
+    const parser = new Parser
+    const { assets, preCalcs } = parser.parse(algorithm)
+
+    expect(assets).toEqual(['QQQ', 'SPY', 'DIA', 'IWM']);
+    expect(preCalcs).toEqual([
+      {
+        node: {
+          ticker: "QQQ",
+          name: "QQQ",
+          id: "node_01jj4s4e6snw0sjse8qf10mxhg",
+          node_type: TradingBotNodeType.asset,
+        },
+        fn: "precalc-standard-deviation-return",
+        params: {
+          window: 20,
+        },
+      }, {
+        node: {
+          ticker: "SPY",
+          name: "SPY",
+          id: "node_01jj4s4e6t8xg96jxctq21b6z3",
+          node_type: TradingBotNodeType.asset,
+        },
+        fn: "precalc-standard-deviation-return",
+        params: {
+          window: 20,
+        },
+      }, {
+        node: {
+          ticker: "DIA",
+          name: "DIA",
+          id: "node_01jj4s4e6tj7ez3fcdt937hy1p",
+          node_type: TradingBotNodeType.asset,
+        },
+        fn: "precalc-standard-deviation-return",
+        params: {
+          window: 20,
+        },
+      }, {
+        node: {
+          ticker: "IWM",
+          name: "IWM",
+          id: "node_01jj4s4e6tj7ez37hy1pfcdt93",
+          node_type: TradingBotNodeType.asset,
+        },
+        fn: "precalc-standard-deviation-return",
+        params: {
+          window: 20,
         },
       }
     ]);

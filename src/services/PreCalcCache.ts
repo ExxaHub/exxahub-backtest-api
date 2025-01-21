@@ -6,6 +6,10 @@ import { Interpreter } from "./Interpreter"
 import { Rebalancer } from "./Rebalancer"
 import type { AllocationResult } from "./Backtester"
 import { standardDeviationOfReturn } from "../preCalcs/standardDeviationOfReturn"
+import { movingAverageOfReturn } from "../preCalcs/movingAverageOfReturn"
+import { cumulativeReturn } from "../preCalcs/cumulativeReturn"
+import { maxDrawdown } from "../preCalcs/maxDrawdown"
+import { relativeStrengthIndex } from "../preCalcs/relativeStrengthIndex"
 
 export type DailyReturn = {
   date: string,
@@ -106,6 +110,14 @@ export class PreCalcCache {
     switch(fn) {
       case 'precalc-standard-deviation-return':
         return standardDeviationOfReturn
+      case 'precalc-moving-average-return':
+        return movingAverageOfReturn
+      case 'precalc-cumulative-return':
+        return cumulativeReturn
+      case 'precalc-max-drawdown':
+        return maxDrawdown
+      case 'precalc-relative-strength-index':
+        return relativeStrengthIndex
       default:
         throw new Error(`Unknown preCalc function: ${fn}`)
     }

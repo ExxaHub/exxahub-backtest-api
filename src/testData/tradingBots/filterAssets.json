@@ -1,0 +1,56 @@
+{
+    "description": "",
+    "name": "New Symphony",
+    "id": "new",
+    "node_type": "root",
+    "rebalance": "daily",
+    "version": "v1",
+    "children": [
+        {
+            "id": "node_01jj4s4e6r7j8tdr8cqgpbtc2n",
+            "node_type": "wt-cash-equal",
+            "children": [
+                {
+                    "id": "node_01jj4s4e6rcbd6g41xgrgb717g",
+                    "node_type": "filter",
+                    "sort": {
+                        "fn": "standard-deviation-return",
+                        "params": {
+                            "window": 20
+                        }
+                    },
+                    "select": {
+                        "fn": "top",
+                        "num": 3
+                    },
+                    "children": [
+                        {
+                            "ticker": "QQQ",
+                            "name": "QQQ",
+                            "id": "node_01jj4s4e6snw0sjse8qf10mxhg",
+                            "node_type": "asset"
+                        },
+                        {
+                            "ticker": "SPY",
+                            "name": "SPY",
+                            "id": "node_01jj4s4e6t8xg96jxctq21b6z3",
+                            "node_type": "asset"
+                        },
+                        {
+                            "ticker": "DIA",
+                            "name": "DIA",
+                            "id": "node_01jj4s4e6tj7ez3fcdt937hy1p",
+                            "node_type": "asset"
+                        },
+                        {
+                            "ticker": "IWM",
+                            "name": "IWM",
+                            "id": "node_01jj4s4e6tj7ez37hy1pfcdt93",
+                            "node_type": "asset"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

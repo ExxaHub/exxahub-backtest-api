@@ -8,7 +8,8 @@ import {
   TradingBotNodeIfThenElseConditionType,
   type TradingBotNodeCondition,
   type TradingBotNodeWeightInverseVolatility,
-  type TradingBotNodeAsset
+  type TradingBotNodeAsset,
+  type TradingBotNodeFilter
 } from "../types/types";
 import type { PreCalcCache } from "./PreCalcCache";
 
@@ -68,20 +69,11 @@ export class Interpreter {
       }
 
       case TradingBotNodeType.weight_inverse_volatility: {
-        // We can't divide by stdDev if stdDev is zero, so we'll use a small number instead
-        const minStdDev = 0.00001
-        const inverseVolatilities = node.children!.map(child => {
-          const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
-          return 1 / (stdDev === 0 ? minStdDev : stdDev);
-        })
-        const totalInverseVolatility = inverseVolatilities.reduce((acc, val) => acc + val, 0)
+        return this.evaluateInverseVolatility(node)
+      }
 
-        return node.children!.flatMap((child) => {
-          const stdDev = this.preCalcCache.getPreCalcForNodeId(child.id).get(this.date)!;
-          const inverseVolatility = 1 / (stdDev === 0 ? minStdDev : stdDev);
-          const weight = (inverseVolatility / totalInverseVolatility) * 100
-          return this.evaluateNode(child, WeightType.Specified, weight)
-        })
+      case TradingBotNodeType.filter: {
+        return this.evaluateFilter(node, parentWeight)
       }
   
       case TradingBotNodeType.group: {
@@ -149,6 +141,40 @@ export class Interpreter {
   
     return this.compare(lhsValue, rhsValue, comparator);
   }
+
+  private evaluateInverseVolatility(node: TradingBotNodeWeightInverseVolatility): unknown[] {
+    // We can't divide by stdDev if stdDev is zero, so we'll use a small number instead
+    const minStdDev = 0.00001
+    const inverseVolatilities = node.children!.map(child => {
+      const stdDev = this.getPreCalcValue(child.id);
+      return 1 / (stdDev === 0 ? minStdDev : stdDev);
+    })
+    const totalInverseVolatility = inverseVolatilities.reduce((acc, val) => acc + val, 0)
+
+    return node.children!.flatMap((child) => {
+      const stdDev = this.getPreCalcValue(child.id);
+      const inverseVolatility = 1 / (stdDev === 0 ? minStdDev : stdDev);
+      const weight = (inverseVolatility / totalInverseVolatility) * 100
+      return this.evaluateNode(child, WeightType.Specified, weight)
+    })
+  }
+
+  private evaluateFilter(node: TradingBotNodeFilter, parentWeight: number = 100): unknown[] {
+    const preCalcValues = node.children!.map(child => [child.id, this.getPreCalcValue(child.id)] as [string, number]);
+    const sortedValues = preCalcValues.sort(([, a], [, b]) => a - b);
+    const sortedNodeIds = sortedValues.map(([id]) => id);
+
+    let filteredIds: string[] = []
+    if (node.select.fn === 'top') { 
+      filteredIds = sortedNodeIds.slice(0, node.select.num)
+    } else {
+      filteredIds = sortedNodeIds.slice(-node.select.num)
+    }
+
+    const equalWeight = parentWeight / filteredIds.length;
+
+    return node.children!.filter(child => filteredIds.includes(child.id)).flatMap(child => this.evaluateNode(child, WeightType.Equal, equalWeight))
+  }
   
   private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
     const cacheKey = `${ticker}-${fn}-${JSON.stringify(params)}-${this.date}`
@@ -158,6 +184,10 @@ export class Interpreter {
     const value = this.indicatorCache.getIndicatorValue(ticker, fn, params, this.date)
     this.indicatorValueCache.set(cacheKey, value)
     return value
+  }
+
+  private getPreCalcValue(nodeId: string): number {
+    return this.preCalcCache.getPreCalcForNodeId(nodeId).get(this.date)!
   }
   
   private compare(lhs: number, rhs: number, comparator: string): boolean {
