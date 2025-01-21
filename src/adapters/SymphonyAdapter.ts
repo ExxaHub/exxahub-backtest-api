@@ -56,6 +56,24 @@ export class SymphonyAdapter {
                 children: node.children!.flatMap((child) => this.parseNode(child))
             }
           }
+
+          case 'filter': {  
+            return {
+              id: this.getId(),
+              node_type: TradingBotNodeType.filter,
+              sort: {
+                fn: node['sort-by-fn']!,
+                params: {
+                    window: node['sort-by-fn-params']!['window']
+                }
+              },
+              select: {
+                  fn: node['select-fn']!,
+                  num: parseInt(node['select-n']!),
+              },
+              children: node.children!.flatMap((child) => this.parseNode(child))
+          }
+          }
       
           case 'group': {
             return {

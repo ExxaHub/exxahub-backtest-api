@@ -21,6 +21,10 @@ export interface SymphonyNode {
     collapsed?: boolean;
     rebalance?: string;
     description?: string;
+    'select-fn'?: string;
+    'select-n'?: string;
+    'sort-by-fn'?: string;
+    'sort-by-fn-params'?: Record<string, any>;
 }
 
 export interface Symphony {
@@ -40,6 +44,7 @@ export enum TradingBotNodeType {
     weight_cash_equal = 'wt-cash-equal',
     weight_cash_specified = 'wt-cash-specified',
     weight_inverse_volatility = 'wt-inverse-volatility',
+    filter = 'filter',
     if_then_else = 'if-then-else',
     condition = 'condition',
     asset = 'asset'
@@ -99,6 +104,22 @@ export type TradingBotNodeWeightInverseVolatility = {
     children: TradingBotNode[]
 }
 
+export type TradingBotNodeFilter = {
+    id: string,
+    node_type: TradingBotNodeType.filter,
+    sort: {
+        fn: string,
+        params: {
+            window: number
+        }
+    },
+    select: {
+        fn: string,
+        num: number,
+    },
+    children: TradingBotNode[]
+}
+
 export enum TradingBotNodeIfThenElseConditionType {
     AllOf = 'allOf',
     AnyOf = 'anyOf',
@@ -150,6 +171,7 @@ export type TradingBotNode =
     | TradingBotNodeWeightCashEqual 
     | TradingBotNodeWeightCashSpecified
     | TradingBotNodeWeightInverseVolatility
+    | TradingBotNodeFilter
     | TradingBotNodeIfThenElse
     | TradingBotNodeCondition
     | TradingBotNodeAsset 
