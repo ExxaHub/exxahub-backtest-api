@@ -72,7 +72,7 @@ export class SymphonyAdapter {
                   num: parseInt(node['select-n']!),
               },
               children: node.children!.flatMap((child) => this.parseNode(child))
-          }
+            }
           }
       
           case 'group': {

@@ -60,6 +60,19 @@ export class Parser {
         node.children!.forEach(childNode => this.parseNode(childNode));
         break
       }
+
+      case TradingBotNodeType.filter: {
+        node.children!.forEach(childNode => this.preCalcs.set(childNode.id, {
+          node: childNode,
+          fn: `precalc-${node.sort.fn}`,
+          params: {
+            window: node.sort.params.window
+          }
+        }))
+        this.largestPreCalcWindow = Math.max(this.largestPreCalcWindow, node.sort.params.window)
+        node.children!.forEach(childNode => this.parseNode(childNode));
+        break
+      }
   
       case TradingBotNodeType.if_then_else: {
         this.evaluateConditions(node)

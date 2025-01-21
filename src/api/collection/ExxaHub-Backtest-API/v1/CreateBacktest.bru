@@ -27,122 +27,39 @@ body:json {
     "version": "v1",
     "children": [
       {
-        "id": "node_01jj0bwhh586ckbwqryjpvhh6y",
-        "node_type": "wt-inverse-volatility",
-        "params": {
-          "window": 10
-        },
+        "id": "node_01jj4s4e6r7j8tdr8cqgpbtc2n",
+        "node_type": "wt-cash-equal",
         "children": [
           {
-            "id": "node_01jj0bwhh8qjejvqp917n8cxjg",
-            "node_type": "if-then-else",
-            "condition_type": "allOf",
-            "conditions": [
-              {
-                "id": "node_01jj0bwhh77fqjmx35aafcd9fd",
-                "node_type": "condition",
-                "lhs_fn": "relative-strength-index",
-                "lhs_fn_params": {
-                  "window": 10
-                },
-                "lhs_val": "QQQ",
-                "comparator": "gt",
-                "rhs_fn": "relative-strength-index",
-                "rhs_fn_params": {
-                  "window": 10
-                },
-                "rhs_val": "HYD"
+            "id": "node_01jj4s4e6rcbd6g41xgrgb717g",
+            "node_type": "filter",
+            "sort": {
+              "fn": "standard-deviation-return",
+              "params": {
+                "window": 20
               }
-            ],
-            "then_children": [
+            },
+            "select": {
+              "fn": "top",
+              "num": 2
+            },
+            "children": [
               {
                 "ticker": "QQQ",
                 "name": "QQQ",
-                "id": "node_01jj0bwhh7rzfgnv99dqdxj3fx",
+                "id": "node_01jj4s4e6snw0sjse8qf10mxhg",
                 "node_type": "asset"
-              }
-            ],
-            "else_children": [
+              },
               {
-                "ticker": "BIL",
-                "name": "BIL",
-                "id": "node_01jj0bwhh8jq0y0vgdzephgt20",
+                "ticker": "SPY",
+                "name": "SPY",
+                "id": "node_01jj4s4e6t8xg96jxctq21b6z3",
                 "node_type": "asset"
-              }
-            ]
-          },
-          {
-            "id": "node_01jj0bwhh9yevtcx67ttpqbrmk",
-            "node_type": "if-then-else",
-            "condition_type": "allOf",
-            "conditions": [
+              },
               {
-                "id": "node_01jj0bwhh8s0jt5at031m7c89v",
-                "node_type": "condition",
-                "lhs_fn": "relative-strength-index",
-                "lhs_fn_params": {
-                  "window": 10
-                },
-                "lhs_val": "QLD",
-                "comparator": "gt",
-                "rhs_fn": "relative-strength-index",
-                "rhs_fn_params": {
-                  "window": 10
-                },
-                "rhs_val": "HYD"
-              }
-            ],
-            "then_children": [
-              {
-                "ticker": "QLD",
-                "name": "QLD",
-                "id": "node_01jj0bwhh86wertndj4qf6r981",
-                "node_type": "asset"
-              }
-            ],
-            "else_children": [
-              {
-                "ticker": "BIL",
-                "name": "BIL",
-                "id": "node_01jj0bwhh9hha6shx7b7ntbg2a",
-                "node_type": "asset"
-              }
-            ]
-          },
-          {
-            "id": "node_01jj0bwhh99fww6vzhfzr7m925",
-            "node_type": "if-then-else",
-            "condition_type": "allOf",
-            "conditions": [
-              {
-                "id": "node_01jj0bwhh9kc06jwzq1xr5cfw0",
-                "node_type": "condition",
-                "lhs_fn": "relative-strength-index",
-                "lhs_fn_params": {
-                  "window": 10
-                },
-                "lhs_val": "TQQQ",
-                "comparator": "gt",
-                "rhs_fn": "relative-strength-index",
-                "rhs_fn_params": {
-                  "window": 10
-                },
-                "rhs_val": "HYD"
-              }
-            ],
-            "then_children": [
-              {
-                "ticker": "TQQQ",
-                "name": "TQQQ",
-                "id": "node_01jj0bwhh9b55dgavfsnaec5qt",
-                "node_type": "asset"
-              }
-            ],
-            "else_children": [
-              {
-                "ticker": "BIL",
-                "name": "BIL",
-                "id": "node_01jj0bwhh9tmy12kvwyn5ct4qh",
+                "ticker": "DIA",
+                "name": "DIA",
+                "id": "node_01jj4s4e6tj7ez3fcdt937hy1p",
                 "node_type": "asset"
               }
             ]
