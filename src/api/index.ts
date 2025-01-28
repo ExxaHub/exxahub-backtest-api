@@ -12,7 +12,7 @@ workerPool.init()
 const app = express()
 const port = process.env.PORT || 3000
 
-app.use(express.json());
+app.use(express.json({limit: '1mb'}));
 
 app.get('/api/v1/health', handleRequest(HealthController, 'show'))
 
