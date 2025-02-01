@@ -13,7 +13,8 @@
     "dev": "bun --watch run ./src/api/index.ts",
     "generate:dbcreds": "bun run ./src/commands/generate-db-password",
     "migrate:make": "bun run ./src/commands/migrate-make",
-    "migrate:latest": "bun run ./src/commands/migrate-latest"
+    "migrate:latest": "bun run ./src/commands/migrate-latest",
+    "tickers:backfill": "bun run ./src/commands/backfill-tickers"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -28,6 +29,7 @@
     "dayjs": "^1.11.13",
     "express": "^4.21.2",
     "knex": "^3.1.0",
+    "node-stream-zip": "^1.15.0",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
     "sqlite3": "^5.1.7",

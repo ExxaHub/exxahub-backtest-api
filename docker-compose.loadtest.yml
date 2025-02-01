@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  loadtester:
+  exxahub_loadtester:
     build: loadtest/
-    container_name: loadtester
+    container_name: exxahub_loadtester
     networks:
-      - exxa_network
+      - exxahub_network
     volumes:
       - ./loadtest/test.js:/app/test.js
     working_dir: /app

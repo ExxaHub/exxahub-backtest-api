@@ -1,40 +1,40 @@
 version: '3.8'
 
 services:
-  backtester:
+  exxahub_backtest_api:
     build: .
-    container_name: backtester
+    container_name: exxahub_backtest_api
     ports:
       - "3000:3000"
     networks:
-      - exxa_network
+      - exxahub_network
     env_file:
       - .env
     volumes:
       - .:/usr/src/app
     command: ["bun", "--watch", "run", "./src/api/index.ts"]
 
-  migrations:
+  exxahub_backtest_migrations:
     build: .
-    container_name: migrations
+    container_name: exxahub_backtest_migrations
     depends_on:
-      database:
+      exxahub_backtest_db:
         condition: service_healthy
     networks:
-      - exxa_network
+      - exxahub_network
     env_file:
       - .env
     volumes:
       - .:/usr/src/app
     command: ["bun", "run", "migrate:latest"]
 
-  database:
+  exxahub_backtest_db:
     image: 'postgres:16.4-alpine3.20'
-    container_name: backtester_db
+    container_name: exxahub_backtest_db
     ports:
-      - 5432:5432
+      - "5433:5432"
     networks:
-      - exxa_network
+      - exxahub_network
     environment:
         PGPASSWORD: '${DB_PASS}'
         POSTGRES_DB: '${DB_NAME}'
@@ -51,8 +51,8 @@ services:
         retries: 10
 
 networks:
-  exxa_network:
-    name: exxa
+  exxahub_network:
+    external: true
 
 volumes:
   db:

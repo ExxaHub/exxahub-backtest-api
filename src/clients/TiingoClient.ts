@@ -45,6 +45,15 @@ export type TiingoLastPriceResponse = Array<{
     askPrice: number,
 }>
 
+export type TiingoMetaDataResponse = {
+    ticker: string,
+    name: string
+    exchangeCode: string
+    startDate: string
+    endDate: string
+    description: string
+}
+
 type ErrorResponse = {
     detail: string
 }
@@ -132,6 +141,14 @@ export class TiingoClient implements ClientInterface {
         return {
             [resp[0].timestamp.split('T')[0]]: resp[0].last
         }
+    }
+
+    async getTickerMetadata(ticker: string): Promise<TiingoMetaDataResponse> {
+        const params = {}
+
+        const resp = await this.get<TiingoMetaDataResponse>(`/daily/${ticker}`, params)
+        
+        return resp
     }
 
     private normalizeTiingoBars(bars: {[key: string]: TiingoOHLCBar[]}): {[key: string]: OHLCBar[]} {
