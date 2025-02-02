@@ -14,8 +14,8 @@ export type BacktestMetrics = {
     max_drawdown: number,
     calmer: number,
     sharpe: number,
-    tailing_1_month: number,
-    tailing_3_month: number,
+    trailing_1_month: number,
+    trailing_3_month: number,
 }
 
 export class BacktestMetricsService {
@@ -41,8 +41,8 @@ export class BacktestMetricsService {
             max_drawdown: maximumDrawdown(balanceHistory) * 100,
             calmer: calmerMetric * 100,
             sharpe: sharpeMetric,
-            tailing_1_month: trailingPercentChange(history, 1, 'month'),
-            tailing_3_month: trailingPercentChange(history, 3, 'month'),
+            trailing_1_month: trailingPercentChange(history, 1, 'month'),
+            trailing_3_month: trailingPercentChange(history, 3, 'month'),
         }
     }
 
