@@ -10,3 +10,5 @@ const res = await db.migrate.latest({
 })
 
 console.log('Finished running migrations:', res)
+
+process.exit(0);

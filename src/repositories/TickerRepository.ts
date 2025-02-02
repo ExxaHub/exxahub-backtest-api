@@ -17,6 +17,6 @@ export class TickerRepository {
     }
 
     async getAll(): Promise<Ticker[]> {
-        return db<Ticker>(table).select(['ticker', 'name'])
+        return db<Ticker>(table).select(['ticker', 'name', 'asset_type'])
     }
 }

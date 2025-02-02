@@ -69,6 +69,32 @@ export class OhlcBarRepository {
         }
     }
 
+    async bulkInsert(ticker: string, bars: OHLCBar[]): Promise<boolean> {
+        try { 
+            const barsToSave = bars.map(bar => {
+                return {
+                    symbol: ticker, 
+                    date: bar.date, 
+                    ts: dayjs(bar.date).startOf('day').unix(),  
+                    open: bar.open, 
+                    high: bar.high, 
+                    low: bar.low, 
+                    close: bar.close, 
+                    volume: bar.volume
+                }
+            })
+
+            console.log('bulk inserting', barsToSave.length, 'bars')
+            
+            await db.batchInsert(table, barsToSave, 1000)
+
+            return true
+        } catch (error) {
+            console.error('Error saving bars:', error)
+            return false
+        }
+    }
+
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
         try {
             const results = await db(table)
