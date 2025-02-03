@@ -35,6 +35,13 @@ export class OhlcBarRepository {
                 .offset(offset)
                 .limit(1)
 
+            console.log('date offset', {
+                symbol,
+                date,
+                offset,
+                result: result[0].date
+            })
+
             return result[0].date
         } catch (error) {
             console.error('Error getting date offset:', error)
@@ -61,6 +68,32 @@ export class OhlcBarRepository {
                 .insert(barsToSave)
                 .onConflict(['symbol', 'ts'])
                 .merge()
+
+            return true
+        } catch (error) {
+            console.error('Error saving bars:', error)
+            return false
+        }
+    }
+
+    async bulkInsert(ticker: string, bars: OHLCBar[]): Promise<boolean> {
+        try { 
+            const barsToSave = bars.map(bar => {
+                return {
+                    symbol: ticker, 
+                    date: bar.date, 
+                    ts: dayjs(bar.date).startOf('day').unix(),  
+                    open: bar.open, 
+                    high: bar.high, 
+                    low: bar.low, 
+                    close: bar.close, 
+                    volume: bar.volume
+                }
+            })
+
+            console.log('bulk inserting', barsToSave.length, 'bars')
+            
+            await db.batchInsert(table, barsToSave, 1000)
 
             return true
         } catch (error) {

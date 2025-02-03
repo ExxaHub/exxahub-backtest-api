@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, jest } from "bun:test";
+import { describe, it, expect, mock } from "bun:test";
 import { AlpacaStockClient } from "../clients/AlpacaClient";
 import { OhlcCache } from "./OhlcCache";
 import type { OHLCBar } from "../types/types";

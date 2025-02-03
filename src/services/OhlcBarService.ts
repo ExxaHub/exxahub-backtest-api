@@ -31,6 +31,10 @@ export class OhlcBarService {
         await this.ohlcBarSummaryRepository.refreshMaterializedView()
     }
 
+    async bulkInsert(ticker: string, bars: OHLCBar[]): Promise<boolean> {
+        return await this.ohlcBarRepository.bulkInsert(ticker, bars)
+    }
+
     async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
         return this.ohlcBarRepository.getBarsForDateRange(tickers, fromDate, toDate)
     }

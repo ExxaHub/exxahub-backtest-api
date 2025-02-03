@@ -8,3 +8,5 @@ const res = await db.migrate.make(name, {
 })
 
 console.log('New migration created:', res)
+
+process.exit(0);

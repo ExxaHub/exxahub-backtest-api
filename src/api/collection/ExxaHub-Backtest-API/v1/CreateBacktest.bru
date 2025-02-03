@@ -12,61 +12,92 @@ post {
 
 body:json {
   {
-    "starting_balance": 100000,
-    "start_date": "2011-01-04",
-    "end_date": "2026-01-02",
-    "include": {
-      "history": true
-    },
-    "trading_bot": {
-    "description": "",
-    "name": "New Symphony",
-    "id": "new",
-    "node_type": "root",
-    "rebalance": "daily",
-    "version": "v1",
-    "children": [
-      {
-        "id": "node_01jj4s4e6r7j8tdr8cqgpbtc2n",
-        "node_type": "wt-cash-equal",
-        "children": [
-          {
-            "id": "node_01jj4s4e6rcbd6g41xgrgb717g",
-            "node_type": "filter",
-            "sort": {
-              "fn": "standard-deviation-return",
-              "params": {
-                "window": 20
+      "start_date": "2002-02-02",
+      "end_date": "2025-02-02",
+      "starting_balance": 10000,
+      "include": {
+          "history": false
+      },
+      "trading_bot": {
+          "description": "",
+          "name": "10d HYD > 10d IYZ",
+          "id": "new",
+          "node_type": "root",
+          "rebalance": "daily",
+          "version": "v1",
+          "weight": {
+              "num": 100,
+              "den": 100
+          },
+          "is_collapsed": false,
+          "children": [
+              {
+                  "id": "node_01jk3q65fp142yp7072kvcrprv",
+                  "node_type": "wt-cash-equal",
+                  "is_collapsed": false,
+                  "weight": {
+                      "num": 0,
+                      "den": 100
+                  },
+                  "children": [
+                      {
+                          "id": "node_01jk3q8gprwg4fyrra887x2pay",
+                          "node_type": "if-then-else",
+                          "weight": {
+                              "num": 0,
+                              "den": 100
+                          },
+                          "is_conditions_collapsed": false,
+                          "is_then_collapsed": false,
+                          "is_else_collapsed": false,
+                          "condition_type": "allOf",
+                          "conditions": [
+                              {
+                                  "id": "node_01jk3q8j35ccwj0cysy5tgktc6",
+                                  "node_type": "condition",
+                                  "lhs_fn": "relative-strength-index",
+                                  "lhs_fn_params": {
+                                      "window": 10
+                                  },
+                                  "lhs_val": "HYD",
+                                  "rhs_fn": "relative-strength-index",
+                                  "rhs_fn_params": {
+                                      "window": 10
+                                  },
+                                  "rhs_val": "IYZ",
+                                  "comparator": "gt"
+                              }
+                          ],
+                          "then_children": [
+                              {
+                                  "id": "node_01jk3qc0fp6sqvc6aqwzc8g2by",
+                                  "node_type": "asset",
+                                  "weight": {
+                                      "num": 0,
+                                      "den": 100
+                                  },
+                                  "ticker": "TQQQ",
+                                  "name": "PROSHARES ULTRAPRO QQQ ",
+                                  "is_collapsed": false
+                              }
+                          ],
+                          "else_children": [
+                              {
+                                  "id": "node_01jk3qc4wv3by1qc9gj2wj9jr6",
+                                  "node_type": "asset",
+                                  "weight": {
+                                      "num": 0,
+                                      "den": 100
+                                  },
+                                  "ticker": "PSQ",
+                                  "name": "ProShares Short QQQ -1x Shares",
+                                  "is_collapsed": false
+                              }
+                          ]
+                      }
+                  ]
               }
-            },
-            "select": {
-              "fn": "top",
-              "num": 2
-            },
-            "children": [
-              {
-                "ticker": "QQQ",
-                "name": "QQQ",
-                "id": "node_01jj4s4e6snw0sjse8qf10mxhg",
-                "node_type": "asset"
-              },
-              {
-                "ticker": "SPY",
-                "name": "SPY",
-                "id": "node_01jj4s4e6t8xg96jxctq21b6z3",
-                "node_type": "asset"
-              },
-              {
-                "ticker": "DIA",
-                "name": "DIA",
-                "id": "node_01jj4s4e6tj7ez3fcdt937hy1p",
-                "node_type": "asset"
-              }
-            ]
-          }
-        ]
+          ]
       }
-    ]
-  }
   }
 }

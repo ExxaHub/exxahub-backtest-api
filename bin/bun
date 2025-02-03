@@ -1,0 +1,8 @@
+#!/bin/bash
+
+PROJECT_NAME=exxahub
+
+docker-compose \
+		-f docker-compose.yml \
+		-p ${PROJECT_NAME} \
+		run --rm exxahub_backtest_api bun run ${@:1}

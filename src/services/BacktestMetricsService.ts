@@ -14,8 +14,8 @@ export type BacktestMetrics = {
     max_drawdown: number,
     calmer: number,
     sharpe: number,
-    tailing_1_month: number,
-    tailing_3_month: number,
+    trailing_1_month: number | null,
+    trailing_3_month: number | null,
 }
 
 export class BacktestMetricsService {
@@ -34,6 +34,16 @@ export class BacktestMetricsService {
         const calmerMetric = calmerRatio(annualizedReturnMetric, standardDeviationMetric);
         const sharpeMetric = sharpeRatio(dailyReturns);
 
+        let trailing1Month = null
+        try {
+            trailing1Month = trailingPercentChange(history, 1, 'month')
+        } catch (e) {}
+
+        let trailing3Month = null
+        try {
+            trailing3Month = trailingPercentChange(history, 3, 'month')
+        } catch (e) {}
+
         return {
             cumulative_return: cumulativeReturnMetric * 100,
             annualized_return: annualizedReturnMetric * 100,
@@ -41,8 +51,8 @@ export class BacktestMetricsService {
             max_drawdown: maximumDrawdown(balanceHistory) * 100,
             calmer: calmerMetric * 100,
             sharpe: sharpeMetric,
-            tailing_1_month: trailingPercentChange(history, 1, 'month'),
-            tailing_3_month: trailingPercentChange(history, 3, 'month'),
+            trailing_1_month: trailing1Month,
+            trailing_3_month: trailing3Month,
         }
     }
 

@@ -38,34 +38,10 @@ export class IndicatorCache {
     })
 
     await Promise.all(loadPromises)
-
-    this.loaded = true
-  }
-
-  isLoaded(): boolean {
-    return this.loaded
   }
 
   getLargestWindow(): number {
     return this.largestWindow
-  }
-
-  async recalculateForDateRange(fromDate: Dayjs, toDate: Dayjs): Promise<void> {
-    const recalculatePromises = this.indicators.map(async (indicator) => {
-      const indicatorFn = this.getIndicatorFunction(indicator.fn)
-
-      if (indicator.params.window) {
-        // TODO: Figure out better way to account for weekends other than multiplying by 2
-        fromDate = toDate.clone().subtract(indicator.params.window * 2, 'days')
-      }
-
-      const tickerBars = this.ohlcCache.getBars(indicator.ticker, fromDate, toDate)
-      const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
-      const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
-      this.cachedIndicators.set(key, new Map(Object.entries(calculatedIndicator)))
-    })
-
-    await Promise.all(recalculatePromises)
   }
 
   getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {

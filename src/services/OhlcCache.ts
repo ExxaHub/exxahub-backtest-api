@@ -24,6 +24,7 @@ export class OhlcCache {
     const dateOffsetsFullWindow = await Promise.all(this.tickers.map(
       ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestIndicatorWindow + this.largestPreCalcWindow))
     )
+
     const ohlcBarsFromFullWindowDate = dateOffsetsFullWindow.reduce((max, current) =>
       dayjs(current).isAfter(dayjs(max)) ? current : max
     );
@@ -31,6 +32,7 @@ export class OhlcCache {
     const dateOffsetsPreCalcWindow = await Promise.all(this.tickers.map(
       ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestPreCalcWindow))
     )
+
     const ohlcBarsFromPreCalcWindowDate = dateOffsetsPreCalcWindow.reduce((max, current) =>
       dayjs(current).isAfter(dayjs(max)) ? current : max
     );
@@ -42,6 +44,7 @@ export class OhlcCache {
     }
 
     this.loaded = true
+
     return dayjs(ohlcBarsFromPreCalcWindowDate)
   }
 
