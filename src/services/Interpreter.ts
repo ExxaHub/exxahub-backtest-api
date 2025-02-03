@@ -133,9 +133,9 @@ export class Interpreter {
 
   private evaluateCondition(condition: TradingBotNodeCondition): boolean {
     const lhsValue = this.getIndicatorValue(condition.lhs_val, condition.lhs_fn, condition.lhs_fn_params);
-    const rhsValue = condition.rhs_fn
-      ? this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, condition.rhs_fn_params)
-      : parseInt(condition.rhs_val!) 
+    const rhsValue = condition.rhs_fixed_val
+      ? parseInt(condition.rhs_val!)
+      : this.getIndicatorValue(condition.rhs_val!, condition.rhs_fn!, condition.rhs_fn_params)
     const comparator = condition.comparator
   
     return this.compare(lhsValue, rhsValue, comparator);
