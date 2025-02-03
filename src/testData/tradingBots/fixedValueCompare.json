@@ -24,6 +24,7 @@
               },
               "lhs_val": "SPY",
               "comparator": "gt",
+              "rhs_fixed_val": true,
               "rhs_val": "80"
             }
           ],

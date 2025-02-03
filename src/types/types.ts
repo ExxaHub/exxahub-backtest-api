@@ -150,6 +150,7 @@ export type TradingBotNodeCondition = {
     rhs_fn_params?: {
         window?: number
     },
+    rhs_fixed_val?: boolean,
     rhs_val?: string,
     comparator: string
 }
