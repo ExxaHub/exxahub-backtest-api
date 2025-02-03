@@ -35,6 +35,13 @@ export class OhlcBarRepository {
                 .offset(offset)
                 .limit(1)
 
+            console.log('date offset', {
+                symbol,
+                date,
+                offset,
+                result: result[0].date
+            })
+
             return result[0].date
         } catch (error) {
             console.error('Error getting date offset:', error)

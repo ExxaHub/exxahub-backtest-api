@@ -10,6 +10,7 @@ import {
 export type ParsedAssetsAndIndicators = {
   assets: string[],
   tradeableAssets: string[],
+  indicatorAssets: string[],
   indicators: Indicator[],
   preCalcs: PreCalc[],
   largestIndicatorWindow: number
@@ -20,6 +21,7 @@ export class Parser {
   private indicators: Map<string, Indicator> = new Map()
   private assets: Set<string> = new Set<string>()
   private tradeableAssets: Set<string> = new Set<string>()
+  private indicatorAssets: Set<string> = new Set<string>()
   private preCalcs: Map<string, PreCalc> = new Map()
   private largestIndicatorWindow = 0
   private largestPreCalcWindow = 0
@@ -31,6 +33,7 @@ export class Parser {
     return {
       assets: Array.from(this.assets),
       tradeableAssets: Array.from(this.tradeableAssets),
+      indicatorAssets: Array.from(this.indicatorAssets),
       indicators: Array.from(this.indicators.values()),
       preCalcs: Array.from(this.preCalcs.values()),
       largestIndicatorWindow: this.largestIndicatorWindow,
@@ -105,6 +108,7 @@ export class Parser {
     
     if (!this.assets.has(lhs.ticker)) {
       this.assets.add(lhs.ticker)
+      this.indicatorAssets.add(lhs.ticker)
     }
     
     const lhsHash = this.generateHash(lhs);
@@ -121,6 +125,7 @@ export class Parser {
       }
       if (!this.assets.has(rhs.ticker)) {
         this.assets.add(rhs.ticker)
+        this.indicatorAssets.add(rhs.ticker)
       }
       const rhsHash = this.generateHash(rhs);
       if (!this.indicators.has(rhsHash)) {

@@ -8,7 +8,6 @@ import {
   TradingBotNodeIfThenElseConditionType,
   type TradingBotNodeCondition,
   type TradingBotNodeWeightInverseVolatility,
-  type TradingBotNodeAsset,
   type TradingBotNodeFilter
 } from "../types/types";
 import type { PreCalcCache } from "./PreCalcCache";

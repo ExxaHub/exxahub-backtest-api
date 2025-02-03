@@ -15,4 +15,8 @@ export class TickerService {
     async getAll(): Promise<Ticker[]> {
         return this.tickerRepository.getAll()
     }
+
+    async getMaxAndMinDateForTickers(tickers: string[]): Promise<{ minDate: string, maxDate: string }> {
+        return this.tickerRepository.getMaxAndMinDateForTickers(tickers)
+    }
 }
