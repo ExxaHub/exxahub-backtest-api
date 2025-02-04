@@ -1,5 +1,5 @@
 import { OhlcBarRepository } from '../repositories/OhlcBarRepository'
-import { type OHLCBar } from '../types/types'
+import { type CloseBar, type OHLCBar } from '../types/types'
 import { OhlcBarSummaryRepository } from '../repositories/OhlcBarSummaryRepository'
 
 export class OhlcBarService {
@@ -35,7 +35,7 @@ export class OhlcBarService {
         return await this.ohlcBarRepository.bulkInsert(ticker, bars)
     }
 
-    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
+    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: CloseBar[] }> {
         return this.ohlcBarRepository.getBarsForDateRange(tickers, fromDate, toDate)
     }
 }

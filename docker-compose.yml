@@ -12,7 +12,7 @@ services:
       - .env
     volumes:
       - .:/usr/src/app
-    command: ["bun", "--watch", "run", "./src/api/index.ts"]
+    command: ["bun", "run", "./src/api/index.ts", "--watch", "./src/"]
 
   exxahub_backtest_migrations:
     build: .

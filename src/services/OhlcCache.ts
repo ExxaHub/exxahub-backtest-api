@@ -1,19 +1,17 @@
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs"
-import type { ClientInterface, OHLCBar } from "../types/types"
+import type { CloseBar } from "../types/types"
 import { OhlcBarService } from "./OhlcBarService"
 
 export class OhlcCache {
-  private client: ClientInterface
   private ohlcBarService: OhlcBarService
   private tickers: string[]
   private largestIndicatorWindow: number
   private largestPreCalcWindow: number
-  private cachedOhlcBars: Map<string, Map<string, OHLCBar>> = new Map<string, Map<string, OHLCBar>>()
+  private cachedOhlcBars: Map<string, Map<string, CloseBar>> = new Map<string, Map<string, CloseBar>>()
   private loaded: boolean = false
 
-  constructor(client: ClientInterface, tickers: string[], largestIndicatorWindow: number, largestPreCalcWindow: number) {
-    this.client = client
+  constructor(tickers: string[], largestIndicatorWindow: number, largestPreCalcWindow: number) {
     this.tickers = tickers
     this.largestIndicatorWindow = largestIndicatorWindow
     this.largestPreCalcWindow = largestPreCalcWindow
@@ -21,27 +19,18 @@ export class OhlcCache {
   }
 
   async load(fromDate: Dayjs, toDate: Dayjs): Promise<Dayjs> {
-    console.log('tickers', this.tickers)
-
     if (this.tickers.length === 0) {
       this.loaded = true
       return fromDate
     }
 
     const dateOffsetsFullWindow = await Promise.all(this.tickers.map(ticker => {
-        console.log('AAA', {
-          ticker, 
-          fromData: fromDate.format('YYYY-MM-DD'), 
-          offset: this.largestIndicatorWindow + this.largestPreCalcWindow
-        })
         return this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestIndicatorWindow + this.largestPreCalcWindow)
     }))
-    console.log('dateOffsetsFullWindow', dateOffsetsFullWindow)
 
     const ohlcBarsFromFullWindowDate = dateOffsetsFullWindow.reduce((max, current) =>
       dayjs(current).isAfter(dayjs(max)) ? current : max
     );
-    console.log('ohlcBarsFromFullWindowDate', ohlcBarsFromFullWindowDate)
 
     const dateOffsetsPreCalcWindow = await Promise.all(this.tickers.map(
       ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestPreCalcWindow))
@@ -62,8 +51,8 @@ export class OhlcCache {
     return dayjs(ohlcBarsFromPreCalcWindowDate)
   }
 
-  private indexByDate(ohlcBars: OHLCBar[]): Map<string, OHLCBar> {
-    const ohlcMap = new Map<string, OHLCBar>()
+  private indexByDate(ohlcBars: CloseBar[]): Map<string, CloseBar> {
+    const ohlcMap = new Map<string, CloseBar>()
     
     ohlcBars.forEach(bar => {
       ohlcMap.set(bar.date, bar)
@@ -86,7 +75,7 @@ export class OhlcCache {
     return false
   }
 
-  getBars(ticker: string, fromDate?: Dayjs, toDate?: Dayjs): OHLCBar[] {
+  getBars(ticker: string, fromDate?: Dayjs, toDate?: Dayjs): CloseBar[] {
     const barsMap = this.cachedOhlcBars.get(ticker)
 
     if (!barsMap) {
@@ -105,7 +94,7 @@ export class OhlcCache {
     return bars
   }
 
-  getBarForDate(ticker: string, date: string): OHLCBar | undefined {
+  getBarForDate(ticker: string, date: string): CloseBar | undefined {
     const bars = this.cachedOhlcBars.get(ticker)
     if (!bars) {
       throw new Error(`No bars available for ticker: ${ticker}`)
@@ -117,58 +106,8 @@ export class OhlcCache {
     return Array.from(this.cachedOhlcBars.keys())
   }
 
-  private async getTickerBars(fromDate: string, toDate: string): Promise<{[key: string]: OHLCBar[]}> {
-    const lastBarDates = await this.ohlcBarService.getLastBarDates(this.tickers)
-    
-    await Promise.all([
-      this.backfillBars(lastBarDates),
-      this.updateBars(lastBarDates)
-    ])
-    
+  private async getTickerBars(fromDate: string, toDate: string): Promise<{[key: string]: CloseBar[]}> {
     return this.ohlcBarService.getBarsForDateRange(this.tickers, fromDate, toDate)
-  }
-
-  private async backfillBars(lastBarDates: {[key: string]: string}): Promise<void> {
-    const tickersToBackfill = this.tickers.filter(ticker => !lastBarDates[ticker])
-
-    if (tickersToBackfill.length === 0) {
-      return
-    }
-
-    const barsToSave = await this.client.getBarsForSymbols(tickersToBackfill)
-    await this.ohlcBarService.saveBars(barsToSave)
-  }
-
-  private async updateBars(lastBarDates: {[key: string]: string}): Promise<void> {
-    let lastMarketDay = dayjs()
-
-    if (lastMarketDay.day() === 0) {
-      lastMarketDay = lastMarketDay.subtract(2, 'day')
-    } else if (lastMarketDay.day() === 6) { 
-      lastMarketDay = lastMarketDay.subtract(1, 'day')
-    }
-
-    const tickersToUpdate = this.tickers.filter(ticker => dayjs(lastBarDates[ticker]).isBefore(lastMarketDay.startOf('day')))
-
-    if (tickersToUpdate.length === 0) {
-      return
-    }
-
-    const promises = tickersToUpdate.map(ticker => this.client.getBarsForSymbol(ticker, lastBarDates[ticker]))
-
-    const results = await Promise.allSettled(promises)
-    const bars: {[key: string]: OHLCBar[]} = {}
-        
-    for (const result of results) {
-        if (result.status === 'rejected') {
-            console.error(result)
-            throw new Error('Unable to fetch data')
-        }
-
-        bars[result.value.symbol] = result.value.bars
-    }
-
-    await this.ohlcBarService.saveBars(bars)
   }
 
   printDebugTable() {
