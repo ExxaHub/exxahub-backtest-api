@@ -21,14 +21,14 @@ export class TickerRepository {
         return db<Ticker>(table).select(['ticker', 'name', 'asset_type'])
     }
 
-    async getMaxAndMinDateForTickers(tickers: string[]): Promise<{ minDate: string, maxDate: string }> {
+    async getMaxAndMinDateForTickers(tickers: string[]): Promise<{ minDate: number, maxDate: number }> {
         const results = await db(table)
-            .select(db.raw('max(start_date) as min'))
-            .select(db.raw('min(end_date) as max'))
+            .select(db.raw('max(start_ts) as min'))
+            .select(db.raw('min(end_ts) as max'))
             .whereIn('ticker', tickers)
         return {
-            minDate: dayjs(results[0].min).format('YYYY-MM-DD'),
-            maxDate: dayjs(results[0].max).format('YYYY-MM-DD')
+            minDate: results[0].min,
+            maxDate: results[0].max
         }
     }
 }

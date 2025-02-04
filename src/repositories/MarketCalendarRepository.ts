@@ -15,4 +15,14 @@ export class MarketCalendarRepository {
             throw new Error('Error saving trading day')
         }
     }
+
+    async getMarketCalendarDateFromOffset(startDate: number, offset: number): Promise<number> {
+        const result = await db<MarketCalendar>(table)
+            .select('ts')
+            .where('ts', '<=', startDate)
+            .orderBy('ts', 'desc')
+            .offset(offset)
+            .limit(1)
+        return result[0].ts
+    }
 }
