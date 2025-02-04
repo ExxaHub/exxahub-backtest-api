@@ -105,7 +105,7 @@ const run = async () => {
         return true
     });
   
-    await Promise.all(filteredTickers.slice(0, 10).map(insertTicker));
+    await Promise.all(filteredTickers.map(insertTicker));
 
     deleteFiles();
 }
