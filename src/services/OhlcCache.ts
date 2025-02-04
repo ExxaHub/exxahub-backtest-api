@@ -5,50 +5,47 @@ import { OhlcBarService } from "./OhlcBarService"
 
 export class OhlcCache {
   private ohlcBarService: OhlcBarService
-  private tickers: string[]
-  private largestIndicatorWindow: number
-  private largestPreCalcWindow: number
+  private indicatorStartDate: number
+  private tradeableStartDate: number
+  private tradeableEndDate: number
+  private tradeableAssets: string[]
+  private indicatorAssets: string[]
   private cachedOhlcBars: Map<string, Map<string, CloseBar>> = new Map<string, Map<string, CloseBar>>()
   private loaded: boolean = false
 
-  constructor(tickers: string[], largestIndicatorWindow: number, largestPreCalcWindow: number) {
-    this.tickers = tickers
-    this.largestIndicatorWindow = largestIndicatorWindow
-    this.largestPreCalcWindow = largestPreCalcWindow
+  constructor(
+    indicatorStartDate: number,
+    tradeableStartDate: number,
+    tradeableEndDate: number,
+    tradeableAssets: string[],
+    indicatorAssets: string[]
+  ) {
+    this.indicatorStartDate = indicatorStartDate
+    this.tradeableStartDate = tradeableStartDate
+    this.tradeableEndDate = tradeableEndDate
+    this.tradeableAssets = tradeableAssets
+    this.indicatorAssets = indicatorAssets
     this.ohlcBarService = new OhlcBarService()
   }
 
-  async load(fromDate: Dayjs, toDate: Dayjs): Promise<Dayjs> {
-    if (this.tickers.length === 0) {
-      this.loaded = true
-      return fromDate
-    }
+  async load(): Promise<void> {
+    const indicatorBars = await this.getTickerBars(this.indicatorAssets, this.indicatorStartDate, this.tradeableEndDate)
 
-    const dateOffsetsFullWindow = await Promise.all(this.tickers.map(ticker => {
-        return this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestIndicatorWindow + this.largestPreCalcWindow)
-    }))
+    const tradeableBars = await this.getTickerBars(this.tradeableAssets, this.tradeableStartDate, this.tradeableEndDate)
 
-    const ohlcBarsFromFullWindowDate = dateOffsetsFullWindow.reduce((max, current) =>
-      dayjs(current).isAfter(dayjs(max)) ? current : max
-    );
-
-    const dateOffsetsPreCalcWindow = await Promise.all(this.tickers.map(
-      ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestPreCalcWindow))
-    )
-
-    const ohlcBarsFromPreCalcWindowDate = dateOffsetsPreCalcWindow.reduce((max, current) =>
-      dayjs(current).isAfter(dayjs(max)) ? current : max
-    );
-
-    const bars = await this.getTickerBars(ohlcBarsFromFullWindowDate, toDate.format('YYYY-MM-DD'))
-
-    for (const [ticker, ohlcBars] of Object.entries(bars)) {
+    for (const [ticker, ohlcBars] of Object.entries(indicatorBars)) {
       this.cachedOhlcBars.set(ticker, this.indexByDate(ohlcBars))
     }
 
-    this.loaded = true
+    for (const [ticker, ohlcBars] of Object.entries(tradeableBars)) {
+      // If we already have the bars for this ticker, skip because we don't 
+      // want to overwrite the existing bars from the indicator date windows
+      if (!this.cachedOhlcBars.has(ticker)) {
+        this.cachedOhlcBars.set(ticker, this.indexByDate(ohlcBars))
+      }
+    }
 
-    return dayjs(ohlcBarsFromPreCalcWindowDate)
+    this.loaded = true
   }
 
   private indexByDate(ohlcBars: CloseBar[]): Map<string, CloseBar> {
@@ -106,8 +103,8 @@ export class OhlcCache {
     return Array.from(this.cachedOhlcBars.keys())
   }
 
-  private async getTickerBars(fromDate: string, toDate: string): Promise<{[key: string]: CloseBar[]}> {
-    return this.ohlcBarService.getBarsForDateRange(this.tickers, fromDate, toDate)
+  private async getTickerBars(assets: string[], fromDate: number, toDate: number): Promise<{[key: string]: CloseBar[]}> {
+    return this.ohlcBarService.getBarsForDateRange(assets, fromDate, toDate)
   }
 
   printDebugTable() {
