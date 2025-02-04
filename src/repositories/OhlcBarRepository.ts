@@ -95,13 +95,13 @@ export class OhlcBarRepository {
         }
     }
 
-    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: CloseBar[] }> {
+    async getBarsForDateRange(tickers: string[], fromDate: number, toDate: number): Promise<{ [key: string]: CloseBar[] }> {
         try {
             const results = await db(table)
                 .select(['symbol', 'date', 'close'])
                 .whereIn('symbol', tickers)
-                .where('ts', '>=', dayjs(fromDate).startOf('day').unix())
-                .where('ts', '<=', dayjs(toDate).startOf('day').unix())
+                .where('ts', '>=', fromDate)
+                .where('ts', '<=', toDate)
                 .orderBy('ts', 'asc')
 
             const bars: { [key: string]: CloseBar[] } = {}
