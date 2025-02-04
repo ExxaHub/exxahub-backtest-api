@@ -94,7 +94,7 @@ const payload = JSON.stringify({
 const headers = { 'Content-Type': 'application/json' };
 
 export default function () {
-  const res = http.post('http://backtester:3000/api/v1/backtests', payload, { headers });
+  const res = http.post('http://exxahub_backtest_api:3000/api/v1/backtests', payload, { headers });
 
   // Validate the response
   check(res, {
