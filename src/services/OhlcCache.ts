@@ -21,13 +21,27 @@ export class OhlcCache {
   }
 
   async load(fromDate: Dayjs, toDate: Dayjs): Promise<Dayjs> {
-    const dateOffsetsFullWindow = await Promise.all(this.tickers.map(
-      ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestIndicatorWindow + this.largestPreCalcWindow))
-    )
+    console.log('tickers', this.tickers)
+
+    if (this.tickers.length === 0) {
+      this.loaded = true
+      return fromDate
+    }
+
+    const dateOffsetsFullWindow = await Promise.all(this.tickers.map(ticker => {
+        console.log('AAA', {
+          ticker, 
+          fromData: fromDate.format('YYYY-MM-DD'), 
+          offset: this.largestIndicatorWindow + this.largestPreCalcWindow
+        })
+        return this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestIndicatorWindow + this.largestPreCalcWindow)
+    }))
+    console.log('dateOffsetsFullWindow', dateOffsetsFullWindow)
 
     const ohlcBarsFromFullWindowDate = dateOffsetsFullWindow.reduce((max, current) =>
       dayjs(current).isAfter(dayjs(max)) ? current : max
     );
+    console.log('ohlcBarsFromFullWindowDate', ohlcBarsFromFullWindowDate)
 
     const dateOffsetsPreCalcWindow = await Promise.all(this.tickers.map(
       ticker => this.ohlcBarService.getDateOffset(ticker, fromDate.format('YYYY-MM-DD'), this.largestPreCalcWindow))
