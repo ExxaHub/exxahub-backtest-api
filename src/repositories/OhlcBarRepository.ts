@@ -1,7 +1,7 @@
 import { symbol } from 'zod'
 import { db } from '../db'
 import { table } from '../models/OhlcBar'
-import { type OHLCBar } from '../types/types'
+import { type CloseBar, type OHLCBar } from '../types/types'
 import dayjs from 'dayjs'
 
 export class OhlcBarRepository {
@@ -34,13 +34,6 @@ export class OhlcBarRepository {
                 .orderBy('ts', 'desc')
                 .offset(offset)
                 .limit(1)
-
-            console.log('date offset', {
-                symbol,
-                date,
-                offset,
-                result: result[0].date
-            })
 
             return result[0].date
         } catch (error) {
@@ -102,27 +95,23 @@ export class OhlcBarRepository {
         }
     }
 
-    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
+    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: CloseBar[] }> {
         try {
             const results = await db(table)
-                .select('*')
+                .select(['symbol', 'date', 'close'])
                 .whereIn('symbol', tickers)
                 .where('ts', '>=', dayjs(fromDate).startOf('day').unix())
                 .where('ts', '<=', dayjs(toDate).startOf('day').unix())
                 .orderBy('ts', 'asc')
 
-            const bars: { [key: string]: OHLCBar[] } = {}
+            const bars: { [key: string]: CloseBar[] } = {}
             results.forEach(result => {
                 if (bars[result.symbol] === undefined) {
                     bars[result.symbol] = []
                 }
                 bars[result.symbol].push({
                     close: result.close,
-                    high: result.high,
-                    low: result.low,
-                    open: result.open,
                     date: result.date,
-                    volume: result.volume
                 })
             })
 

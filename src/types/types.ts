@@ -213,3 +213,8 @@ export type OHLCBar = {
     volume: number;
     [key: string]: unknown;
 }
+
+export type CloseBar = {
+    close: number;
+    date: string;
+}

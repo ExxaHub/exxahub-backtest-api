@@ -1,18 +1,11 @@
 import { OhlcBarRepository } from '../repositories/OhlcBarRepository'
-import { type OHLCBar } from '../types/types'
-import { OhlcBarSummaryRepository } from '../repositories/OhlcBarSummaryRepository'
+import { type CloseBar, type OHLCBar } from '../types/types'
 
 export class OhlcBarService {
     private ohlcBarRepository: OhlcBarRepository
-    private ohlcBarSummaryRepository: OhlcBarSummaryRepository
 
     constructor() { 
         this.ohlcBarRepository = new OhlcBarRepository()
-        this.ohlcBarSummaryRepository = new OhlcBarSummaryRepository()
-    }
-
-    async getLastBarDates(tickers: string[]): Promise<{ [key: string]: string }> {
-        return this.ohlcBarSummaryRepository.getLastBarDates(tickers)
     }
 
     async getDateOffset(symbol: string, date: string, offset: number): Promise<string> {
@@ -27,15 +20,13 @@ export class OhlcBarService {
         }
 
         const results = await Promise.all(promises)
-
-        await this.ohlcBarSummaryRepository.refreshMaterializedView()
     }
 
     async bulkInsert(ticker: string, bars: OHLCBar[]): Promise<boolean> {
         return await this.ohlcBarRepository.bulkInsert(ticker, bars)
     }
 
-    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: OHLCBar[] }> {
+    async getBarsForDateRange(tickers: string[], fromDate: string, toDate: string): Promise<{ [key: string]: CloseBar[] }> {
         return this.ohlcBarRepository.getBarsForDateRange(tickers, fromDate, toDate)
     }
 }

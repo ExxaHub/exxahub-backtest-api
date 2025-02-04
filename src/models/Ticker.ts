@@ -9,6 +9,8 @@ export const tickerModelSchema = z.object({
     exchange_code: z.string().max(16),
     asset_type: z.string().max(8),
     start_date: z.string().date(),
+    start_ts: z.number().int(),
     end_date: z.string().date(),
+    end_ts: z.number().int(),
 })
 export type Ticker = z.infer<typeof tickerModelSchema>

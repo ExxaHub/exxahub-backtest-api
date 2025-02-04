@@ -29,7 +29,6 @@ export type BacktestResults = {
 }
 
 export class Backtester {
-    private client: ClientInterface
     private tradeableAssetOhlcCache?: OhlcCache
     private indicatorOhlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
@@ -83,10 +82,10 @@ export class Backtester {
         fromDate = dayjs(minDate).isAfter(fromDate) ? dayjs(minDate) : fromDate
         toDate = dayjs(maxDate).isBefore(toDate) ? dayjs(maxDate) : toDate
 
-        this.indicatorOhlcCache = new OhlcCache(this.client, indicatorAssets, largestIndicatorWindow, largestPreCalcWindow)
+        this.indicatorOhlcCache = new OhlcCache(indicatorAssets, largestIndicatorWindow, largestPreCalcWindow)
         const ohlcBarsFromPreCalcWindowDate = await this.indicatorOhlcCache.load(fromDate, toDate)
 
-        this.tradeableAssetOhlcCache = new OhlcCache(this.client, tradeableAssets, 0, 0)
+        this.tradeableAssetOhlcCache = new OhlcCache(tradeableAssets, 0, 0)
         await this.tradeableAssetOhlcCache.load(fromDate, toDate)
 
         fromDate = this.getNextMarketDate(fromDate)
