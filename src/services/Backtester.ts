@@ -29,7 +29,6 @@ export type BacktestResults = {
 }
 
 export class Backtester {
-    private client: ClientInterface
     private tradeableAssetOhlcCache?: OhlcCache
     private indicatorOhlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache

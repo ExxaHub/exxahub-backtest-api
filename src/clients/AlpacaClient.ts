@@ -85,6 +85,13 @@ export type AlpacaCorporateAction = {
     }>
 }
 
+export type TradingDay = {
+    date: string,
+    open: string,
+    close: string,
+    settlement_date: string,
+}
+
 export type AlpacaCorporateActionsResponse =
     {
         "corporate_actions": AlpacaCorporateAction,
@@ -113,6 +120,29 @@ export class AlpacaBaseClient {
 }
 
 export class AlpacaStockClient extends AlpacaBaseClient implements ClientInterface {
+    async getMarketCalendar(start?: string, end?: string): Promise<TradingDay[]> {
+        const params: { start?: string, end?: string } = {}
+
+        if (start) {
+            params['start'] = start
+        }
+
+        if (end) {
+            params['end'] = end
+        }
+
+        const urlParams = new URLSearchParams(params)
+        const response = await fetch(`https://api.alpaca.markets/v2/calendar?${urlParams.toString()}`, {
+            method: "GET",
+            headers: {
+                'APCA-API-KEY-ID': alpacaApiKeyId(),
+                'APCA-API-SECRET-KEY': alpacaApiSecretKey(),
+                'Accept': "application/json"
+            },
+        });
+        return await response.json() as TradingDay[];
+    }
+
     async getBarsForSymbols(symbols: string[]): Promise<{[key: string]: OHLCBar[]}> {
         const promises: Promise<{symbol: string, bars: OHLCBar[]}>[] = []
 

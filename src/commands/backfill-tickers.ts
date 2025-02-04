@@ -37,7 +37,9 @@ const insertTicker = async (ticker: Ticker) => {
         exchange_code: ticker.exchange,
         asset_type: ticker.assetType,
         start_date: ticker.startDate,
+        start_ts: dayjs(ticker.startDate).unix(),
         end_date: ticker.endDate,
+        end_ts: dayjs(ticker.endDate).unix(),
     });
     console.log(`Inserted ticker: ${inserted.ticker}`);
 }
