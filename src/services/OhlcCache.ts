@@ -9,6 +9,7 @@ export class OhlcCache {
   private indicatorAssets: string[]
   private maxWindow: number
   private cachedOhlcBars: Map<string, (number | null)[]> = new Map<string, (number | null)[]>()
+  private dates: number[] | null = null
   private loaded: boolean = false
   private maxLength: number = 0
 
@@ -30,16 +31,13 @@ export class OhlcCache {
   }
 
   async load(): Promise<void> {
-    const removeDuplicates = (arr1: string[], arr2: string[]): string[] => {
-      const arr1Set = new Set(arr1);
-      return arr2.filter(item => !arr1Set.has(item));
-    };
-
     // Remove any assets from tradeableAssets that are also in indicatorAssets so we don't load the bars twice
-    this.tradeableAssets = removeDuplicates(this.indicatorAssets, this.tradeableAssets)
+    this.tradeableAssets = this.removeDuplicates(this.indicatorAssets, this.tradeableAssets)
 
     const indicatorBars = await this.getTickerBars(this.indicatorAssets, this.indicatorStartDate, this.tradeableEndDate)
     const tradeableBars = await this.getTickerBars(this.tradeableAssets, this.tradeableStartDate, this.tradeableEndDate)
+    
+    this.dates = await this.ohlcBarService.getDates(this.indicatorAssets[0], this.indicatorStartDate, this.tradeableEndDate)
 
     for (const [ticker, closeBars] of Object.entries(indicatorBars)) {
       this.cachedOhlcBars.set(ticker, closeBars)
@@ -86,6 +84,14 @@ export class OhlcCache {
     return bars
   }
 
+  getDates(): number[] {  
+    if (!this.dates) {
+      throw new Error('Unable to load dates')
+    }
+
+    return this.dates
+  }
+
   getBarForIndex(ticker: string, index: number): number | null {
     const bars = this.cachedOhlcBars.get(ticker)
     if (!bars) {
@@ -101,4 +107,9 @@ export class OhlcCache {
   private async getTickerBars(assets: string[], fromDate: number, toDate: number): Promise<{[key: string]: number[]}> {
     return this.ohlcBarService.getBarsForDateRange(assets, fromDate, toDate)
   }
+
+  private removeDuplicates(arr1: string[], arr2: string[]): string[] {
+    const arr1Set = new Set(arr1);
+    return arr2.filter(item => !arr1Set.has(item));
+  };
 }

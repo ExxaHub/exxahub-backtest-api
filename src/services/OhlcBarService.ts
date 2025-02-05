@@ -1,15 +1,11 @@
 import { OhlcBarRepository } from '../repositories/OhlcBarRepository'
-import { type CloseBar, type OHLCBar } from '../types/types'
+import { type OHLCBar } from '../types/types'
 
 export class OhlcBarService {
     private ohlcBarRepository: OhlcBarRepository
 
     constructor() { 
         this.ohlcBarRepository = new OhlcBarRepository()
-    }
-
-    async getDateOffset(symbol: string, date: string, offset: number): Promise<string> {
-        return this.ohlcBarRepository.getDateOffset(symbol, date, offset)
     }
 
     async saveBars(bars: { [key: string]: OHLCBar[] }): Promise<void> {
@@ -19,7 +15,7 @@ export class OhlcBarService {
             promises.push(this.ohlcBarRepository.saveBars(ticker, bars[ticker]))
         }
 
-        const results = await Promise.all(promises)
+        await Promise.all(promises)
     }
 
     async bulkInsert(ticker: string, bars: OHLCBar[]): Promise<boolean> {
@@ -28,5 +24,9 @@ export class OhlcBarService {
 
     async getBarsForDateRange(tickers: string[], fromDate: number, toDate: number): Promise<{ [key: string]: number[] }> {
         return this.ohlcBarRepository.getBarsForDates(tickers, fromDate, toDate)
+    }
+
+    async getDates(ticker: string, fromDate: number, toDate: number): Promise<number[]> {
+        return this.ohlcBarRepository.getDates(ticker, fromDate, toDate)
     }
 }

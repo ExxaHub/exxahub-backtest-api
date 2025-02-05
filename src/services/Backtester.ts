@@ -11,7 +11,7 @@ import { PreCalcCache } from "./PreCalcCache";
 import { BacktestDateService } from "./BacktestDateService";
 
 export type AllocationResult = { 
-    date: string,
+    timestamp: number
     value: number,
     tickers: {
         [key: string]: number | null
@@ -33,14 +33,12 @@ export class Backtester {
     private ohlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
     private preCaclCache?: PreCalcCache
-    private backtestMetricsService: BacktestMetricsService
     private allocationResults: AllocationResult[] = []
     private backtestResults: BacktestResults = {}
     private tickerStartDates: Record<string, string> = {}
 
     constructor() {
         this.backtestDateService = new BacktestDateService()
-        this.backtestMetricsService = new BacktestMetricsService()
     }
 
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
@@ -84,21 +82,14 @@ export class Backtester {
         await this.ohlcCache.load()
         
         const maxLength = this.ohlcCache.getMaxLength()
-
-        console.log('OHLC Cache loaded')
-        console.log(this.ohlcCache.getTickers())
-        this.ohlcCache.getTickers().map((ticker) => console.log(ticker, this.ohlcCache?.getBars(ticker).length))
+        const dates = this.ohlcCache.getDates()
 
         if (!this.ohlcCache.isLoaded()) {
             throw new Error('OHLC cache has not been initialized.')
         }
 
-        this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
+        this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators, largestIndicatorWindow)
         await this.indicatorCache.load()
-
-        console.log('Indicator Cache loaded')
-        console.log(this.indicatorCache.getKeys())
-        this.indicatorCache.getKeys().map((indicator) => console.log(indicator, this.indicatorCache?.getByKey(indicator).length))
 
         this.preCaclCache = new PreCalcCache(
             this.ohlcCache, 
@@ -122,9 +113,7 @@ export class Backtester {
         const interpreter = new Interpreter(this.indicatorCache, this.preCaclCache, tradeableAssets)
         const rebalancer = new Rebalancer(this.ohlcCache, backtestConfig.starting_balance)
 
-        let currentDate = startDate.clone()
-
-        for (let idx = maxWindow; idx < maxLength; idx++) {
+        for (let idx = maxWindow; idx <= maxLength; idx++) {
             // Calculate allocations for date
             const allocations = interpreter.evaluate(
                 backtestConfig.trading_bot as TradingBotNode, 
@@ -135,18 +124,22 @@ export class Backtester {
             rebalancer.rebalance(idx, allocations)
 
             this.allocationResults.push({
-                date: currentDate.format('YYYY-MM-DD'),
+                timestamp: Number(dates[idx]),
                 tickers: allocations,
                 value: rebalancer.getBalance()
             })
         }
 
+        console.log('Allocation results length', this.allocationResults.length)
+
         this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
-        this.backtestResults.metrics = this.backtestMetricsService.getMetrics(
+
+        const backtestMetricsService = new BacktestMetricsService(dates)
+        this.backtestResults.metrics = backtestMetricsService.getMetrics(
             backtestConfig.starting_balance,
             rebalancer.getBalance(),
-            this.allocationResults
+            this.allocationResults,
         )
 
         if (backtestConfig.include.history) {
@@ -154,5 +147,16 @@ export class Backtester {
         }
 
         return this.backtestResults
+    }
+
+    private generateTimestamps(start: number, end: number): number[] {
+        const timestamps: number[] = [];
+        const oneDay = 86400; // Number of seconds in a day
+    
+        for (let ts = start; ts <= end; ts += oneDay) {
+            timestamps.push(ts);
+        }
+    
+        return timestamps;
     }
 }

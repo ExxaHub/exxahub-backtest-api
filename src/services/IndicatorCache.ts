@@ -14,20 +14,24 @@ export class IndicatorCache {
   private ohlcCache: OhlcCache
   private indicators: Indicator[]
   private cachedIndicators: Map<string, number[]> = new Map<string, number[]>()
+  private paddingSize: number = 0
   private loaded: boolean = false
 
-  constructor(ohlcCache: OhlcCache, indicators: Indicator[]) {
+  constructor(ohlcCache: OhlcCache, indicators: Indicator[], paddingSize: number) {
     this.ohlcCache = ohlcCache
     this.indicators = indicators
+    this.paddingSize = paddingSize
   }
 
   async load(): Promise<void> {
+    const indicatorWindowPadding: null[] = new Array(this.paddingSize).fill(null);
+    
     const loadPromises = this.indicators.map(async (indicator) => {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker)
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
       const calculatedIndicatorValues = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
-      this.cachedIndicators.set(key, calculatedIndicatorValues)
+      this.cachedIndicators.set(key, [...indicatorWindowPadding, ...calculatedIndicatorValues])
     })
 
     await Promise.all(loadPromises)
