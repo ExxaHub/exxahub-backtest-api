@@ -130,8 +130,6 @@ export class Backtester {
             })
         }
 
-        console.log('Allocation results length', this.allocationResults.length)
-
         this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
 
@@ -147,16 +145,5 @@ export class Backtester {
         }
 
         return this.backtestResults
-    }
-
-    private generateTimestamps(start: number, end: number): number[] {
-        const timestamps: number[] = [];
-        const oneDay = 86400; // Number of seconds in a day
-    
-        for (let ts = start; ts <= end; ts += oneDay) {
-            timestamps.push(ts);
-        }
-    
-        return timestamps;
     }
 }
