@@ -1,4 +1,3 @@
-import type { Dayjs } from "dayjs"
 import { cumulativeReturn } from "../indicators/cumulativeReturn"
 import { currentPrice } from "../indicators/currentPrice"
 import { exponentialMovingAverageOfPrice } from "../indicators/exponentialMovingAverageOfPrice"
@@ -10,13 +9,11 @@ import { standardDeviationOfPrice } from "../indicators/standardDeviationOfPrice
 import { standardDeviationOfReturn } from "../indicators/standardDeviationOfReturn"
 import type { OhlcCache } from "./OhlcCache"
 import type { Indicator } from "../types/types"
-import dayjs from "dayjs"
 
 export class IndicatorCache {
   private ohlcCache: OhlcCache
   private indicators: Indicator[]
-  private cachedIndicators: Map<string, Map<string, number>> = new Map<string, Map<string, number>>()
-  private largestWindow = 0
+  private cachedIndicators: Map<string, number[]> = new Map<string, number[]>()
   private loaded: boolean = false
 
   constructor(ohlcCache: OhlcCache, indicators: Indicator[]) {
@@ -29,44 +26,40 @@ export class IndicatorCache {
       const tickerBars = this.ohlcCache.getBars(indicator.ticker)
       const indicatorFn = this.getIndicatorFunction(indicator.fn)
       const key = `${indicator.ticker}-${indicator.fn}-${indicator.params.window}`
-      const calculatedIndicator = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
-      this.cachedIndicators.set(key, new Map(Object.entries(calculatedIndicator)))
-
-      if (indicator.params.window) {
-        this.largestWindow = Math.max(this.largestWindow, indicator.params.window)
-      }
+      const calculatedIndicatorValues = await indicatorFn(indicator.ticker, indicator.params, tickerBars)
+      this.cachedIndicators.set(key, calculatedIndicatorValues)
     })
 
     await Promise.all(loadPromises)
+    this.loaded = true
   }
 
-  getLargestWindow(): number {
-    return this.largestWindow
+  getKeys(): string[] {
+    return Array.from(this.cachedIndicators.keys())
   }
 
-  getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, date?: string): number {
+  getByKey(key: string): number[] {
+    return this.cachedIndicators.get(key) || []
+  }
+
+  getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}, index?: number): number {
     const key = `${ticker}-${fn}-${params.window}`
     
     const cachedIndicator = this.cachedIndicators.get(key)
     
-    if (cachedIndicator) {
-      if (date) {
-        const value = cachedIndicator.get(date)
+    if (cachedIndicator && index) {
+        const value = cachedIndicator[index]
 
         if (!value) {
-          throw new Error(`Could not calculate indicator value for key: ${key} on date ${date}`)
+          throw new Error(`Could not calculate indicator value for key: ${key} at index: ${index}`)
         }
 
         return value
-      } else {
-        const keys = Array.from(cachedIndicator.keys())
-        return cachedIndicator.get(keys[keys.length - 1])!
-      }
     }
     throw new Error(`Unable to get cached indicator: ${key}`)
   }
 
-  getIndicatorValues(ticker: string, fn: string, params: Record<string, any> = {}): Map<string, number> | undefined {
+  getIndicatorValues(ticker: string, fn: string, params: Record<string, any> = {}): number[] | undefined {
     const key = `${ticker}-${fn}-${params.window}`
     return this.cachedIndicators.get(key)
   }

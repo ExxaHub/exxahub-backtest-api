@@ -121,4 +121,24 @@ export class OhlcBarRepository {
             return {}
         }
     }
+
+    async getBarsForDates(tickers: string[], fromDate: number, toDate: number): Promise<{ [key: string]: number[] }> {
+        try {
+            const results = await db(table)
+                .select('symbol', db.raw('ARRAY_AGG(close ORDER BY ts) AS close_prices'))
+                .whereIn('symbol', tickers)
+                .where('ts', '>=', fromDate)
+                .where('ts', '<=', toDate)
+                .groupBy('symbol')
+            
+            const bars: { [key: string]: number[] } = {}
+            results.forEach(result => {
+                bars[result.symbol] = result.close_prices
+            })
+            return bars
+        } catch (error) {
+            console.error('Error getting bars for date range:', error)
+            return {}
+        }
+    }
 }

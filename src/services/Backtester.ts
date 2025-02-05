@@ -1,7 +1,7 @@
 import type { TradingBotNode } from "../types/types";
 import { OhlcCache } from './OhlcCache'
 import { IndicatorCache } from './IndicatorCache'
-import dayjs, { type Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { Rebalancer } from "./Rebalancer";
 import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
@@ -33,12 +33,9 @@ export class Backtester {
     private ohlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
     private preCaclCache?: PreCalcCache
-
     private backtestMetricsService: BacktestMetricsService
-    
     private allocationResults: AllocationResult[] = []
     private backtestResults: BacktestResults = {}
-
     private tickerStartDates: Record<string, string> = {}
 
     constructor() {
@@ -62,7 +59,8 @@ export class Backtester {
         const { 
             indicatorStartDate, 
             tradeableStartDate, 
-            tradeableEndDate 
+            tradeableEndDate,
+            maxWindow
         } = await this.backtestDateService.calculateBacktestDates(
             backtestConfig.start_date,
             backtestConfig.end_date,
@@ -80,9 +78,16 @@ export class Backtester {
             tradeableStartDate,
             tradeableEndDate,
             tradeableAssets, 
-            indicatorAssets
+            indicatorAssets,
+            maxWindow
         )
         await this.ohlcCache.load()
+        
+        const maxLength = this.ohlcCache.getMaxLength()
+
+        console.log('OHLC Cache loaded')
+        console.log(this.ohlcCache.getTickers())
+        this.ohlcCache.getTickers().map((ticker) => console.log(ticker, this.ohlcCache?.getBars(ticker).length))
 
         if (!this.ohlcCache.isLoaded()) {
             throw new Error('OHLC cache has not been initialized.')
@@ -90,6 +95,10 @@ export class Backtester {
 
         this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
         await this.indicatorCache.load()
+
+        console.log('Indicator Cache loaded')
+        console.log(this.indicatorCache.getKeys())
+        this.indicatorCache.getKeys().map((indicator) => console.log(indicator, this.indicatorCache?.getByKey(indicator).length))
 
         this.preCaclCache = new PreCalcCache(
             this.ohlcCache, 
@@ -115,27 +124,21 @@ export class Backtester {
 
         let currentDate = startDate.clone()
 
-        while (currentDate <= endDate) {
+        for (let idx = maxWindow; idx < maxLength; idx++) {
             // Calculate allocations for date
             const allocations = interpreter.evaluate(
                 backtestConfig.trading_bot as TradingBotNode, 
                 this.indicatorCache, 
-                currentDate
+                idx
             )
-            
-            rebalancer.rebalance(currentDate.format('YYYY-MM-DD'), allocations)
+
+            rebalancer.rebalance(idx, allocations)
 
             this.allocationResults.push({
                 date: currentDate.format('YYYY-MM-DD'),
                 tickers: allocations,
                 value: rebalancer.getBalance()
             })
-
-            if (currentDate.isSame(endDate)) {
-                break
-            }
-
-            currentDate = this.getNextMarketDate(currentDate, true)
         }
 
         this.backtestResults.starting_balance = backtestConfig.starting_balance
@@ -151,21 +154,5 @@ export class Backtester {
         }
 
         return this.backtestResults
-    }
-
-    private getNextMarketDate(date: Dayjs, skipCurrentDate = false): Dayjs {
-        if (!this.ohlcCache) {
-            throw new Error('ohlcCache not loaded.')
-        }
-
-        if (skipCurrentDate) {
-            date = date.add(1, 'day')
-        }
-
-        while (!this.ohlcCache.hasBarsForDate(date))  {
-            date = date.add(1, 'day')
-        } 
-
-        return date
     }
 }

@@ -26,7 +26,7 @@ export class OhlcBarService {
         return await this.ohlcBarRepository.bulkInsert(ticker, bars)
     }
 
-    async getBarsForDateRange(tickers: string[], fromDate: number, toDate: number): Promise<{ [key: string]: CloseBar[] }> {
-        return this.ohlcBarRepository.getBarsForDateRange(tickers, fromDate, toDate)
+    async getBarsForDateRange(tickers: string[], fromDate: number, toDate: number): Promise<{ [key: string]: number[] }> {
+        return this.ohlcBarRepository.getBarsForDates(tickers, fromDate, toDate)
     }
 }
