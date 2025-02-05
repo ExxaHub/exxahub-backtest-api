@@ -1,34 +1,28 @@
-import type {OHLCBar} from "../types/types";
-
 type Params = { 
     window: number 
 }
 
-export const exponentialMovingAverageOfPrice = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+export const exponentialMovingAverageOfPrice = (ticker: string, params: Params, closes: number[]): number[] => {
     if (params.window <= 0) {
-        throw new Error('Window size must be greater than zero')
+        throw new Error('Window size must be greater than zero');
     }
 
-    if (params.window >= bars.length) {
-        throw new Error('Not enough data to calculate for window size')
+    if (params.window >= closes.length) {
+        throw new Error('Not enough data to calculate for window size');
     }
     
-    const indicator: Record<string, number> = {}
-    const period = params.window
-
+    const period = params.window;
     const k = 2 / (period + 1);
     let ema: number[] = [];
-    ema[0] = bars[0].close; // Start with the first price as the initial EMA
+    ema[0] = closes[0]; // Start with the first price as the initial EMA
 
-    for (let i = 1; i < bars.length; i++) {
-        ema[i] = bars[i].close * k + ema[i - 1] * (1 - k);
+    for (let i = 1; i < closes.length; i++) {
+        ema[i] = closes[i] * k + ema[i - 1] * (1 - k);
 
         if (i < period) {
-            continue
+            continue;
         }
-
-        indicator[bars[i].date] = ema[i]
     }
 
-    return indicator;
+    return ema.slice(period - 1); // Return the EMA values after the initial period
 };

@@ -3,7 +3,7 @@ import { maxDrawdown } from "./maxDrawdown";
 import type { OHLCBar } from "../types/types";
 
 describe("maxDrawdown", () => {
-    const mockBars: OHLCBar[] = [
+    const bars: OHLCBar[] = [
         { date: "2024-11-10", open: 102, high: 105, low: 95, close: 100, volume: 10 },
         { date: "2024-11-11", open: 101, high: 106, low: 96, close: 97, volume: 10 },
         { date: "2024-11-12", open: 99, high: 108, low: 94, close: 100, volume: 10 },
@@ -13,24 +13,22 @@ describe("maxDrawdown", () => {
         { date: "2024-11-18", open: 101, high: 110, low: 92, close: 100, volume: 10 },
     ];
 
+    const closes = bars.map((bar) => bar.close);
+
     it("calculates max drawdown for a valid window", () => {
         const params = { window: 7 };
-        const result = maxDrawdown("TEST", params, mockBars);
+        const result = maxDrawdown("TEST", params, closes);
 
-        expect(result).toEqual({
-            "2024-11-10": 0,
-            "2024-11-11": 3,
-            "2024-11-12": 3,
-            "2024-11-13": 9,
-            "2024-11-14": 9,
-            "2024-11-17": 9,
-            "2024-11-18": 9,
-        });
+        console.log(result)
+
+        expect(result).toEqual([
+            9,
+        ]);
     });
 
     it("returns an empty object if window is larger than bars length", () => {
         const params = { window: 10 };
-        expect(() => maxDrawdown("TEST", params, mockBars)).toThrow(
+        expect(() => maxDrawdown("TEST", params, closes)).toThrow(
             `Not enough data to calculate max drawdown for a window of ${params.window}.`
         );
     });
@@ -39,24 +37,21 @@ describe("maxDrawdown", () => {
         const paramsZero = { window: 0 };
         const paramsNegative = { window: -1 };
 
-        expect(() => maxDrawdown("TEST", paramsZero, mockBars)).toThrow(
+        expect(() => maxDrawdown("TEST", paramsZero, closes)).toThrow(
             "Window size must be greater than zero"
         );
-        expect(() => maxDrawdown("TEST", paramsNegative, mockBars)).toThrow(
+        expect(() => maxDrawdown("TEST", paramsNegative, closes)).toThrow(
             "Window size must be greater than zero"
         );
     });
 
     it("handles a single bar in the array gracefully", () => {
         const params = { window: 1 };
-        const singleBar: OHLCBar[] = [
-            { date: "2024-11-10", open: 100, high: 105, low: 95, close: 100, volume: 10 },
-        ];
 
-        const result = maxDrawdown("TEST", params, singleBar);
-        expect(result).toEqual({
-            "2024-11-10": 0, // No drawdown in a single bar
-        });
+        const result = maxDrawdown("TEST", params, [100]);
+        expect(result).toEqual([
+            0, // No drawdown in a single bar
+        ]);
     });
 
     it("calculates drawdown correctly when all bars have increasing highs", () => {
@@ -67,14 +62,14 @@ describe("maxDrawdown", () => {
             { date: "2024-11-12", open: 102, high: 103, low: 101, close: 102, volume: 10 },
             { date: "2024-11-13", open: 103, high: 104, low: 102, close: 103, volume: 10 },
         ];
+        const closes = increasingBars.map((bar) => bar.close);
 
-        const result = maxDrawdown("TEST", params, increasingBars);
+        const result = maxDrawdown("TEST", params, closes);
 
-        expect(result).toEqual({
-            "2024-11-11": 0,
-            "2024-11-12": 0,
-            "2024-11-13": 0,
-        });
+        expect(result).toEqual([
+            0,
+            0,
+        ]);
     });
 
     it("calculates drawdown correctly when all bars have decreasing lows", () => {
@@ -85,13 +80,13 @@ describe("maxDrawdown", () => {
             { date: "2024-11-12", open: 100, high: 102, low: 80, close: 98, volume: 10 },
             { date: "2024-11-13", open: 100, high: 101, low: 75, close: 97, volume: 10 },
         ];
+        const closes = decreasingBars.map((bar) => bar.close);
 
-        const result = maxDrawdown("TEST", params, decreasingBars);
+        const result = maxDrawdown("TEST", params, closes);
 
-        expect(result).toEqual({
-            "2024-11-11": 0,
-            "2024-11-12": 1.0101010101010102,
-            "2024-11-13": 2.0202020202020203,
-        });
+        expect(result).toEqual([
+            2,
+            3
+        ]);
     });
 });

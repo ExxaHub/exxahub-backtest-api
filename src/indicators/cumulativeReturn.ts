@@ -1,27 +1,25 @@
-import type {OHLCBar} from "../types/types";
-
 type Params = { 
     window: number 
 }
 
-export const cumulativeReturn = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+export const cumulativeReturn = (ticker: string, params: Params, closes: number[]): number[] => {
     if (params.window <= 0) {
-        throw new Error('Window size must be greater than zero')
+        throw new Error('Window size must be greater than zero');
     }
 
-    if (params.window >= bars.length) {
-        throw new Error('Not enough data to calculate for window size')
+    if (params.window >= closes.length) {
+        throw new Error('Not enough data to calculate for window size');
     }
 
-    const indicator: Record<string, number> = {}
-    const returnLength = params.window
+    const returnLength = params.window;
+    const returns: number[] = [];
 
-    for (let i = returnLength; i < bars.length; i++) {
-        const previousClose = bars[i - returnLength].close;
-        const currentClose = bars[i].close;
+    for (let i = returnLength; i < closes.length; i++) {
+        const previousClose = closes[i - returnLength];
+        const currentClose = closes[i];
         const returnPercentage = ((currentClose - previousClose) / previousClose) * 100;
-        indicator[bars[i].date] = parseFloat(returnPercentage.toFixed(2))
+        returns.push(parseFloat(returnPercentage.toFixed(2)));
     }
 
-    return indicator;
-}
+    return returns;
+};
