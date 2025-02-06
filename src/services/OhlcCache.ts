@@ -8,7 +8,7 @@ export class OhlcCache {
   private tradeableAssets: string[]
   private indicatorAssets: string[]
   private maxWindow: number
-  private cachedOhlcBars: Map<string, (number | null)[]> = new Map<string, (number | null)[]>()
+  protected cachedOhlcBars: Map<string, (number | null)[]> = new Map<string, (number | null)[]>()
   private dates: number[] | null = null
   private loaded: boolean = false
   private maxLength: number = 0
