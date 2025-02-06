@@ -1,6 +1,7 @@
 import { annualizedReturn } from "../metrics/annualizedReturn";
 import { calmerRatio } from "../metrics/calmerRatio";
 import { cumulativeReturn } from "../metrics/cumulativeReturn";
+import { formatDuration } from "../metrics/duration";
 import { maximumDrawdown } from "../metrics/maximumDrawdown";
 import { sharpeRatio } from "../metrics/sharpeRatio";
 import { standardDeviationOfReturn } from "../metrics/standardDeviationOfReturn";
@@ -8,6 +9,7 @@ import { trailingPercentChange } from "../metrics/trailingPercentChange";
 import type { AllocationResult } from "./Backtester"
 
 export type BacktestMetrics = {
+    duration: string,
     cumulative_return: number,
     annualized_return: number,
     standard_deviation: number,
@@ -32,6 +34,7 @@ export class BacktestMetricsService {
 
         const balanceHistory = history.map(r => r.value)
 
+        const duration = formatDuration(this.dates[0], this.dates[this.dates.length - 1]);
         const dailyReturns = this.calculateDailyReturns(balanceHistory);
         const cumulativeReturnMetric = cumulativeReturn(startingBalance, endingBalance);
         const annualizedReturnMetric = annualizedReturn(cumulativeReturnMetric, balanceHistory.length, 252);
@@ -54,6 +57,7 @@ export class BacktestMetricsService {
         }
 
         return {
+            duration: duration,
             cumulative_return: cumulativeReturnMetric * 100,
             annualized_return: annualizedReturnMetric * 100,
             standard_deviation: standardDeviationMetric,
