@@ -1,21 +1,17 @@
-import type {OHLCBar} from "../types/types";
-
 type Params = { 
     window: number 
-}
+};
 
-export const standardDeviationOfPrice = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+export const standardDeviationOfPrice = (ticker: string, params: Params, closes: number[]): number[] => {
     if (params.window <= 0) {
-        throw new Error('Window size must be greater than zero')
+        throw new Error('Window size must be greater than zero');
     }
 
-    if (params.window >= bars.length) {
-        throw new Error('Not enough data to calculate for window size')
+    if (params.window >= closes.length) {
+        throw new Error('Not enough data to calculate for window size');
     }
     
-    const indicator: Record<string, number> = {}
-    const stdDevLength = params.window
-    const closes: number[] = bars.map(bar => bar.close);
+    const stdDevLength = params.window;
     const stdDevs: number[] = [];
 
     for (let i = stdDevLength - 1; i < closes.length; i++) {
@@ -24,12 +20,8 @@ export const standardDeviationOfPrice = (ticker: string, params: Params, bars: O
         const squareDiffs = slice.map(val => Math.pow(val - avg, 2));
         const variance = squareDiffs.reduce((acc, val) => acc + val, 0) / stdDevLength;
         const stdDev = Math.sqrt(variance);
-        stdDevs.push(stdDev);
+        stdDevs.push(parseFloat(stdDev.toFixed(2)));
     }
 
-    for (let i = stdDevLength - 1; i < closes.length; i++) {
-        indicator[bars[i].date] = parseFloat(stdDevs[i - stdDevLength + 1].toFixed(2))
-    }
-
-    return indicator;
-}
+    return stdDevs;
+};

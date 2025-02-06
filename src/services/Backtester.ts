@@ -1,7 +1,7 @@
 import type { TradingBotNode } from "../types/types";
 import { OhlcCache } from './OhlcCache'
 import { IndicatorCache } from './IndicatorCache'
-import dayjs, { type Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { Rebalancer } from "./Rebalancer";
 import { Interpreter } from "./Interpreter";
 import { Parser } from "./Parser"
@@ -11,7 +11,7 @@ import { PreCalcCache } from "./PreCalcCache";
 import { BacktestDateService } from "./BacktestDateService";
 
 export type AllocationResult = { 
-    date: string,
+    timestamp: number
     value: number,
     tickers: {
         [key: string]: number | null
@@ -33,17 +33,12 @@ export class Backtester {
     private ohlcCache?: OhlcCache
     private indicatorCache?: IndicatorCache
     private preCaclCache?: PreCalcCache
-
-    private backtestMetricsService: BacktestMetricsService
-    
     private allocationResults: AllocationResult[] = []
     private backtestResults: BacktestResults = {}
-
     private tickerStartDates: Record<string, string> = {}
 
     constructor() {
         this.backtestDateService = new BacktestDateService()
-        this.backtestMetricsService = new BacktestMetricsService()
     }
 
     async run(backtestConfig: BacktestConfig): Promise<BacktestResults> {
@@ -62,7 +57,8 @@ export class Backtester {
         const { 
             indicatorStartDate, 
             tradeableStartDate, 
-            tradeableEndDate 
+            tradeableEndDate,
+            maxWindow
         } = await this.backtestDateService.calculateBacktestDates(
             backtestConfig.start_date,
             backtestConfig.end_date,
@@ -80,15 +76,19 @@ export class Backtester {
             tradeableStartDate,
             tradeableEndDate,
             tradeableAssets, 
-            indicatorAssets
+            indicatorAssets,
+            maxWindow
         )
         await this.ohlcCache.load()
+        
+        const maxLength = this.ohlcCache.getMaxLength()
+        const dates = this.ohlcCache.getDates()
 
         if (!this.ohlcCache.isLoaded()) {
             throw new Error('OHLC cache has not been initialized.')
         }
 
-        this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators)
+        this.indicatorCache = new IndicatorCache(this.ohlcCache, indicators, largestIndicatorWindow)
         await this.indicatorCache.load()
 
         this.preCaclCache = new PreCalcCache(
@@ -113,37 +113,31 @@ export class Backtester {
         const interpreter = new Interpreter(this.indicatorCache, this.preCaclCache, tradeableAssets)
         const rebalancer = new Rebalancer(this.ohlcCache, backtestConfig.starting_balance)
 
-        let currentDate = startDate.clone()
-
-        while (currentDate <= endDate) {
+        for (let idx = maxWindow; idx <= maxLength; idx++) {
             // Calculate allocations for date
             const allocations = interpreter.evaluate(
                 backtestConfig.trading_bot as TradingBotNode, 
                 this.indicatorCache, 
-                currentDate
+                idx
             )
-            
-            rebalancer.rebalance(currentDate.format('YYYY-MM-DD'), allocations)
+
+            rebalancer.rebalance(idx, allocations)
 
             this.allocationResults.push({
-                date: currentDate.format('YYYY-MM-DD'),
+                timestamp: Number(dates[idx]),
                 tickers: allocations,
                 value: rebalancer.getBalance()
             })
-
-            if (currentDate.isSame(endDate)) {
-                break
-            }
-
-            currentDate = this.getNextMarketDate(currentDate, true)
         }
 
         this.backtestResults.starting_balance = backtestConfig.starting_balance
         this.backtestResults.ending_balance = rebalancer.getBalance()
-        this.backtestResults.metrics = this.backtestMetricsService.getMetrics(
+
+        const backtestMetricsService = new BacktestMetricsService(dates)
+        this.backtestResults.metrics = backtestMetricsService.getMetrics(
             backtestConfig.starting_balance,
             rebalancer.getBalance(),
-            this.allocationResults
+            this.allocationResults,
         )
 
         if (backtestConfig.include.history) {
@@ -151,21 +145,5 @@ export class Backtester {
         }
 
         return this.backtestResults
-    }
-
-    private getNextMarketDate(date: Dayjs, skipCurrentDate = false): Dayjs {
-        if (!this.ohlcCache) {
-            throw new Error('ohlcCache not loaded.')
-        }
-
-        if (skipCurrentDate) {
-            date = date.add(1, 'day')
-        }
-
-        while (!this.ohlcCache.hasBarsForDate(date))  {
-            date = date.add(1, 'day')
-        } 
-
-        return date
     }
 }

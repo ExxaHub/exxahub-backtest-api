@@ -1,40 +1,41 @@
 import dayjs from "dayjs";
-import type { AllocationResult } from "../services/Backtester";
 
 export const trailingPercentChange = (
-    values: AllocationResult[], 
+    history: number[], 
+    dates: number[],
     lookbackValue: number, 
     lookbackInterval: 'day' | 'month' | 'year'
 ): number => {
-    // Step 1: Find the most recent data point (today's data point)
-    const mostRecentValue = values[values.length - 1];
+    // Step 1: Find the most recent data point (the last value in the backtest)
+    const mostRecentDate = dates[dates.length - 1];
 
-    if (!mostRecentValue) {
+    if (!mostRecentDate) {
         throw new Error("At least one data point is required.");
     }
 
-    // Step 2: Get most revent date and calculate the target date based on the lookback period
-    const targetDate = dayjs(mostRecentValue.date).subtract(lookbackValue, lookbackInterval);
+    // Step 2: Get most recent date and calculate the target date based on the lookback period
+    const targetDate = dayjs.unix(mostRecentDate).subtract(lookbackValue, lookbackInterval).startOf('day').unix();
 
     // Step 3: Find the value closest to the target date (from the specified lookback period)
-    let startValue: AllocationResult | null = null;
+    let startIndex = dates.length - 1
 
     // Iterate over the values array in reverse to find the closest date before or on the target date
-    for (let i = values.length - 2; i >= 0; i--) {
-        const value = values[i];
+    for (let index = dates.length - 1; index >= 0; index--) {
+        const date = dates[index];
 
-        const valueDate = dayjs(value.date);
-        if (valueDate.isBefore(targetDate) || valueDate.isSame(targetDate, 'day')) {
-            startValue = value;
+        if (date === targetDate || date <= targetDate) {
+            startIndex = index;
             break;
         }
     }
 
-    if (startValue === null) {
+    if (startIndex === null) {
         throw new Error("No data point found for the specified lookback period.");
     }
 
+    const startValue = history[startIndex];
+    const endValue = history[history.length - 1];
+
     // Step 4: Calculate the percent change
-    const percentChange = ((mostRecentValue.value - startValue.value) / startValue.value) * 100;
-    return percentChange;
+    return ((endValue - startValue) / startValue) * 100
 };

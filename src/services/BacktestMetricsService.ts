@@ -19,6 +19,11 @@ export type BacktestMetrics = {
 }
 
 export class BacktestMetricsService {
+    private dates: number[] = []
+
+    constructor(dates: number[]) {
+        this.dates = dates
+    }
 
     public getMetrics(startingBalance: number, endingBalance: number, history: AllocationResult[]): BacktestMetrics {
         if (startingBalance === undefined || endingBalance === undefined) {
@@ -36,13 +41,17 @@ export class BacktestMetricsService {
 
         let trailing1Month = null
         try {
-            trailing1Month = trailingPercentChange(history, 1, 'month')
-        } catch (e) {}
+            trailing1Month = trailingPercentChange(balanceHistory, this.dates, 1, 'month')
+        } catch (e) {
+            console.error(e)
+        }
 
         let trailing3Month = null
         try {
-            trailing3Month = trailingPercentChange(history, 3, 'month')
-        } catch (e) {}
+            trailing3Month = trailingPercentChange(balanceHistory, this.dates, 3, 'month')
+        } catch (e) {
+            console.error(e)
+        }
 
         return {
             cumulative_return: cumulativeReturnMetric * 100,

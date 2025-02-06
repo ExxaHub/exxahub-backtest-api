@@ -3,28 +3,42 @@ import { AlpacaStockClient } from "../clients/AlpacaClient";
 import { OhlcCache } from "./OhlcCache";
 import type { OHLCBar } from "../types/types";
 import { IndicatorCache } from "./IndicatorCache";
+import dayjs from "dayjs";
 
-const alpacaStockClient = new AlpacaStockClient()
-const ohlcCache = new OhlcCache(alpacaStockClient, ['SPY', 'QQQ'])
+const indicatorStartDate = dayjs("2024-01-01").unix()
+const tradeableStartDate = dayjs("2024-01-15").unix()
+const tradeableEndDate = dayjs("2024-11-10").unix()
+const tradeableAssets = ['SPY']
+const indicatorAssets = ['QQQ']
+const maxWindow = 10
 
-ohlcCache.getBars = mock((ticker: string): OHLCBar[] => {
+const ohlcCache = new OhlcCache(
+  indicatorStartDate,
+  tradeableStartDate,
+  tradeableEndDate,
+  tradeableAssets,
+  indicatorAssets,
+  maxWindow
+)
+
+ohlcCache.getBars = mock((ticker: string): (number | null)[] => {
   switch(ticker) {
     case 'SPY': 
       return [
-        { date: "2024-11-10", open: 100, high: 105, low: 95, close: 100, volume: 10 },
-        { date: "2024-11-11", open: 100, high: 110, low: 90, close: 105, volume: 10 },
-        { date: "2024-11-12", open: 105, high: 115, low: 95, close: 102, volume: 10 },
-        { date: "2024-11-13", open: 102, high: 112, low: 92, close: 108, volume: 10 },
-        { date: "2024-11-14", open: 108, high: 118, low: 98, close: 110, volume: 10 },
+        100,
+        105,
+        102,
+        108,
+        110,
       ]
 
     case 'QQQ': 
       return [
-        { date: "2024-11-10", open: 102, high: 105, low: 95, close: 100, volume: 10 },
-        { date: "2024-11-11", open: 101, high: 106, low: 96, close: 97, volume: 10 },
-        { date: "2024-11-12", open: 99, high: 108, low: 94, close: 100, volume: 10 },
-        { date: "2024-11-13", open: 103, high: 107, low: 93, close: 91, volume: 10 },
-        { date: "2024-11-14", open: 104, high: 110, low: 92, close: 100, volume: 10 },
+        100,
+        97,
+        100,
+        91,
+        100,
       ]
 
     default:
@@ -49,11 +63,11 @@ describe("IndicatorCache", () => {
         },
         ticker: "QQQ",
       },
-    ])
+    ], 10)
     await indicatorCache.load()
 
-    expect(indicatorCache.getIndicatorValue('SPY', 'relative-strength-index', { window: 3 })).toEqual(89.0909)
-    expect(indicatorCache.getIndicatorValue('QQQ', 'max-drawdown', { window: 3 })).toEqual(9)
+    expect(indicatorCache.getIndicatorValue('SPY', 'relative-strength-index', { window: 3 }, 11)).toEqual(89.0909)
+    expect(indicatorCache.getIndicatorValue('QQQ', 'max-drawdown', { window: 3 }, 11)).toEqual(9)
 
     expect(
       () => indicatorCache.getIndicatorValue('QQQ', 'relative-strength-index', { window: 3 })

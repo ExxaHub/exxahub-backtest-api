@@ -1,33 +1,12 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { Rebalancer } from "./Rebalancer";
 import { OhlcCache } from "./OhlcCache";
-import { TiingoClient } from "../clients/TiingoClient";
 import dayjs, { Dayjs } from "dayjs";
 import type { OHLCBar } from "../types/types";
 
 class MockOhlcCache extends OhlcCache {
-  private barForDate: Record<string, Record<string, OHLCBar>> = {}
-
-  setBarForDate(ticker: string, date: Dayjs, bar: OHLCBar): void {
-    if (!this.barForDate[ticker]) {
-      this.barForDate[ticker] = {}
-    }
-    this.barForDate[ticker][date.format('YYYY-MM-DD')] = bar
-  }
-
-  getBarForDate(ticker: string, date: string): OHLCBar {
-    return this.barForDate[ticker][date]
-  }
-}
-
-const barWithClose = (close: number) => {
-  return {
-    close: close,
-    high: 1,
-    low: 1, 
-    open: 1, 
-    date: '2024-01-01',
-    volume: 1
+  setBars(ticker: string, bars: number[]): void {
+    this.cachedOhlcBars.set(ticker, bars)
   }
 }
 
@@ -35,7 +14,21 @@ describe("Rebalancer", () => {
   let mockOhlcCache: MockOhlcCache
 
   beforeEach(() => {
-    mockOhlcCache = new MockOhlcCache(new TiingoClient(), ['SPY', 'QQQ'])
+    const indicatorStartDate = dayjs('2024-01-01').unix()
+    const tradeableStartDate = dayjs('2024-01-01').unix()
+    const tradeableEndDate = dayjs('2024-01-03').unix()
+    const tradeableAssets = ['SPY', 'QQQ']
+    const indicatorAssets = ['SPY']
+    const maxWindow = 5
+
+    mockOhlcCache = new MockOhlcCache(
+      indicatorStartDate,
+      tradeableStartDate,
+      tradeableEndDate,
+      tradeableAssets,
+      indicatorAssets,
+      maxWindow
+    )
   })
   
   it("Defaults to 10,000 starting balance", () => {
@@ -46,15 +39,10 @@ describe("Rebalancer", () => {
   it('Updates portfolio value correctly when holding the same asset over multiple rebalances', async () => {
     const rebalancer = new Rebalancer(mockOhlcCache)
 
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-01'), barWithClose(500))
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-02'), barWithClose(510))
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-03'), barWithClose(490))
+    mockOhlcCache.setBars('SPY', [500, 510, 490])
+    mockOhlcCache.setBars('QQQ', [100, 110, 120])
 
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-01'), barWithClose(100))
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-02'), barWithClose(110))
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-03'), barWithClose(120))
-    
-    await rebalancer.rebalance('2024-01-01', {
+    await rebalancer.rebalance(0, {
       'SPY': 100,
       'QQQ': null
     })
@@ -68,7 +56,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    rebalancer.rebalance('2024-01-02', {
+    rebalancer.rebalance(1, {
       'SPY': 100,
       'QQQ': null
     })
@@ -82,7 +70,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    rebalancer.rebalance('2024-01-03', {
+    rebalancer.rebalance(2, {
       'SPY': 100,
       'QQQ': null
     })
@@ -100,15 +88,10 @@ describe("Rebalancer", () => {
   it('Rebalances correctly when selling 100% one asset and buying 100% another asset', async () => {
     const rebalancer = new Rebalancer(mockOhlcCache)
 
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-01'), barWithClose(500))
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-02'), barWithClose(510))
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-03'), barWithClose(490))
+    mockOhlcCache.setBars('SPY', [500, 510, 490])
+    mockOhlcCache.setBars('QQQ', [100, 110, 120])
 
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-01'), barWithClose(100))
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-02'), barWithClose(110))
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-03'), barWithClose(120))
-    
-    await rebalancer.rebalance('2024-01-01', {
+    await rebalancer.rebalance(0, {
       'SPY': 100,
       'QQQ': null
     })
@@ -122,7 +105,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    await rebalancer.rebalance('2024-01-02', {
+    await rebalancer.rebalance(1, {
       'SPY': null,
       'QQQ': 100
     })
@@ -141,7 +124,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    await rebalancer.rebalance('2024-01-03', {
+    await rebalancer.rebalance(2, {
       'SPY': null,
       'QQQ': 100
     })
@@ -164,15 +147,10 @@ describe("Rebalancer", () => {
   it('Rebalances correctly when selling 50% one asset and buying 50% another asset', async () => {
     const rebalancer = new Rebalancer(mockOhlcCache)
 
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-01'), barWithClose(500))
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-02'), barWithClose(510))
-    mockOhlcCache.setBarForDate('SPY', dayjs('2024-01-03'), barWithClose(490))
+    mockOhlcCache.setBars('SPY', [500, 510, 490])
+    mockOhlcCache.setBars('QQQ', [100, 110, 120])
 
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-01'), barWithClose(100))
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-02'), barWithClose(110))
-    mockOhlcCache.setBarForDate('QQQ', dayjs('2024-01-03'), barWithClose(120))
-    
-    await rebalancer.rebalance('2024-01-01', {
+    await rebalancer.rebalance(0, {
       'SPY': 100,
       'QQQ': null
     })
@@ -186,7 +164,7 @@ describe("Rebalancer", () => {
       }
     });
 
-    await rebalancer.rebalance('2024-01-02', {
+    await rebalancer.rebalance(1, {
       'SPY': 75,
       'QQQ': 25
     })
@@ -213,7 +191,7 @@ describe("Rebalancer", () => {
       rebalancer.getCurrentHoldings().SPY.value + rebalancer.getCurrentHoldings().QQQ.value
     ).toEqual(rebalancer.getBalance())
 
-    await rebalancer.rebalance('2024-01-03', {
+    await rebalancer.rebalance(2, {
       'SPY': 50,
       'QQQ': 50
     })

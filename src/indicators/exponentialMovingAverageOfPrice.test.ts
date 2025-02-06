@@ -13,35 +13,38 @@ describe("exponentialMovingAverageOfPrice", () => {
     { date: "2024-11-18", open: 106, high: 111, low: 101, close: 112, volume: 10 },
   ];
 
+  const closes = bars.map((bar) => bar.close);
+
   it("should calculate the correct moving average for a valid period", () => {
     const params = { window: 3 };
-    const result = exponentialMovingAverageOfPrice("TEST", params, bars);
+    const result = exponentialMovingAverageOfPrice("TEST", params, closes);
 
-    expect(result).toEqual({
-      "2024-11-13": 104.25,
-      "2024-11-14": 106.125,
-      "2024-11-17": 108.0625,
-      "2024-11-18": 110.03125,
-    });
+    expect(result).toEqual([
+      102.5,
+      104.25,
+      106.125,
+      108.0625,
+      110.03125,
+    ]);
   });
 
   it("should return an empty object if the period is larger than the number of bars", () => {
     const params = { window: 8 }; // Period > number of bars
 
-    expect(() => exponentialMovingAverageOfPrice("TEST", params, bars)).toThrow(`Not enough data to calculate for window size`);
+    expect(() => exponentialMovingAverageOfPrice("TEST", params, closes)).toThrow(`Not enough data to calculate for window size`);
   });
 
   it("should throw an error for a window size of 0 or less", () => {
     const invalidParams = { window: 0 };
 
-    expect(() => exponentialMovingAverageOfPrice("TEST", invalidParams, bars)).toThrow(
+    expect(() => exponentialMovingAverageOfPrice("TEST", invalidParams, closes)).toThrow(
       "Window size must be greater than zero"
     );
   });
 
   it("should handle edge case with exactly `window` bars", () => {
     const params = { window: 7 }; // Period == number of bars
-    expect(() => exponentialMovingAverageOfPrice("TEST", params, bars)).toThrow(`Not enough data to calculate for window size`);
+    expect(() => exponentialMovingAverageOfPrice("TEST", params, closes)).toThrow(`Not enough data to calculate for window size`);
   });
 
   it("should return an empty object for an empty bars array", () => {

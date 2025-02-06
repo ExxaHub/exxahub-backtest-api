@@ -17,67 +17,54 @@ mock.module("../repositories/OhlcBarRepository", () => {
         return Promise.resolve(date)
       }
 
-      getBarsForDateRange(tickers: string[], fromDate: string, toDate: string) {
+      getDates(ticker: string, fromDate: number, toDate: number) {
+        return [
+          dayjs("2024-01-01").unix(),
+          dayjs("2024-01-02").unix(),
+          dayjs("2024-01-03").unix(),
+          dayjs("2024-01-04").unix(),
+          dayjs("2024-01-05").unix()
+        ]
+      }
+
+      getBarsForDates(tickers: string[], fromDate: string, toDate: string) {
         return Promise.resolve({
-          'SPY': [
-            { date: "2024-11-10", close: 100 },
-            { date: "2024-11-11", close: 102 },
-            { date: "2024-11-12", close: 104 },
-            { date: "2024-11-13", close: 106 },
-            { date: "2024-11-14", close: 108 },
-          ],
-          'QQQ': [
-            { date: "2024-11-10", close: 200 },
-            { date: "2024-11-11", close: 202 },
-            { date: "2024-11-12", close: 204 },
-            { date: "2024-11-13", close: 206 },
-            { date: "2024-11-14", close: 208 },
-          ],
+          'SPY': [100, 102, 104, 106, 108],
+          'QQQ': [200, 202, 204, 206, 208],
         })
       }
     }
   };
 });
 
-mock.module("../repositories/OhlcBarSummaryRepository", () => {
-  return {
-    OhlcBarSummaryRepository: class {
-      getLastBarDates(symbols: string[]) {
-        return Promise.resolve({
-          'SPY': "2024-11-14",
-          'QQQ': "2024-11-14",
-        })
-      }
-
-      refreshMaterializedView() {
-        return Promise.resolve()
-      }
-    }
-  }
-})
-
 describe("OhlcCache", () => {
   it("Loads OHLC bars from client", async () => {
-    const ohlcCache = new OhlcCache(['SPY', 'QQQ'], 10, 10)
 
-    await ohlcCache.load(dayjs("2024-11-10"), dayjs("2024-11-14"))
+    const indicatorStartDate = dayjs("2024-01-01").unix()
+    const tradeableStartDate = dayjs("2024-01-15").unix()
+    const tradeableEndDate = dayjs("2024-11-10").unix()
+    const tradeableAssets = ['SPY']
+    const indicatorAssets = ['QQQ']
+    const maxWindow = 10
 
-    expect(ohlcCache.getBars('SPY')).toEqual([
-      { date: "2024-11-10", close: 100 },
-      { date: "2024-11-11", close: 102 },
-      { date: "2024-11-12", close: 104 },
-      { date: "2024-11-13", close: 106 },
-      { date: "2024-11-14", close: 108 },
-    ])
+    const ohlcCache = new OhlcCache(
+      indicatorStartDate,
+      tradeableStartDate,
+      tradeableEndDate,
+      tradeableAssets,
+      indicatorAssets,
+      maxWindow
+    )
 
-    expect(ohlcCache.getBars('QQQ')).toEqual([
-      { date: "2024-11-10", close: 200 },
-      { date: "2024-11-11", close: 202 },
-      { date: "2024-11-12", close: 204 },
-      { date: "2024-11-13", close: 206 },
-      { date: "2024-11-14", close: 208 },
-    ])
+    await ohlcCache.load()
 
-    expect(() => ohlcCache.getBars('DIA')).toThrow('Unable to load OHLC bars for ticker: DIA')
+    expect(ohlcCache.getBars('SPY')).toEqual([100, 102, 104, 106, 108])
+    expect(ohlcCache.getBars('QQQ')).toEqual([200, 202, 204, 206, 208])
+
+    try {
+      expect(ohlcCache.getBars('DIA')).toThrow()
+    } catch (e) {
+      expect((e as Error).message).toEqual('Unable to load OHLC bars for ticker: DIA')
+    }
   });
 });

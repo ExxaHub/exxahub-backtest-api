@@ -17,6 +17,7 @@
     "migrate:make": "bun run ./src/commands/migrate-make",
     "migrate:latest": "bun run ./src/commands/migrate-latest",
     "pkg": "bun build ./src/index.ts --outdir ./dist",
+    "sandbox": "bun run ./src/commands/sandbox",
     "update:ticker-bars": "bun run ./src/commands/update-ticker-bars"
   },
   "peerDependencies": {

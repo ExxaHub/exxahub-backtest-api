@@ -60,14 +60,14 @@ export class Rebalancer {
         this.balanceHistory.push(this.portfolioValue)
     }
 
-    rebalance(date: string, newAllocations: Allocations): void {
+    rebalance(index: number, newAllocations: Allocations): void {
         // update portfolio value based on current day's close
-        this.updatePortfolioValue(date)
+        this.updatePortfolioValue(index)
         
         // calculate new share counts based on current portfolio value
         const newHoldings = Object.fromEntries(
             Object.entries(newAllocations).map(([ticker, allocation]) => {
-                const tickerPrice = this.getTickerPriceOnDate(ticker, date)
+                const tickerPrice = this.getTickerPriceAtIndex(ticker, index)
                 const newTickerValue = allocation ? (allocation / 100) * this.portfolioValue : 0;
                 const newShareCount = newTickerValue / tickerPrice
                 return [ticker, {
@@ -131,7 +131,7 @@ export class Rebalancer {
         return newHoldings
     }
 
-    private updatePortfolioValue(date: string): void {
+    private updatePortfolioValue(index: number): void {
         if (Object.keys(this.currentHoldings).length === 0) {
             this.setPortfolioValue(this.initialPortfolioValue)
             return 
@@ -140,18 +140,18 @@ export class Rebalancer {
         let newValue = 0
         for (const [ticker, holding] of Object.entries(this.currentHoldings)) {
             const shares = holding.shares
-            this.currentHoldings[ticker].value = shares * this.getTickerPriceOnDate(ticker, date)
+            this.currentHoldings[ticker].value = shares * this.getTickerPriceAtIndex(ticker, index)
             newValue = newValue + this.currentHoldings[ticker].value
         }
         this.setPortfolioValue(newValue)
     }
 
-    private getTickerPriceOnDate(ticker: string, date: string): number {
-        const bar = this.ohlcCache.getBarForDate(ticker, date)
+    private getTickerPriceAtIndex(ticker: string, index: number): number {
+        const bar = this.ohlcCache.getBarForIndex(ticker, index)
         if (!bar) {
-            console.log(`No bar available for ${ticker} on ${date}`)
+            console.log(`No bar available for ticker: ${ticker} at index:${index}`)
             throw new Error('No bar available to update holdings')
         }
-        return bar.close
+        return bar
     }
 }

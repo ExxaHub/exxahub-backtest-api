@@ -26,7 +26,7 @@ export class PreCalcCache {
   private startingBalance: number
   private loaded: boolean = false
 
-  private cachedPreCalcs: Map<string, Map<string, number>> = new Map<string, Map<string, number>>()
+  private cachedPreCalcs: Map<string, number[]> = new Map<string, number[]>()
 
   constructor(
     ohlcCache: OhlcCache, 
@@ -51,7 +51,7 @@ export class PreCalcCache {
       const dailyReturns = this.calculateReturns(preCalc.node)
       const preCalcFn = this.getPreCalcFunction(preCalc.fn)
       const calculatedPreCalc = await preCalcFn(dailyReturns, preCalc.params)
-      this.cachedPreCalcs.set(preCalc.node.id, new Map(Object.entries(calculatedPreCalc)))
+      this.cachedPreCalcs.set(preCalc.node.id, calculatedPreCalc)
     })
 
     await Promise.all(loadPromises)
@@ -63,7 +63,7 @@ export class PreCalcCache {
     return this.loaded
   }
 
-  getPreCalcForNodeId(nodeId: string): Map<string, number> {
+  getPreCalcForNodeId(nodeId: string): number[] {
     const preCalc = this.cachedPreCalcs.get(nodeId)
 
     if (!preCalc) {
@@ -76,16 +76,17 @@ export class PreCalcCache {
   private calculateReturns(node: TradingBotNode): DailyReturn[] {
     const interpreter = new Interpreter(this.indicatorCache, this, this.tradeableAssets)
     const rebalancer = new Rebalancer(this.ohlcCache, this.startingBalance)
+    const maxLength = this.ohlcCache.getMaxLength()
 
     let currentDate = this.fromDate.clone()
     const allocationResults: AllocationResult[] = []
 
-    while (currentDate <= this.toDate) {
+    for (let idx = 0; idx < maxLength; idx++) {
         // Calculate allocations for date
         const allocations = interpreter.evaluate(
             node as TradingBotNode, 
             this.indicatorCache, 
-            currentDate
+            idx
         )
         
         rebalancer.rebalance(currentDate.format('YYYY-MM-DD'), allocations)
@@ -95,12 +96,6 @@ export class PreCalcCache {
             tickers: allocations,
             value: rebalancer.getBalance()
         })
-
-        if (currentDate.isSame(this.toDate)) {
-            break
-        }
-
-        currentDate = this.getNextMarketDate(currentDate)
     }
 
     return this.calculateDailyReturns(allocationResults);
@@ -121,18 +116,6 @@ export class PreCalcCache {
       default:
         throw new Error(`Unknown preCalc function: ${fn}`)
     }
-  }
-
-  private getNextMarketDate(date: Dayjs): Dayjs {
-    if (!this.ohlcCache) {
-        throw new Error('ohlcCache not loaded.')
-    }
-
-    do {
-        date = date.add(1, 'day')
-    } while (!this.ohlcCache.hasBarsForDate(date))
-
-    return date
   }
 
   private calculateDailyReturns(allocationResults: AllocationResult[]): DailyReturn[] {

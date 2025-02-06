@@ -6,6 +6,9 @@ type Params = {}
 // TODO: Figure out a way to inject this client to use different data providers
 const alpacaClient = new AlpacaStockClient()
 
-export const currentPrice = async (ticker: string, params: Params, bars: OHLCBar[]): Promise<Record<string, number>> => {
-    return await alpacaClient.getCurrentPriceForSymbol(ticker)
+export const currentPrice = async (ticker: string, params: Params, closes: number[]): Promise<number[]> => {
+    // const result = await alpacaClient.getCurrentPriceForSymbol(ticker)
+    // return [result[ticker]]
+
+    return closes
 }

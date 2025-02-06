@@ -1,51 +1,34 @@
-export type OHLCBar = {
-    close: number;
-    high: number;
-    low: number;
-    open: number;
-    date: string;
-    volume: number;
-    [key: string]: unknown;
-}
-
 type Params = { 
-    window: number 
-}
+    window: number; 
+};
 
-export const maxDrawdown = (ticker: string, params: Params, bars: OHLCBar[]): Record<string, number> => {
+export const maxDrawdown = (ticker: string, params: Params, closes: number[]): number[] => {
     const { window } = params;
 
     if (window < 1) {
         throw new Error('Window size must be greater than zero');
     }
 
-    if (bars.length < window) {
+    if (closes.length < window) {
         throw new Error(`Not enough data to calculate max drawdown for a window of ${window}.`);
     }
 
-    // Extract the most recent `window` bars
-    const recentBars = bars.slice(-window);
-
-    const indicator: Record<string, number> = {}
+    const drawdowns: number[] = [];
     let peak = Number.NEGATIVE_INFINITY;
     let maxDrawdown = 0;
 
-    for (const bar of recentBars) {
-        // Update the peak if the current close price is higher
-        if (bar.close > peak) {
-            peak = bar.close;
+    for (let i = 0; i < closes.length; i++) {
+        if (closes[i] > peak) {
+            peak = closes[i];
         }
 
-        // Calculate drawdown as a percentage
-        const drawdown = ((peak - bar.close) / peak) * 100;
+        const drawdown = ((peak - closes[i]) / peak) * 100;
+        maxDrawdown = Math.max(maxDrawdown, drawdown);
 
-        // Update the max drawdown
-        if (drawdown > maxDrawdown) {
-            maxDrawdown = drawdown;
+        if (i >= window - 1) {
+            drawdowns.push(maxDrawdown);
         }
-
-        indicator[bar.date] = maxDrawdown
     }
 
-    return indicator
-}
+    return drawdowns;
+};

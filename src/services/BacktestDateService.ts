@@ -18,7 +18,7 @@ export class BacktestDateService {
         indicatorAssets: string[], 
         largestIndicatorWindow: number, 
         largestPreCalcWindow: number
-    ): Promise<{ indicatorStartDate: number, tradeableStartDate: number, tradeableEndDate: number }> {
+    ): Promise<{ indicatorStartDate: number, tradeableStartDate: number, tradeableEndDate: number, maxWindow: number }> {
         const today = dayjs()
         let backtestStartDate = dayjs(btStartDate)
         let backtestEndDate = dayjs(btEndDate)
@@ -56,16 +56,19 @@ export class BacktestDateService {
         const tradeableStartDate = Math.max(minTradeableStartDate, minIndicatorStartDate, backtestStartDate.unix())
         const tradeableEndDate = Math.min(maxTradeableEndDate, maxIndicatorEndDate, backtestEndDate.unix())
 
+        const maxWindow = largestIndicatorWindow + largestPreCalcWindow
+
         // And find the date that we need to start calculating indicators ahead of the backtest start date
         const indicatorStartDate = await this.marketCalendarRepository.getMarketCalendarDateFromOffset(
             tradeableStartDate, 
-            largestIndicatorWindow + largestPreCalcWindow
+            maxWindow
         )
 
         return {
             indicatorStartDate,
             tradeableStartDate,
-            tradeableEndDate
+            tradeableEndDate,
+            maxWindow
         }
     }
 }

@@ -24,7 +24,7 @@ export type Allocations = {
 export class Interpreter {
   private indicatorCache: IndicatorCache
   private preCalcCache: PreCalcCache
-  private date: string
+  private index: number
   private tradeableAssets: string[]
   private indicatorValueCache: Map<string, number>
 
@@ -32,13 +32,13 @@ export class Interpreter {
     this.indicatorCache = indicatorCache
     this.preCalcCache = preCalcCache
     this.tradeableAssets = tradeableAssets
-    this.date = dayjs().format('YYYY-MM-DD')
+    this.index = -1
     this.indicatorValueCache = new Map()
   }
 
-  evaluate(algorithm: TradingBotNode, indicatorCache: IndicatorCache, date?: Dayjs): Allocations {
+  evaluate(algorithm: TradingBotNode, indicatorCache: IndicatorCache, index?: number): Allocations {
     this.indicatorCache = indicatorCache
-    this.date = date ? date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+    this.index = index ?? -1
     this.indicatorValueCache.clear()
     const rawAllocations = this.evaluateNode(algorithm)
     return this.combineAllocationsByAsset(rawAllocations as AllocationAsset[])
@@ -176,17 +176,17 @@ export class Interpreter {
   }
   
   private getIndicatorValue(ticker: string, fn: string, params: Record<string, any> = {}): number {
-    const cacheKey = `${ticker}-${fn}-${JSON.stringify(params)}-${this.date}`
+    const cacheKey = `${ticker}-${fn}-${JSON.stringify(params)}-${this.index}`
     if (this.indicatorValueCache.has(cacheKey)) {
       return this.indicatorValueCache.get(cacheKey)!
     }
-    const value = this.indicatorCache.getIndicatorValue(ticker, fn, params, this.date)
+    const value = this.indicatorCache.getIndicatorValue(ticker, fn, params, this.index)
     this.indicatorValueCache.set(cacheKey, value)
     return value
   }
 
   private getPreCalcValue(nodeId: string): number {
-    return this.preCalcCache.getPreCalcForNodeId(nodeId).get(this.date)!
+    return this.preCalcCache.getPreCalcForNodeId(nodeId)[this.index]
   }
   
   private compare(lhs: number, rhs: number, comparator: string): boolean {

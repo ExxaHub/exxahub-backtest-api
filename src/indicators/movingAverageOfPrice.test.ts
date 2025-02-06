@@ -13,35 +13,42 @@ describe("movingAverageOfPrice", () => {
     { date: "2024-11-18", open: 100, high: 105, low: 95, close: 104, volume: 10 },
   ];
 
+  const closes = bars.map((bar) => bar.close);
+
   it("should calculate the correct moving average for a valid period", () => {
     const params = { window: 3 };
-    const result = movingAverageOfPrice("TEST", params, bars);
+    const result = movingAverageOfPrice("TEST", params, closes);
 
-    expect(result).toEqual({
-      "2024-11-13": 104,
-      "2024-11-14": 106,
-      "2024-11-17": 106.67,
-      "2024-11-18": 106,
-    });
+    expect(result).toEqual([
+      102, 
+      104, 
+      106, 
+      106.67, 
+      106
+    ]);
   });
 
   it("should return an empty object if the period is larger than the number of bars", () => {
     const params = { window: 8 }; // Period > number of bars
 
-    expect(() => movingAverageOfPrice("TEST", params, bars)).toThrow(`Not enough data to calculate for window size`);
+    expect(() => movingAverageOfPrice("TEST", params, closes)).toThrow(`Not enough data to calculate for window size`);
   });
 
   it("should throw an error for a window size of 0 or less", () => {
     const invalidParams = { window: 0 };
 
-    expect(() => movingAverageOfPrice("TEST", invalidParams, bars)).toThrow(
+    expect(() => movingAverageOfPrice("TEST", invalidParams, closes)).toThrow(
       "Window size must be greater than zero"
     );
   });
 
   it("should handle edge case with exactly `window` bars", () => {
     const params = { window: 7 }; // Period == number of bars
-    expect(() => movingAverageOfPrice("TEST", params, bars)).toThrow(`Not enough data to calculate for window size`);
+    const result = movingAverageOfPrice("TEST", params, closes);
+
+    expect(result).toEqual([
+      104.29
+    ]);
   });
 
   it("should return an empty object for an empty bars array", () => {
