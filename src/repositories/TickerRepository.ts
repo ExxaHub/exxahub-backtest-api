@@ -18,7 +18,7 @@ export class TickerRepository {
     }
 
     async getAll(): Promise<Ticker[]> {
-        return db<Ticker>(table).select(['ticker', 'name', 'asset_type'])
+        return db<Ticker>(table).select('*')
     }
 
     async getMaxAndMinDateForTickers(tickers: string[]): Promise<{ minDate: number, maxDate: number }> {
@@ -30,5 +30,13 @@ export class TickerRepository {
             minDate: results[0].min,
             maxDate: results[0].max
         }
+    }
+
+    async updateEndDate(ticker: string, endDate: string): Promise<Ticker> {
+        const result = await db<Ticker>(table)
+            .where('ticker', ticker)
+            .update({ end_date: endDate })
+            .returning('*')
+        return result[0]
     }
 }

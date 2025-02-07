@@ -11,4 +11,8 @@ export class MarketCalendarService {
     async insert(attributes: MarketCalendar): Promise<MarketCalendar> {
         return this.marketCalendarRepository.insert(attributes)
     }
+
+    async marketIsOpenOnDate(date: string): Promise<boolean> {
+        return this.marketCalendarRepository.marketIsOpenOnDate(date)
+    }
 }
