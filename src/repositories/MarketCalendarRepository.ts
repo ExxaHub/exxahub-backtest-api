@@ -25,4 +25,13 @@ export class MarketCalendarRepository {
             .limit(1)
         return result[0].ts
     }
+
+    async marketIsOpenOnDate(date: string): Promise<boolean> {
+        const result = await db<MarketCalendar>(table)
+            .select('*')
+            .where('date', date)
+            .first()
+
+        return result !== undefined
+    }
 }

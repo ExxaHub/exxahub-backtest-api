@@ -1,0 +1,1 @@
+*/1 * * * * sh -c 'cd /usr/src/app && /usr/local/bin/bun ./src/cron/index.ts' >> /proc/1/fd/1 2>&1

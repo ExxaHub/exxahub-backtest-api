@@ -20,5 +20,6 @@ export const db = knex({
       password: credentials.DB_PASS,
       database: credentials.DB_NAME,
     },
+    debug: false,
     log: console
 });

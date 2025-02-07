@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   exxahub_backtest_api:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: exxahub_backtest_api
     ports:
       - "3000:3000"
@@ -14,8 +16,23 @@ services:
       - .:/usr/src/app
     command: ["bun", "run", "./src/api/index.ts", "--watch", "./src/"]
 
+  exxahub_backtest_cron:
+    build: 
+      context: .
+      dockerfile: Dockerfile.cron
+    container_name: exxahub_backtest_cron
+    networks:
+      - exxahub_network
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    restart: unless-stopped
+
   exxahub_backtest_migrations:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: exxahub_backtest_migrations
     depends_on:
       exxahub_backtest_db:

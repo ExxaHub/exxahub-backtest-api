@@ -37,11 +37,15 @@ export class OhlcCache {
     const indicatorBars = await this.getTickerBars(this.indicatorAssets, this.indicatorStartDate, this.tradeableEndDate)
     const tradeableBars = await this.getTickerBars(this.tradeableAssets, this.tradeableStartDate, this.tradeableEndDate)
     
-    this.dates = await this.ohlcBarService.getDates(this.indicatorAssets[0], this.indicatorStartDate, this.tradeableEndDate)
+    this.dates = await this.ohlcBarService.getDates(
+      this.indicatorAssets[0] ?? this.tradeableAssets[0], // If not indicators, fallback to tradable asset 
+      this.indicatorStartDate, 
+      this.tradeableEndDate
+    )
 
     for (const [ticker, closeBars] of Object.entries(indicatorBars)) {
       this.cachedOhlcBars.set(ticker, closeBars)
-      this.maxLength = closeBars.length
+      this.maxLength = Math.max(this.maxLength, closeBars.length)
     }
 
     const indicatorWindowBuffer: null[] = new Array(this.maxWindow).fill(null);
@@ -52,6 +56,8 @@ export class OhlcCache {
       if (!this.cachedOhlcBars.has(ticker)) {
         this.cachedOhlcBars.set(ticker, [...indicatorWindowBuffer, ...closeBars])
       }
+
+      this.maxLength = Math.max(this.maxLength, closeBars.length)
     }
 
     this.loaded = true
