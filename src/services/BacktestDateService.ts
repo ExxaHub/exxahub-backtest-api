@@ -47,11 +47,16 @@ export class BacktestDateService {
         const minTradeableStartDate = tradeabledates.minDate
         const maxTradeableEndDate = tradeabledates.maxDate
 
-        // Get start and end dates for indicator tickers
-        const indicatorDates = await this.tickerRepository.getMaxAndMinDateForTickers(indicatorAssets)
-        const minIndicatorStartDate = indicatorDates.minDate
-        const maxIndicatorEndDate = indicatorDates.maxDate
+        let minIndicatorStartDate = backtestStartDate.unix()
+        let maxIndicatorEndDate = backtestEndDate.unix()
 
+        if (indicatorAssets.length > 0) {
+            // Get start and end dates for indicator tickers
+            const indicatorDates = await this.tickerRepository.getMaxAndMinDateForTickers(indicatorAssets)
+            minIndicatorStartDate = indicatorDates.minDate
+            maxIndicatorEndDate = indicatorDates.maxDate
+        }
+        
         // Then take Max start date from both of those queries and the backtest start date
         const tradeableStartDate = Math.max(minTradeableStartDate, minIndicatorStartDate, backtestStartDate.unix())
         const tradeableEndDate = Math.min(maxTradeableEndDate, maxIndicatorEndDate, backtestEndDate.unix())
@@ -65,9 +70,9 @@ export class BacktestDateService {
         )
 
         return {
-            indicatorStartDate,
-            tradeableStartDate,
-            tradeableEndDate,
+            indicatorStartDate: Number(indicatorStartDate),
+            tradeableStartDate: Number(tradeableStartDate),
+            tradeableEndDate: Number(tradeableEndDate),
             maxWindow
         }
     }

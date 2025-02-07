@@ -32,6 +32,14 @@ export class OhlcBarRepository {
     }
 
     async bulkInsert(ticker: string, bars: OHLCBar[]): Promise<boolean> {
+        function chunkArray(array: OHLCBar[], chunkSize: number) {
+            let chunks = [];
+            for (let i = 0; i < array.length; i += chunkSize) {
+                chunks.push(array.slice(i, i + chunkSize));
+            }
+            return chunks;
+        }
+
         try { 
             const barsToSave = bars.map(bar => {
                 return {
@@ -47,9 +55,16 @@ export class OhlcBarRepository {
             })
 
             console.log('bulk inserting', barsToSave.length, 'bars')
-            
-            await db.batchInsert(table, barsToSave, 1000)
 
+            const chunks = chunkArray(barsToSave, 1000)
+
+            for (const chunk of chunks) {
+                await db(table)
+                    .insert(chunk)
+                    .onConflict(['symbol', 'ts'])
+                    .merge();
+            }
+            
             return true
         } catch (error) {
             console.error('Error saving bars:', error)
