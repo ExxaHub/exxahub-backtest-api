@@ -28,15 +28,14 @@ export class FetchLatestBars {
     }
 
     /**
-     *  5   - Minute (at the 5th minute)
+     *  30  - Minute (at the 30th minute)
      *  16  - Hour (4 PM in 24-hour format)
      *  *   - Day of the month (every day)
      *  *   - Month (every month)
      *  1-5 - Day of the week (1 = Monday, 5 = Friday)
      */
     schedule(): string {
-        return '* * * * 1-5'
-        // return '5 16 * * 1-5'
+        return '30 16 * * 1-5'
     }
 
     timezone(): string {
