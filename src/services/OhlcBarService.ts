@@ -29,4 +29,8 @@ export class OhlcBarService {
     async getDates(ticker: string, fromDate: number, toDate: number): Promise<number[]> {
         return this.ohlcBarRepository.getDates(ticker, fromDate, toDate)
     }
+
+    async findMissingBars(ticker: string, fromDate: string, toDate: string): Promise<string[]> {
+        return this.ohlcBarRepository.findMissingBars(ticker, fromDate, toDate)
+    }
 }

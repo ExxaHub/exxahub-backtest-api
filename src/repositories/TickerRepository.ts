@@ -21,6 +21,13 @@ export class TickerRepository {
         return db<Ticker>(table).select('*')
     }
 
+    async getTicker(ticker: string): Promise<Ticker | undefined> {
+        return db<Ticker>(table)
+            .select('*')
+            .where('ticker', ticker)
+            .first()
+    }
+
     async getMaxAndMinDateForTickers(tickers: string[]): Promise<{ minDate: number, maxDate: number }> {
         const results = await db(table)
             .select(db.raw('max(start_ts) as min'))
@@ -35,7 +42,10 @@ export class TickerRepository {
     async updateEndDate(ticker: string, endDate: string): Promise<Ticker> {
         const result = await db<Ticker>(table)
             .where('ticker', ticker)
-            .update({ end_date: endDate })
+            .update({ 
+                end_date: endDate,
+                end_ts: dayjs(endDate).unix()
+            })
             .returning('*')
         return result[0]
     }

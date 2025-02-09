@@ -13,9 +13,12 @@
     "backfill:tickers": "bun run ./src/commands/backfill-tickers",
     "backfill:ticker-bars": "bun run ./src/commands/backfill-ticker-bars",
     "dev": "bun --watch run ./src/api/index.ts",
+    "fix:insert-bars": "bun run ./src/commands/fix-insert-bars",
+    "fix:find-missing-bars": "bun run ./src/commands/fix-find-missing-bars",
     "generate:dbcreds": "bun run ./src/commands/generate-db-password",
     "migrate:make": "bun run ./src/commands/migrate-make",
     "migrate:latest": "bun run ./src/commands/migrate-latest",
+    "migrate:rollback": "bun run ./src/commands/migrate-rollback",
     "pkg": "bun build ./src/index.ts --outdir ./dist",
     "sandbox": "bun run ./src/commands/sandbox",
     "update:ticker-bars": "bun run ./src/commands/update-ticker-bars"

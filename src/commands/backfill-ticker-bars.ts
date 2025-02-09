@@ -7,27 +7,38 @@ const tiingoClient = new TiingoClient();
 const ohlcBarService = new OhlcBarService();
 const tickerService = new TickerService();
 
-let tickers = [];
+// const ticker = process.argv[2];
 
-const ticker = process.argv[2];
+// if (ticker) {
+//     tickers.push(...ticker.split(','));
+// } else {
+//     tickers = (await tickerService.getAll()).map(ticker => ticker.ticker)
+// }
 
-if (ticker) {
-    tickers.push(ticker);
-} else {
-    tickers = (await tickerService.getAll()).map(ticker => ticker.ticker)
-}
+// Read a text file with one ticker per line into an array of tickers
+const tickers = require('fs').readFileSync('tickers.txt', 'utf-8').split(/\r?\n/);
 
 const backfillTicker = async (ticker: string) => {
+    // sleep for 1 second to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 250));
+
     const { minDate } = await tickerService.getMaxAndMinDateForTickers([ticker]);
     const minDateFormatted = dayjs.unix(minDate).format('YYYY-MM-DD');
+    const maxDateFormatted = dayjs().format('YYYY-MM-DD');
+
+    console.log(`Backfilling ${ticker} from ${minDateFormatted} to ${maxDateFormatted}`);
     
-    console.log(`Fetching ticker bars for ${ticker} from ${minDateFormatted} to today`);
-    const resp = await tiingoClient.getBarsForSymbol(ticker, minDateFormatted);
-    const result = await ohlcBarService.bulkInsert(ticker, resp.bars);
-    console.log(`Backfilled ticker bars for ${ticker}`);
+    const resp = await tiingoClient.getBarsForSymbol(ticker, minDateFormatted, maxDateFormatted);
+
+    await ohlcBarService.bulkInsert(ticker, resp.bars);
+    await tickerService.updateEndDate(ticker, maxDateFormatted);
+    
+    console.log(`Backfilled ${ticker} with ${resp.bars.length} bars`);
 }
 
-await Promise.all(tickers.map(ticker => backfillTicker(ticker)));
+for (const ticker of tickers) {
+    await backfillTicker(ticker)
+}
 
 console.log('Backfill complete');
 

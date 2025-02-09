@@ -71,6 +71,15 @@ export class Backtester {
         const startDate = dayjs.unix(tradeableStartDate)
         const endDate = dayjs.unix(tradeableEndDate)
 
+        console.log({
+            indicatorStartDate,
+            tradeableStartDate,
+            tradeableEndDate,
+            tradeableAssets, 
+            indicatorAssets,
+            maxWindow
+        })
+
         this.ohlcCache = new OhlcCache(
             indicatorStartDate,
             tradeableStartDate,
@@ -80,6 +89,8 @@ export class Backtester {
             maxWindow
         )
         await this.ohlcCache.load()
+
+        this.ohlcCache.getTickers().map(ticker => console.log(ticker, this.ohlcCache?.getBars(ticker).length))
         
         const maxLength = this.ohlcCache.getMaxLength()
         const dates = this.ohlcCache.getDates()

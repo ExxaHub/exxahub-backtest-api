@@ -30,6 +30,9 @@ const readCSV = async (filePath: string): Promise<any[]> => {
 }
 
 const insertTicker = async (ticker: Ticker) => {
+    // sleep for 1 second to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     const metadata = await tiingoClient.getTickerMetadata(ticker.ticker);
     const inserted = await tickerService.insert({
         ticker: ticker.ticker,
