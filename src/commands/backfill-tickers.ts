@@ -107,6 +107,10 @@ const run = async () => {
             return false;
         }
 
+        if (row.ticker.length >= 5) {
+            return false;
+        }
+
         return true
     });
   
